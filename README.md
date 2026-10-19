@@ -18,22 +18,18 @@ La portada se arma sola con los datos de `datos.js`; no hay que editarla.
 | `favicon.png`, `icono-192.png` | No | Ícono de la pestaña del navegador |
 | `apple-touch-icon.png` | No | Ícono cuando guardan el sitio en la pantalla del celular |
 | `compartir.png` | No | Imagen que aparece al compartir el enlace por WhatsApp o Facebook |
+| `manifest.webmanifest` | No | Permite instalar el sitio como app en el celular |
+| `sw.js` | No | Guarda una copia para que funcione sin internet |
+| `icono-512.png` | No | Ícono grande de la app instalada |
 | `.nojekyll` | No | Hace que GitHub Pages publique los archivos tal cual |
 | `.gitignore` | No | Evita subir archivos basura del sistema |
-
----|---|---|
-| `datos.js` | **Sí, cada semana** | Escuelas, resultados, sanciones y playoffs |
-| `index.html` | Rara vez | Estructura y texto del reglamento |
-| `estilos.css` | No | Colores y diseño |
-| `app.js` | No | Calcula las tablas, las llaves y el campeón |
-| `.nojekyll` | No | Hace que GitHub Pages publique los archivos tal cual |
 
 ---
 
 ## Publicar en GitHub Pages (solo la primera vez)
 1. Crea una cuenta en github.com y presiona **New repository**. Ponle un nombre, por ejemplo `torneo-reddfut`, márcalo como **Public** y crea el repositorio.
 2. Presiona **Add file → Upload files** y selecciona **todos los archivos** de la carpeta `torneo-reddfut`. Todos están al mismo nivel, sin subcarpetas, así que puedes elegirlos juntos o subirlos uno por uno:
-   `index.html`, `datos.js`, `app.js`, `estilos.css`, `404.html`, `README.md`, `logo.png`, `favicon.png`, `icono-192.png`, `apple-touch-icon.png`, `compartir.png`.
+   `index.html`, `datos.js`, `app.js`, `estilos.css`, `404.html`, `README.md`, `logo.png`, `favicon.png`, `icono-192.png`, `icono-512.png`, `apple-touch-icon.png`, `compartir.png`, `manifest.webmanifest`, `sw.js`.
    - `.nojekyll` y `.gitignore` son archivos ocultos y **opcionales**. Si tu computadora no los muestra, no pasa nada: el sitio funciona igual.
 3. Presiona **Commit changes**.
 4. Entra a **Settings → Pages**. En *Branch* elige `main` y la carpeta `/ (root)`, y presiona **Save**.
@@ -85,6 +81,14 @@ Los cruces se arman solos con la tabla final:
 
 Solo anota los marcadores, por ejemplo `"Sub-13": { C1: "2-0", C2: "1-1 (5-4)" }`.
 Si la REDDFUT define otro cruce, puedes forzarlo: `C1: { local: "...", visitante: "...", resultado: "2-0" }`.
+
+## Usarlo sin internet
+- **Celular (Android o iPhone):** abre el sitio una vez con internet.
+  - En Android aparece el botón **"📲 Instalar en tu celular"** en la portada.
+  - En iPhone: en Safari toca **Compartir** y luego **"Agregar a pantalla de inicio"**.
+  - Después se abre desde el ícono, aunque no haya internet. Cuando vuelva a haber conexión, se actualiza solo.
+- **Computadora:** también se puede instalar desde Chrome o Edge, con el ícono de instalar de la barra de direcciones.
+- **Archivo único:** también existe la versión `Torneo_REDDFUT_sin_internet.html`, para abrir con doble clic o enviar por WhatsApp. Ese archivo no se sube a GitHub.
 
 ## Enlaces para compartir
 Cada vista tiene su propio enlace, por ejemplo: `.../#/inicio`, `.../#/posiciones/sub-13` o `.../#/resultados/sub-9/2`.

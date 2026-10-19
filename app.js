@@ -448,6 +448,7 @@
         <div class="hero-botones">
           <button class="btn-primario" data-ir="posiciones">Ver tabla de posiciones</button>
           <button class="btn-secundario" data-ir="resultados">Últimos resultados</button>
+          ${instalarHTML()}
         </div>
       </section>
 
@@ -550,6 +551,44 @@
     }
   });
 
+  /* ------------------------------------------------------------------ */
+  /* Sin internet: archivo único (MODO_OFFLINE) o app instalada (sw.js) */
+  /* ------------------------------------------------------------------ */
+  let promptInstalar = null;
+  const esArchivoLocal = !!window.MODO_OFFLINE || location.protocol === "file:";
+  const esIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const yaInstalada = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+
+  function instalarHTML() {
+    if (esArchivoLocal || yaInstalada) return "";
+    if (promptInstalar || esIOS) return `<button class="btn-secundario" id="btn-instalar">📲 Instalar en tu celular</button>`;
+    return "";
+  }
+
+  if (!esArchivoLocal && "serviceWorker" in navigator) {
+    window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+  }
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    promptInstalar = e;
+    if (estado.tab === "inicio") render();
+  });
+  document.addEventListener("click", async (e) => {
+    if (!e.target.closest("#btn-instalar")) return;
+    if (promptInstalar) {
+      promptInstalar.prompt();
+      try { await promptInstalar.userChoice; } catch (err) { /* nada */ }
+      promptInstalar = null;
+      render();
+    } else if (esIOS) {
+      alert("Para instalarlo en tu iPhone:\n\n1. Toca el botón Compartir (el cuadro con la flecha hacia arriba).\n2. Elige \"Agregar a pantalla de inicio\".\n3. Toca \"Agregar\".\n\nDespués podrás abrirlo desde tu pantalla, incluso sin internet.");
+    }
+  });
+
   renderCabecera();
+  if (esArchivoLocal && T.actualizado) {
+    document.getElementById("pie-act").textContent =
+      "Versión sin internet · datos al " + fecha(T.actualizado, { day: "numeric", month: "long", year: "numeric" });
+  }
   render();
 })();
