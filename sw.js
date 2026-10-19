@@ -1,7 +1,7 @@
 /* Permite usar el sitio sin internet después de abrirlo una vez.
    Con internet siempre muestra la versión más reciente; sin internet usa la copia guardada.
    Si agregas archivos nuevos, súbele el número a VERSION. */
-const VERSION = "reddfut-v1";
+const VERSION = "reddfut-v2";
 const ARCHIVOS = [
   "./", "index.html", "estilos.css", "app.js", "datos.js", "manifest.webmanifest",
   "logo.png", "favicon.png", "icono-192.png", "icono-512.png", "apple-touch-icon.png"

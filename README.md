@@ -82,6 +82,17 @@ Los cruces se arman solos con la tabla final:
 Solo anota los marcadores, por ejemplo `"Sub-13": { C1: "2-0", C2: "1-1 (5-4)" }`.
 Si la REDDFUT define otro cruce, puedes forzarlo: `C1: { local: "...", visitante: "...", resultado: "2-0" }`.
 
+## Anuncios
+
+Al final de cada sección (Inicio, Posiciones, Resultados, Playoffs y Reglamento) aparecen dos tarjetas marcadas como "Anuncio": **Retro Football Manager SV** y el **portafolio de Christopher Alejo**. Siempre van al final del contenido: no flotan, no tapan nada y no se abren solas. Al tocarlas se abren en una pestaña nueva.
+
+Para cambiarlas, edita la sección `anuncios:` de `datos.js`:
+
+- **Cambiar textos o enlace:** edita `marca`, `titulo`, `texto`, `boton` o `url`.
+- **Quitar un anuncio:** borra su bloque `{ ... }` completo, incluida la coma.
+- **Agregar otro:** copia un bloque y cambia sus datos. `estilo` puede ser `"retro"` (fondo oscuro) o `"claro"` (fondo blanco).
+- **Quitarlos todos:** deja la lista vacía: `anuncios: [],`
+
 ## Usarlo sin internet
 - **Celular (Android o iPhone):** abre el sitio una vez con internet.
   - En Android aparece el botón **"📲 Instalar en tu celular"** en la portada.

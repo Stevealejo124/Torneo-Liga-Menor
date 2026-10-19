@@ -345,3 +345,41 @@ table.tabla { width: 100%; border-collapse: collapse; font-size: .92rem; }
 @media (max-width: 480px) {
   .tabs button { font-size: .72rem; padding: 9px 1px; letter-spacing: -.01em; }
 }
+
+/* ---------- Anuncios (al final de cada sección) ---------- */
+.anuncios { display: grid; gap: 14px; margin: 34px 0 6px; padding-top: 22px; border-top: 1px solid var(--borde); }
+@media (min-width: 760px) { .anuncios { grid-template-columns: 1fr 1fr; } }
+.anuncio { position: relative; display: flex; gap: 14px; align-items: flex-start; padding: 18px 18px 16px; border-radius: var(--radio);
+  text-decoration: none; color: inherit; box-shadow: var(--sombra); transition: transform .15s ease, box-shadow .15s ease; overflow: hidden; }
+.anuncio:hover { transform: translateY(-2px); box-shadow: 0 2px 4px rgba(11,37,69,.08), 0 10px 24px rgba(11,37,69,.12); }
+.anuncio:focus-visible { outline: 3px solid var(--oro); outline-offset: 2px; }
+.anuncio-tag { position: absolute; top: 9px; right: 12px; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .6; }
+.anuncio-ico { flex: 0 0 auto; width: 58px; height: 58px; border-radius: 12px; display: grid; place-items: center; }
+.anuncio-cuerpo { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.anuncio-marca { font-size: 12px; font-weight: 700; letter-spacing: .03em; padding-right: 64px; }
+.anuncio-tit { font-size: 18px; line-height: 1.2; }
+.anuncio-txt { font-size: 14px; line-height: 1.45; opacity: .88; }
+.anuncio-btn { align-self: flex-start; margin-top: 8px; font-size: 14px; font-weight: 800; padding: 7px 14px; border-radius: 999px; }
+
+.anuncio-retro { color: #fff; background:
+  repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 28px, transparent 28px 56px),
+  linear-gradient(135deg, #0a3d24 0%, #0b2545 100%); }
+.anuncio-retro .anuncio-ico { background: #0b6e3f; box-shadow: inset 0 0 0 3px rgba(255,255,255,.15); }
+.anuncio-retro .anuncio-marca { color: var(--oro); font-family: ui-monospace, "Courier New", monospace; text-transform: uppercase; letter-spacing: .06em; }
+.anuncio-retro .anuncio-tit { font-family: ui-monospace, "Courier New", monospace; text-transform: uppercase; letter-spacing: .02em; }
+.anuncio-retro .anuncio-btn { background: var(--oro); color: var(--azul); }
+
+.anuncio-claro { background: var(--blanco); border: 1px solid var(--borde); }
+.anuncio-claro .anuncio-ico { background: #eef2f8; color: var(--azul); }
+.anuncio-claro .anuncio-marca { color: var(--verde); }
+.anuncio-claro .anuncio-tit { color: var(--azul); }
+.anuncio-claro .anuncio-btn { background: var(--azul); color: #fff; }
+
+@media (max-width: 480px) {
+  .anuncio { padding: 16px 14px 14px; gap: 12px; }
+  .anuncio-ico { width: 48px; height: 48px; }
+  .anuncio-ico svg { width: 34px; height: 34px; }
+  .anuncio-tit { font-size: 16.5px; }
+  .anuncio-txt { font-size: 13.5px; }
+}
+@media (prefers-reduced-motion: reduce) { .anuncio { transition: none; } .anuncio:hover { transform: none; } }

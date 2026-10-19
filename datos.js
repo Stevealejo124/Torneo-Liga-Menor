@@ -97,6 +97,28 @@ window.TORNEO = {
   // categoria puede ser "Todas".
   ajustes: [],
 
+  // ---- ANUNCIOS: aparecen al final de cada sección, sin tapar nada.
+  // Para quitar uno, borra su bloque { ... }. Para cambiar textos o enlace,
+  // edita aquí. "estilo" puede ser "retro" (oscuro) o "claro".
+  anuncios: [
+    {
+      estilo: "retro",
+      marca: "Retro Football Manager SV",
+      titulo: "¿Te creés DT?",
+      texto: "Elegí un club de la liga salvadoreña, armá la plantilla, fichá en el mercado de pases y peleá el ascenso. Gratis y desde el navegador.",
+      boton: "Jugar gratis",
+      url: "https://7320256-arch.github.io/Retro-Football-Manager-SV/"
+    },
+    {
+      estilo: "claro",
+      marca: "Christopher Alejo · Jiquilisco, Usulután",
+      titulo: "Herramientas digitales para tu negocio",
+      texto: "Menús digitales con pedidos por WhatsApp, marcadores deportivos para torneos y sitios web sencillos. Sin instalar nada.",
+      boton: "Ver proyectos",
+      url: "https://7320256-arch.github.io/Portafolio-/"
+    }
+  ],
+
   // ---- PLAYOFFS: se llenan al terminar la liga. Los cruces se arman SOLOS
   // con la tabla (C1: 1º vs 8º, C2: 4º vs 5º, C3: 2º vs 7º, C4: 3º vs 6º;
   // S1: ganador C1 vs ganador C2; S2: ganador C3 vs ganador C4; F: Final).
