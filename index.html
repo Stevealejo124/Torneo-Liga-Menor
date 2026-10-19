@@ -21,35 +21,43 @@
   <meta property="og:description" content="Resultados, tabla de posiciones y playoffs: Sub-7, Sub-9, Sub-11, Sub-13 y Sub-15.">
   <meta property="og:image" content="compartir.png">
   <meta name="twitter:card" content="summary_large_image">
+  <link rel="preload" href="letra-800.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
   <header class="cabecera">
     <div class="contenedor cabecera-inner">
       <div class="logo">
-        <img src="logo.png" alt="Logo REDDFUT Usulután" width="85" height="96">
+        <img src="logo.png" alt="Logo REDDFUT Usulután" width="92" height="104">
       </div>
       <div class="titulos">
         <p class="org" id="org">REDDFUT Usulután</p>
         <h1 id="nombre-torneo">Torneo Apertura Liga Menor 2026-2027</h1>
-        <p class="sub" id="subtitulo"></p>
       </div>
     </div>
-    <div class="contenedor progreso" id="progreso"></div>
+    <div class="franja">
+      <div class="contenedor franja-inner" id="progreso"></div>
+    </div>
   </header>
 
   <div id="avisos" class="contenedor"></div>
 
   <nav class="barra" aria-label="Secciones">
-    <div class="contenedor">
-      <div class="tabs" role="tablist" id="tabs">
-        <button role="tab" data-tab="inicio">Inicio</button>
-        <button role="tab" data-tab="posiciones">Posiciones</button>
-        <button role="tab" data-tab="resultados">Resultados</button>
-        <button role="tab" data-tab="playoffs">Playoffs</button>
-        <button role="tab" data-tab="reglamento">Reglamento</button>
+    <div class="barra-tabs">
+      <div class="contenedor">
+        <div class="tabs" role="tablist" id="tabs">
+          <button role="tab" data-tab="inicio">Inicio</button>
+          <button role="tab" data-tab="posiciones">Posiciones</button>
+          <button role="tab" data-tab="resultados">Resultados</button>
+          <button role="tab" data-tab="playoffs">Playoffs</button>
+          <button role="tab" data-tab="reglamento">Reglamento</button>
+        </div>
       </div>
-      <div class="cats" id="cats" aria-label="Categoría"></div>
+    </div>
+    <div class="barra-cats" id="barra-cats">
+      <div class="contenedor">
+        <div class="cats" id="cats" aria-label="Categoría"></div>
+      </div>
     </div>
   </nav>
 

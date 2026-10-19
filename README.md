@@ -20,6 +20,7 @@ La portada se arma sola con los datos de `datos.js`; no hay que editarla.
 | `compartir.png` | No | Imagen que aparece al compartir el enlace por WhatsApp o Facebook |
 | `manifest.webmanifest` | No | Permite instalar el sitio como app en el celular |
 | `sw.js` | No | Guarda una copia para que funcione sin internet |
+| `letra-600.woff2`, `letra-800.woff2` | No | Letra de los títulos y marcadores (Barlow Condensed, licencia libre OFL) |
 | `icono-512.png` | No | Ícono grande de la app instalada |
 | `.nojekyll` | No | Hace que GitHub Pages publique los archivos tal cual |
 | `.gitignore` | No | Evita subir archivos basura del sistema |
@@ -29,7 +30,7 @@ La portada se arma sola con los datos de `datos.js`; no hay que editarla.
 ## Publicar en GitHub Pages (solo la primera vez)
 1. Crea una cuenta en github.com y presiona **New repository**. Ponle un nombre, por ejemplo `torneo-reddfut`, márcalo como **Public** y crea el repositorio.
 2. Presiona **Add file → Upload files** y selecciona **todos los archivos** de la carpeta `torneo-reddfut`. Todos están al mismo nivel, sin subcarpetas, así que puedes elegirlos juntos o subirlos uno por uno:
-   `index.html`, `datos.js`, `app.js`, `estilos.css`, `404.html`, `README.md`, `logo.png`, `favicon.png`, `icono-192.png`, `icono-512.png`, `apple-touch-icon.png`, `compartir.png`, `manifest.webmanifest`, `sw.js`.
+   `index.html`, `datos.js`, `app.js`, `estilos.css`, `404.html`, `README.md`, `logo.png`, `favicon.png`, `icono-192.png`, `icono-512.png`, `apple-touch-icon.png`, `compartir.png`, `manifest.webmanifest`, `sw.js`, `letra-600.woff2`, `letra-800.woff2`.
    - `.nojekyll` y `.gitignore` son archivos ocultos y **opcionales**. Si tu computadora no los muestra, no pasa nada: el sitio funciona igual.
 3. Presiona **Commit changes**.
 4. Entra a **Settings → Pages**. En *Branch* elige `main` y la carpeta `/ (root)`, y presiona **Save**.

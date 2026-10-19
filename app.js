@@ -222,22 +222,27 @@
   /* ------------------------------------------------------------------ */
   /* Render: cabecera, avisos, navegación                               */
   /* ------------------------------------------------------------------ */
+  function ticksHTML() {
+    return `<span class="ticks" aria-hidden="true">${Array.from({ length: NJ }, (_, i) => `<i class="${i < JA ? "ok" : ""}"></i>`).join("")}</span>`;
+  }
+
   function renderCabecera() {
     document.getElementById("org").textContent = T.organizador || "";
+    // "Torneo Apertura Liga Menor 2026-2027" -> "TORNEO APERTURA" / "LIGA MENOR 2026-2027"
     const mN = String(T.nombre || "").match(/^(.*?)\s+(\d{4}-\d{4})$/);
-    document.getElementById("nombre-torneo").innerHTML = mN ? `${esc(mN[1])} <span class="anio">${esc(mN[2])}</span>` : esc(T.nombre || "");
-    document.getElementById("subtitulo").textContent = T.subtitulo || "";
+    const palabras = (mN ? mN[1] : String(T.nombre || "")).split(/\s+/);
+    const corte = Math.ceil(palabras.length / 2);
+    document.getElementById("nombre-torneo").innerHTML =
+      `${esc(palabras.slice(0, corte).join(" "))} <span class="l2">${esc(palabras.slice(corte).join(" "))}${mN ? ` <span class="anio">${esc(mN[2])}</span>` : ""}</span>`;
     document.getElementById("pie-org").textContent = T.organizador || "";
     document.title = `${T.nombre} · ${T.organizador}`;
     const act = T.actualizado ? "Actualizado: " + fecha(T.actualizado, { day: "numeric", month: "long", year: "numeric" }) : "";
     document.getElementById("pie-act").textContent = act;
-    const pct = Math.round((JA / NJ) * 100);
     document.getElementById("progreso").innerHTML = `
-      <div class="progreso-txt">
-        <span>${JA ? `Fase regular · Jornada <b>${JA}</b> de ${NJ}` : "Fase regular · Por iniciar"}</span>
-        <span>${esc(act)}</span>
-      </div>
-      <div class="barra-prog" role="progressbar" aria-valuemin="0" aria-valuemax="${NJ}" aria-valuenow="${JA}"><span style="width:${pct}%"></span></div>`;
+      <span class="franja-txt">${esc(T.subtitulo || "")}</span>
+      <span class="franja-jor" role="progressbar" aria-valuemin="0" aria-valuemax="${NJ}" aria-valuenow="${JA}" aria-label="Jornadas jugadas">
+        ${JA ? `Jornada <b>${JA}</b> de ${NJ}` : "Por iniciar"} ${ticksHTML()}
+      </span>`;
 
     let html = "";
     if (T.modoDemo) html += `<div class="aviso aviso-demo">⚠️ <b>Datos de ejemplo.</b> Los nombres de las escuelas y los resultados mostrados son provisionales.</div>`;
@@ -252,7 +257,7 @@
       b.setAttribute("aria-selected", b.dataset.tab === estado.tab ? "true" : "false");
     });
     const cats = document.getElementById("cats");
-    cats.classList.toggle("oculto", estado.tab === "reglamento" || estado.tab === "inicio");
+    document.getElementById("barra-cats").classList.toggle("oculto", estado.tab === "reglamento" || estado.tab === "inicio");
     cats.innerHTML = CATS.map((c) => `<button data-cat="${esc(c)}" aria-pressed="${c === estado.cat}">${esc(c)}</button>`).join("");
   }
 
@@ -280,7 +285,7 @@
 
     app.innerHTML = `
       <div class="seccion-titulo">
-        <h2>Tabla de posiciones · ${esc(estado.cat)}</h2>
+        <h2>Posiciones <span class="cat">${esc(estado.cat)}</span></h2>
         <span class="muted">${JA ? `Tras la jornada ${JA}` : "Aún no hay partidos jugados"}</span>
       </div>
       <div class="tarjeta">
@@ -290,7 +295,7 @@
               <th>#</th><th class="izq">Escuela</th><th title="Partidos jugados">PJ</th>
               <th class="opt" title="Ganados">G</th><th class="opt" title="Empatados">E</th><th class="opt" title="Perdidos">P</th>
               <th class="opt" title="Goles a favor">GF</th><th class="opt" title="Goles en contra">GC</th>
-              <th title="Diferencia de goles">DG</th><th title="Puntos">Pts</th><th class="opt2">Últimos</th>
+              <th title="Diferencia de goles">DG</th><th class="th-pts" title="Puntos">Pts</th><th class="opt2">Últimos</th>
             </tr></thead>
             <tbody>${filas}</tbody>
           </table>
@@ -298,6 +303,7 @@
         ${conAjuste.length ? `<p class="notas-ajustes">${conAjuste.map((f) => f.motivos.map((m) =>
           `* ${esc(f.nombre)}: ${m.puntos > 0 ? "+" : ""}${m.puntos} pts${m.motivo ? " (" + esc(m.motivo) + ")" : ""}`).join("<br>")).join("<br>")}</p>` : ""}
         <div class="leyenda">
+          <span><span class="sw oro"></span>Líder</span>
           <span><span class="sw"></span>Clasifican a cuartos de final (top ${NCLAS})</span>
           <span>Victoria 3 · Empate 1 · Derrota 0</span>
           <span>Orden: Pts, DG, GF</span>
@@ -311,7 +317,7 @@
   function marcadorHTML(r, jugado) {
     if (!r) return jugado ? `<div class="marcador pendiente" title="Esta categoría no tiene resultado en este partido">SIN<br>PARTIDO</div>` : `<div class="marcador pendiente">VS</div>`;
     if (r.gl == null) return `<div class="marcador texto">${esc(r.texto)}</div>`;
-    return `<div class="marcador">${r.gl} - ${r.gv}</div>`;
+    return `<div class="marcador">${r.gl}<span class="sep">-</span>${r.gv}</div>`;
   }
 
   function renderResultados() {
@@ -358,7 +364,7 @@
         <button class="flecha" data-mover="1" ${estado.jornada >= NJ ? "disabled" : ""} aria-label="Jornada siguiente">›</button>
       </div>
       <div class="jornada-cab">
-        <h2>Jornada ${estado.jornada} · ${esc(estado.cat)}${j && j.fecha ? ` <span class="muted" style="font-size:.85rem;font-weight:500">· ${esc(fecha(j.fecha))}</span>` : ""}</h2>
+        <h2>Jornada ${estado.jornada} <span class="cat">${esc(estado.cat)}</span>${j && j.fecha ? `<span class="fecha-j">${esc(fecha(j.fecha, { weekday: "long", day: "numeric", month: "long", year: "numeric" }))}</span>` : ""}</h2>
         <label class="interruptor"><input type="checkbox" id="chk-todas" ${estado.todas ? "checked" : ""}> Ver todas las categorías</label>
       </div>
       ${cuerpo}`;
@@ -396,7 +402,7 @@
     const campeon = res.F.ganador;
     app.innerHTML = `
       <div class="seccion-titulo">
-        <h2>Playoffs · ${esc(estado.cat)}</h2>
+        <h2>Playoffs <span class="cat">${esc(estado.cat)}</span></h2>
         <span class="muted">1º vs 8º · 2º vs 7º · 3º vs 6º · 4º vs 5º</span>
       </div>
       ${completa ? "" : `<div class="aviso-proy">📊 <b>Proyección:</b> así quedarían los cruces si la fase regular terminara hoy (jornada ${JA || 0} de ${NJ}). Los cruces se confirman al finalizar la jornada ${NJ}.</div>`}
@@ -411,88 +417,72 @@
   /* ------------------------------------------------------------------ */
   /* Render: Inicio (portada)                                           */
   /* ------------------------------------------------------------------ */
-  const ICONOS = {
-    posiciones: '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 9v11"/></svg>',
-    resultados: '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="M8 15h3M13 15h3"/></svg>',
-    playoffs: '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v4a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M12 13v4M8 21h8M9 17h6v4H9z"/></svg>',
-    reglamento: '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></svg>'
-  };
-
   function renderInicio() {
-    const pct = Math.round((JA / NJ) * 100);
-    const act = T.actualizado ? fecha(T.actualizado, { day: "numeric", month: "long" }) : "";
+    const act = T.actualizado ? fecha(T.actualizado, { day: "numeric", month: "long", year: "numeric" }) : "";
+    const jUlt = JORNADAS.filter((j) => j.numero <= JA).pop();
+    const fechaUlt = jUlt && jUlt.fecha ? fecha(jUlt.fecha, { weekday: "long", day: "numeric", month: "long" }) : "";
     const lideres = CATS.map((c) => {
       const t = calcularTabla(c);
-      return { c, f: t.some((x) => x.pj > 0) ? t[0] : null, emp: t.length > 1 && t[0].pts === t[1].pts && t[0].dg === t[1].dg && t[0].gf === t[1].gf };
+      const f = t.some((x) => x.pj > 0) ? t[0] : null;
+      const emp = f && t.length > 1 && t[0].pts === t[1].pts && t[0].dg === t[1].dg && t[0].gf === t[1].gf;
+      return { c, f, emp };
     });
     const escuelas = [...ESCUELAS.values()].sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
     const nPartidos = JORNADAS.reduce((n, j) => n + (j.partidos || []).length, 0);
-    const acceso = (tab, titulo, texto) => `
-      <button class="acceso tarjeta" data-ir="${tab}">
-        <span class="acceso-ico">${ICONOS[tab]}</span>
-        <span class="acceso-txt"><b>${titulo}</b><small>${texto}</small></span>
-        <span class="acceso-flecha" aria-hidden="true">›</span>
-      </button>`;
+    const numCat = (c) => (String(c).match(/\d+/) || [c])[0];
+    const dos = (n) => String(n).padStart(2, "0");
 
     app.innerHTML = `
-      <section class="hero">
-        <p class="hero-kicker">¡Bienvenidos!</p>
-        <h2>Sigue el torneo de las escuelas de fútbol de Usulután</h2>
-        <p class="hero-txt">Consulta los resultados de cada jornada, la tabla de posiciones de cada categoría y el camino hacia la gran final.</p>
-        <div class="hero-estado">
-          <span class="vivo"><i></i>${JA >= NJ ? "Fase final" : "Fase regular"}</span>
-          <span>Jornada <b>${JA}</b> de ${NJ}</span>
-          ${act ? `<span>Actualizado: ${esc(act)}</span>` : ""}
+      <section class="portada">
+        <div class="cartel">
+          <span class="cartel-fase"><i></i>${JA >= NJ ? "Fase final" : "Fase regular"}</span>
+          <div class="cartel-jornada">
+            <span class="num">${dos(JA)}</span>
+            <span class="txt"><b>Jornada</b><span>de ${NJ} jugadas</span></span>
+          </div>
+          <span class="ticks" aria-hidden="true">${Array.from({ length: NJ }, (_, i) => `<i class="${i < JA ? "ok" : ""}"></i>`).join("")}</span>
+          <p class="cartel-act">${fechaUlt ? `Última fecha: ${esc(fechaUlt)} · ` : ""}${act ? `Actualizado el ${esc(act)}` : ""}</p>
+          <div class="cartel-botones">
+            <button class="btn-primario" data-ir="posiciones">Ver posiciones</button>
+            <button class="btn-secundario" data-ir="resultados">Resultados${JA ? ` J${JA}` : ""}</button>
+            ${instalarHTML()}
+          </div>
         </div>
-        <div class="hero-prog"><span style="width:${pct}%"></span></div>
-        <div class="hero-botones">
-          <button class="btn-primario" data-ir="posiciones">Ver tabla de posiciones</button>
-          <button class="btn-secundario" data-ir="resultados">Últimos resultados</button>
-          ${instalarHTML()}
+
+        <div class="tablero">
+          <div class="tablero-cab"><b>Líderes <span>·</span> ${JA ? `J${JA}` : ""}</b><small>Toca para ver la tabla</small></div>
+          <div class="tablero-lista">
+            ${lideres.map(({ c, f, emp }) => `
+              <button class="tablero-fila" data-ir="posiciones" data-cat="${esc(c)}">
+                <span class="cat">${esc(c)}</span>
+                ${f ? `${escudo(f.nombre, true)}
+                  <span class="n">${esc(f.nombre)}<small>DG ${f.dg > 0 ? "+" + f.dg : f.dg}${emp ? " · empatado" : ""}</small></span>
+                  <span class="pts">${f.pts}<small>pts</small></span>`
+                : `<span></span><span class="vacio-t">Sin partidos aún</span><span></span>`}
+              </button>`).join("")}
+          </div>
         </div>
       </section>
 
       <section class="bloque">
-        <div class="bloque-cab"><span class="paso">1</span><div><h3>Elige tu categoría</h3><p class="muted">Toca una categoría para ver su tabla de posiciones.</p></div></div>
+        <h3 class="titulo-bloque">Categorías <small>Elige una para ver su tabla</small></h3>
         <div class="inicio-cats">
-          ${CATS.map((c) => `<button data-ir="posiciones" data-cat="${esc(c)}"><b>${esc(c)}</b><small>Ver tabla ›</small></button>`).join("")}
+          ${CATS.map((c) => `<button class="cat-tile" data-ir="posiciones" data-cat="${esc(c)}" aria-label="Tabla ${esc(c)}">
+            <span class="sub">Sub</span><span class="num">${esc(numCat(c))}</span><span class="ver">Ver tabla ›</span></button>`).join("")}
         </div>
       </section>
 
       <section class="bloque">
-        <div class="bloque-cab"><span class="paso">2</span><div><h3>¿Qué quieres ver?</h3><p class="muted">Elige una sección. También puedes usar las pestañas de arriba.</p></div></div>
-        <div class="accesos">
-          ${acceso("posiciones", "Tabla de posiciones", "Puntos, goles y quiénes van clasificando al Top 8.")}
-          ${acceso("resultados", "Resultados", JA ? `Marcadores de cada jornada. Última jugada: jornada ${JA}.` : "Marcadores de cada jornada.")}
-          ${acceso("playoffs", "Playoffs", "Cuartos de final, semifinales y la gran final.")}
-          ${acceso("reglamento", "Reglamento", "Bases del torneo, formato y sistema de puntos.")}
-        </div>
-      </section>
-
-      <section class="bloque">
-        <div class="bloque-cab"><span class="paso paso-oro">★</span><div><h3>Líderes por categoría</h3><p class="muted">Quién va primero en este momento.</p></div></div>
-        <div class="lideres">
-          ${lideres.map(({ c, f, emp }) => `
-            <button class="lider tarjeta" data-ir="posiciones" data-cat="${esc(c)}">
-              <span class="lider-cat">${esc(c)}</span>
-              ${f ? `${escudo(f.nombre, true)}<b class="lider-n">${esc(f.nombre)}</b>
-                <span class="lider-d">${f.pts} pts · DG ${f.dg > 0 ? "+" + f.dg : f.dg}${emp ? " · empatado" : ""}</span>`
-                : `<b class="lider-n muted">Sin partidos aún</b>`}
-            </button>`).join("")}
-        </div>
-      </section>
-
-      <section class="bloque">
-        <div class="numeros">
+        <div class="cifras">
           <div><b>${ESCUELAS.size}</b><span>Escuelas</span></div>
           <div><b>${CATS.length}</b><span>Categorías</span></div>
           <div><b>${NJ}</b><span>Jornadas</span></div>
-          <div><b>${nPartidos}</b><span>Encuentros jugados</span></div>
+          <div><b>${nPartidos}</b><span>Encuentros</span></div>
         </div>
       </section>
 
       <section class="bloque">
-        <div class="bloque-cab"><span class="paso paso-azul">⚽</span><div><h3>Escuelas participantes</h3></div></div>
+        <h3 class="titulo-bloque">Escuelas participantes</h3>
         <div class="escuelas tarjeta">
           ${escuelas.map((e) => `<div class="escuela">${escudo(e.nombre, true)}<span>${esc(e.nombre)}</span></div>`).join("")}
         </div>
