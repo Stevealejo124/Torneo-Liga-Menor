@@ -20,6 +20,8 @@ La portada se arma sola con los datos de `datos.js`; no hay que editarla.
 | `compartir.png` | No | Imagen que aparece al compartir el enlace por WhatsApp o Facebook |
 | `manifest.webmanifest` | No | Permite instalar el sitio como app en el celular |
 | `sw.js` | No | Guarda una copia para que funcione sin internet |
+| `firebase-config.js` | Solo para activar la quiniela | Datos de Firebase y si la quiniela está activa |
+| `quiniela.js` | No | El juego de pronósticos (se carga solo al abrir la pestaña Quiniela) |
 | `letra-600.woff2`, `letra-800.woff2` | No | Letra de los títulos y marcadores (Barlow Condensed, licencia libre OFL) |
 | `icono-512.png` | No | Ícono grande de la app instalada |
 | `.nojekyll` | No | Hace que GitHub Pages publique los archivos tal cual |
@@ -30,7 +32,7 @@ La portada se arma sola con los datos de `datos.js`; no hay que editarla.
 ## Publicar en GitHub Pages (solo la primera vez)
 1. Crea una cuenta en github.com y presiona **New repository**. Ponle un nombre, por ejemplo `torneo-reddfut`, márcalo como **Public** y crea el repositorio.
 2. Presiona **Add file → Upload files** y selecciona **todos los archivos** de la carpeta `torneo-reddfut`. Todos están al mismo nivel, sin subcarpetas, así que puedes elegirlos juntos o subirlos uno por uno:
-   `index.html`, `datos.js`, `app.js`, `estilos.css`, `404.html`, `README.md`, `logo.png`, `favicon.png`, `icono-192.png`, `icono-512.png`, `apple-touch-icon.png`, `compartir.png`, `manifest.webmanifest`, `sw.js`, `letra-600.woff2`, `letra-800.woff2`.
+   `index.html`, `datos.js`, `app.js`, `estilos.css`, `404.html`, `README.md`, `logo.png`, `favicon.png`, `icono-192.png`, `icono-512.png`, `apple-touch-icon.png`, `compartir.png`, `manifest.webmanifest`, `sw.js`, `letra-600.woff2`, `letra-800.woff2`, `firebase-config.js`, `quiniela.js`.
    - `.nojekyll` y `.gitignore` son archivos ocultos y **opcionales**. Si tu computadora no los muestra, no pasa nada: el sitio funciona igual.
 3. Presiona **Commit changes**.
 4. Entra a **Settings → Pages**. En *Branch* elige `main` y la carpeta `/ (root)`, y presiona **Save**.
@@ -74,6 +76,8 @@ Ejemplo de jornada en `datos.js` (copia el bloque, pégalo después de la últim
 
 **Escuela sin una categoría:** en la lista de escuelas usa `sinCategorias`, por ejemplo `{ nombre: "Estanzuelas", corto: "EST", sinCategorias: ["Sub-15"] }`.
 
+> **¿Subiste los cambios y todavía ves la versión anterior?** GitHub tarda de 1 a 5 minutos en publicar; puedes ver el avance en la pestaña **Actions** del repositorio. Cuando termine, recarga la página. Si aún no aparece, fuerza la recarga con **Ctrl + Shift + R** (en Mac, **Cmd + Shift + R**). En el celular, cierra la página o la app y vuelve a abrirla.
+
 ## Playoffs
 Los cruces se arman solos con la tabla final:
 - Cuartos: C1 = 1º vs 8º, C2 = 4º vs 5º, C3 = 2º vs 7º, C4 = 3º vs 6º.
@@ -82,6 +86,12 @@ Los cruces se arman solos con la tabla final:
 
 Solo anota los marcadores, por ejemplo `"Sub-13": { C1: "2-0", C2: "1-1 (5-4)" }`.
 Si la REDDFUT define otro cruce, puedes forzarlo: `C1: { local: "...", visitante: "...", resultado: "2-0" }`.
+
+## Quiniela de pronósticos
+
+Juego para que la gente adivine quién gana cada partido, por diversión (sin apuestas). Entran con su cuenta de Google, eligen un apodo y ganan 1 punto por acierto. Está **desactivado** hasta que configures Firebase: sigue la guía `GUIA_QUINIELA.md` de la carpeta **Configurar_Quiniela**.
+
+Cada semana: agrega la próxima jornada en `datos.js` con su `fecha` y sus cruces (sin resultados) antes de que se juegue, y abre la pestaña Quiniela con tu cuenta de organizador para publicarla.
 
 ## Anuncios
 

@@ -18,6 +18,7 @@ window.TORNEO = {
   nombre: "Torneo Apertura Liga Menor 2026-2027",
   subtitulo: "Escuelas de fútbol infanto-juveniles de Usulután",
   organizador: "REDDFUT Usulután",
+  urlSitio: "https://stevealejo124.github.io/Torneo-Liga-Menor/",
   actualizado: "2026-10-18",       // fecha de la última actualización (AAAA-MM-DD)
 
   // true = muestra el aviso amarillo de "datos de ejemplo"
@@ -91,6 +92,14 @@ window.TORNEO = {
       ]
     }
   ],
+
+  // ---- QUINIELA: para abrir los pronósticos de una jornada, agrégala ANTES
+  // de que se juegue, con su fecha y sus cruces, SIN resultados. Ejemplo:
+  //   { numero: 3, fecha: "2026-10-24",
+  //     partidos: [ { local: "Berlín", visitante: "El Tránsito" }, ... ] },
+  // Los pronósticos se cierran ese día a las 7:00 a. m. Para otra hora:
+  //   { numero: 3, fecha: "2026-10-24", cierre: "2026-10-24 08:30", ... }
+  // Después del partido, solo agrega los resultados como siempre.
 
   // ---- AJUSTES DE PUNTOS (sanciones). Ejemplo:
   // { escuela: "Berlín", categoria: "Sub-15", puntos: -3, motivo: "Alineación indebida" }

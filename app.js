@@ -193,7 +193,9 @@
   /* ------------------------------------------------------------------ */
   /* Estado (se guarda en la URL para poder compartir enlaces)          */
   /* ------------------------------------------------------------------ */
-  const TABS = ["inicio", "posiciones", "resultados", "playoffs", "reglamento"];
+  const Q = window.QUINIELA;
+  const QUINIELA_ACTIVA = !!(Q && Q.activa && Q.firebase && Q.firebase.apiKey && !/PEGA/.test(Q.firebase.apiKey));
+  const TABS = ["inicio", "posiciones", "resultados", "playoffs", "reglamento"].concat(QUINIELA_ACTIVA ? ["quiniela"] : []);
   const JA = jornadaActual();
   const estado = {
     tab: "inicio",
@@ -213,7 +215,7 @@
 
   function guardarHash() {
     let h = "#/" + estado.tab;
-    if (estado.tab !== "reglamento" && estado.tab !== "inicio") h += "/" + estado.cat.toLowerCase();
+    if (!["reglamento", "inicio", "quiniela"].includes(estado.tab)) h += "/" + estado.cat.toLowerCase();
     if (estado.tab === "resultados") h += "/" + estado.jornada;
     try { history.replaceState(null, "", h); } catch (e) { /* vista previa */ }
     store.set("reddfut-cat", estado.cat);
@@ -257,7 +259,7 @@
       b.setAttribute("aria-selected", b.dataset.tab === estado.tab ? "true" : "false");
     });
     const cats = document.getElementById("cats");
-    document.getElementById("barra-cats").classList.toggle("oculto", estado.tab === "reglamento" || estado.tab === "inicio");
+    document.getElementById("barra-cats").classList.toggle("oculto", ["reglamento", "inicio", "quiniela"].includes(estado.tab));
     cats.innerHTML = CATS.map((c) => `<button data-cat="${esc(c)}" aria-pressed="${c === estado.cat}">${esc(c)}</button>`).join("");
   }
 
@@ -417,6 +419,23 @@
   /* ------------------------------------------------------------------ */
   /* Render: Inicio (portada)                                           */
   /* ------------------------------------------------------------------ */
+  function promoQuiniela() {
+    if (!QUINIELA_ACTIVA) return "";
+    const hora = (Q.horaCierre || "07:00");
+    const ahora = Date.now();
+    const prox = JORNADAS.find((j) => {
+      if (!(j.partidos || []).length || !(j.cierre || j.fecha)) return false;
+      const txt = j.cierre ? String(j.cierre) : `${j.fecha} ${hora}`;
+      const m = txt.match(/^(\d{4}-\d{2}-\d{2})[ T](\d{1,2}):(\d{2})/);
+      return m && new Date(`${m[1]}T${m[2].padStart(2, "0")}:${m[3]}:00-06:00`).getTime() > ahora;
+    });
+    return `<button class="q-promo" data-ir="quiniela">
+      <span><b>${prox ? `Quiniela · Jornada ${prox.numero} abierta` : "Quiniela del torneo"}</b>
+      <span>${prox ? "¿Quién gana este sábado? Haz tus pronósticos y suma puntos." : "Adivina los resultados de cada jornada y compite en la tabla. Solo por diversión."}</span></span>
+      <span class="ir">${prox ? "Jugar ›" : "Ver tabla ›"}</span>
+    </button>`;
+  }
+
   function renderInicio() {
     const act = T.actualizado ? fecha(T.actualizado, { day: "numeric", month: "long", year: "numeric" }) : "";
     const jUlt = JORNADAS.filter((j) => j.numero <= JA).pop();
@@ -464,6 +483,8 @@
         </div>
       </section>
 
+      ${promoQuiniela()}
+
       <section class="bloque">
         <h3 class="titulo-bloque">Categorías <small>Elige una para ver su tabla</small></h3>
         <div class="inicio-cats">
@@ -498,6 +519,25 @@
     if (sub) sub.textContent = `${T.organizador} · ${T.nombre}`;
   }
 
+  /* ------------------------------------------------------------------ */
+  /* Render: Quiniela (se carga aparte, solo con internet)              */
+  /* ------------------------------------------------------------------ */
+  const URL_SITIO = T.urlSitio || "";
+  function renderQuiniela() {
+    app.innerHTML = `<div id="quiniela" class="quiniela"><div class="q-caja"><b>Cargando la quiniela…</b></div></div>`;
+    const cont = app.querySelector("#quiniela");
+    const sinRed = !!window.MODO_OFFLINE || location.protocol === "file:" || navigator.onLine === false;
+    if (sinRed) {
+      cont.innerHTML = `<div class="q-caja"><b>La quiniela necesita internet</b>
+        <p>Para hacer tus pronósticos y ver la tabla, abre el sitio con conexión${URL_SITIO ? `: <a href="${esc(URL_SITIO)}#/quiniela">${esc(URL_SITIO.replace(/^https?:\/\//, ""))}</a>` : "."}</p></div>`;
+      return;
+    }
+    import("./quiniela.js")
+      .then((m) => { if (cont.isConnected) m.montar(cont, { T, CATS, JORNADAS, ESCUELAS, parseRes, escudo, esc, fecha }); })
+      .catch(() => { if (cont.isConnected) cont.innerHTML = `<div class="q-caja"><b>No se pudo cargar la quiniela</b><p>Revisa tu conexión y vuelve a intentarlo.</p></div>`; });
+  }
+
+
   /* Anuncios: siempre al final del contenido, nunca encima ni flotando. */
   const ICONO_ANUNCIO = {
     retro: '<svg viewBox="0 0 16 16" width="44" height="44" shape-rendering="crispEdges" aria-hidden="true"><path fill="#fff" d="M5 1h1v1h-1zM6 1h1v1h-1zM7 1h1v1h-1zM8 1h1v1h-1zM9 1h1v1h-1zM10 1h1v1h-1zM3 2h1v1h-1zM4 2h1v1h-1zM5 2h1v1h-1zM6 2h1v1h-1zM9 2h1v1h-1zM10 2h1v1h-1zM11 2h1v1h-1zM12 2h1v1h-1zM2 3h1v1h-1zM3 3h1v1h-1zM4 3h1v1h-1zM5 3h1v1h-1zM10 3h1v1h-1zM11 3h1v1h-1zM12 3h1v1h-1zM13 3h1v1h-1zM2 4h1v1h-1zM4 4h1v1h-1zM5 4h1v1h-1zM10 4h1v1h-1zM11 4h1v1h-1zM13 4h1v1h-1zM1 5h1v1h-1zM4 5h1v1h-1zM5 5h1v1h-1zM6 5h1v1h-1zM9 5h1v1h-1zM10 5h1v1h-1zM11 5h1v1h-1zM14 5h1v1h-1zM1 6h1v1h-1zM3 6h1v1h-1zM4 6h1v1h-1zM5 6h1v1h-1zM6 6h1v1h-1zM7 6h1v1h-1zM8 6h1v1h-1zM9 6h1v1h-1zM10 6h1v1h-1zM11 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM1 7h1v1h-1zM2 7h1v1h-1zM3 7h1v1h-1zM4 7h1v1h-1zM5 7h1v1h-1zM6 7h1v1h-1zM7 7h1v1h-1zM8 7h1v1h-1zM9 7h1v1h-1zM10 7h1v1h-1zM11 7h1v1h-1zM12 7h1v1h-1zM13 7h1v1h-1zM14 7h1v1h-1zM1 8h1v1h-1zM2 8h1v1h-1zM3 8h1v1h-1zM6 8h1v1h-1zM7 8h1v1h-1zM8 8h1v1h-1zM9 8h1v1h-1zM12 8h1v1h-1zM13 8h1v1h-1zM14 8h1v1h-1zM1 9h1v1h-1zM2 9h1v1h-1zM7 9h1v1h-1zM8 9h1v1h-1zM13 9h1v1h-1zM14 9h1v1h-1zM1 10h1v1h-1zM2 10h1v1h-1zM3 10h1v1h-1zM7 10h1v1h-1zM8 10h1v1h-1zM12 10h1v1h-1zM13 10h1v1h-1zM14 10h1v1h-1zM2 11h1v1h-1zM3 11h1v1h-1zM4 11h1v1h-1zM6 11h1v1h-1zM7 11h1v1h-1zM8 11h1v1h-1zM9 11h1v1h-1zM11 11h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM2 12h1v1h-1zM3 12h1v1h-1zM4 12h1v1h-1zM5 12h1v1h-1zM6 12h1v1h-1zM7 12h1v1h-1zM8 12h1v1h-1zM9 12h1v1h-1zM10 12h1v1h-1zM11 12h1v1h-1zM12 12h1v1h-1zM13 12h1v1h-1zM3 13h1v1h-1zM4 13h1v1h-1zM5 13h1v1h-1zM10 13h1v1h-1zM11 13h1v1h-1zM12 13h1v1h-1zM5 14h1v1h-1zM6 14h1v1h-1zM9 14h1v1h-1zM10 14h1v1h-1z"/><path fill="#0b2545" d="M5 0h1v1h-1zM6 0h1v1h-1zM7 0h1v1h-1zM8 0h1v1h-1zM9 0h1v1h-1zM10 0h1v1h-1zM3 1h1v1h-1zM4 1h1v1h-1zM11 1h1v1h-1zM12 1h1v1h-1zM2 2h1v1h-1zM13 2h1v1h-1zM1 3h1v1h-1zM14 3h1v1h-1zM1 4h1v1h-1zM14 4h1v1h-1zM0 5h1v1h-1zM15 5h1v1h-1zM0 6h1v1h-1zM15 6h1v1h-1zM0 7h1v1h-1zM15 7h1v1h-1zM0 8h1v1h-1zM15 8h1v1h-1zM0 9h1v1h-1zM15 9h1v1h-1zM0 10h1v1h-1zM15 10h1v1h-1zM1 11h1v1h-1zM14 11h1v1h-1zM1 12h1v1h-1zM14 12h1v1h-1zM2 13h1v1h-1zM13 13h1v1h-1zM3 14h1v1h-1zM4 14h1v1h-1zM11 14h1v1h-1zM12 14h1v1h-1zM5 15h1v1h-1zM6 15h1v1h-1zM7 15h1v1h-1zM8 15h1v1h-1zM9 15h1v1h-1zM10 15h1v1h-1zM7 2h1v1h-1zM8 2h1v1h-1zM6 3h1v1h-1zM7 3h1v1h-1zM8 3h1v1h-1zM9 3h1v1h-1zM3 4h1v1h-1zM6 4h1v1h-1zM7 4h1v1h-1zM8 4h1v1h-1zM9 4h1v1h-1zM12 4h1v1h-1zM2 5h1v1h-1zM3 5h1v1h-1zM7 5h1v1h-1zM8 5h1v1h-1zM12 5h1v1h-1zM13 5h1v1h-1zM2 6h1v1h-1zM13 6h1v1h-1zM4 8h1v1h-1zM5 8h1v1h-1zM10 8h1v1h-1zM11 8h1v1h-1zM3 9h1v1h-1zM4 9h1v1h-1zM5 9h1v1h-1zM6 9h1v1h-1zM9 9h1v1h-1zM10 9h1v1h-1zM11 9h1v1h-1zM12 9h1v1h-1zM4 10h1v1h-1zM5 10h1v1h-1zM6 10h1v1h-1zM9 10h1v1h-1zM10 10h1v1h-1zM11 10h1v1h-1zM5 11h1v1h-1zM10 11h1v1h-1zM6 13h1v1h-1zM7 13h1v1h-1zM8 13h1v1h-1zM9 13h1v1h-1zM7 14h1v1h-1zM8 14h1v1h-1z"/></svg>',
@@ -528,7 +568,7 @@
   /* ------------------------------------------------------------------ */
   function render() {
     renderNav();
-    ({ inicio: renderInicio, posiciones: renderPosiciones, resultados: renderResultados, playoffs: renderPlayoffs, reglamento: renderReglamento })[estado.tab]();
+    ({ inicio: renderInicio, posiciones: renderPosiciones, resultados: renderResultados, playoffs: renderPlayoffs, reglamento: renderReglamento, quiniela: renderQuiniela })[estado.tab]();
     app.insertAdjacentHTML("beforeend", anunciosHTML());
     guardarHash();
   }
@@ -584,7 +624,19 @@
   }
 
   if (!esArchivoLocal && "serviceWorker" in navigator) {
-    window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+    // Si ya había una versión guardada y llega una nueva, recargar UNA vez para mostrarla.
+    const habiaVersion = !!navigator.serviceWorker.controller;
+    let recargado = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (!habiaVersion || recargado) return;
+      recargado = true;
+      location.reload();
+    });
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js", { updateViaCache: "none" })
+        .then((reg) => reg.update())
+        .catch(() => {});
+    });
   }
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
@@ -603,6 +655,10 @@
     }
   });
 
+  if (QUINIELA_ACTIVA) {
+    document.getElementById("tab-quiniela").hidden = false;
+    document.getElementById("tabs").classList.add("con-6");
+  }
   renderCabecera();
   if (esArchivoLocal && T.actualizado) {
     document.getElementById("pie-act").textContent =
