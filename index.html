@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Torneo Apertura Liga Menor 2026-2027 · REDDFUT Usulután</title>
+  <meta name="description" content="Resultados, tabla de posiciones y playoffs del torneo de escuelas de fútbol de REDDFUT Usulután.">
+  <meta name="theme-color" content="#0b2545">
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="icon" href="icono-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <!-- Vista previa al compartir el enlace (WhatsApp, Facebook) -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_SV">
+  <meta property="og:title" content="Torneo Apertura Liga Menor 2026-2027 · REDDFUT Usulután">
+  <meta property="og:description" content="Resultados, tabla de posiciones y playoffs: Sub-7, Sub-9, Sub-11, Sub-13 y Sub-15.">
+  <meta property="og:image" content="compartir.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <header class="cabecera">
+    <div class="contenedor cabecera-inner">
+      <div class="logo">
+        <img src="logo.png" alt="Logo REDDFUT Usulután" width="85" height="96">
+      </div>
+      <div class="titulos">
+        <p class="org" id="org">REDDFUT Usulután</p>
+        <h1 id="nombre-torneo">Torneo Apertura Liga Menor 2026-2027</h1>
+        <p class="sub" id="subtitulo"></p>
+      </div>
+    </div>
+    <div class="contenedor progreso" id="progreso"></div>
+  </header>
+
+  <div id="avisos" class="contenedor"></div>
+
+  <nav class="barra" aria-label="Secciones">
+    <div class="contenedor">
+      <div class="tabs" role="tablist" id="tabs">
+        <button role="tab" data-tab="inicio">Inicio</button>
+        <button role="tab" data-tab="posiciones">Posiciones</button>
+        <button role="tab" data-tab="resultados">Resultados</button>
+        <button role="tab" data-tab="playoffs">Playoffs</button>
+        <button role="tab" data-tab="reglamento">Reglamento</button>
+      </div>
+      <div class="cats" id="cats" aria-label="Categoría"></div>
+    </div>
+  </nav>
+
+  <main class="contenedor" id="app"></main>
+
+  <footer class="pie">
+    <div class="contenedor">
+      <p><strong id="pie-org">REDDFUT Usulután</strong> · Ligas Menores</p>
+      <p id="pie-act"></p>
+    </div>
+  </footer>
+
+  <template id="tpl-reglamento">
+    <article class="reglamento tarjeta">
+      <h2>Bases y Reglamento del Torneo</h2>
+      <p class="muted" id="reg-sub">REDDFUT Usulután · Torneo Apertura Liga Menor 2026-2027</p>
+
+      <h3>1. Presentación</h3>
+      <p>El presente documento establece las normas y lineamientos bajo los cuales se regirá el torneo oficial de las escuelas de fútbol pertenecientes a REDDFUT Usulután. Este certamen tiene como objetivo principal fomentar el desarrollo deportivo, el espíritu de competencia sana y la convivencia entre las diversas comunidades del departamento.</p>
+
+      <h3>2. Categorías y niveles de participación</h3>
+      <p>El torneo se dividirá en cinco categorías según las edades de los atletas, asegurando una competencia justa y acorde al desarrollo físico de cada grupo:</p>
+      <ul class="chips-lista">
+        <li>Sub-7</li><li>Sub-9</li><li>Sub-13</li><li>Sub-15</li><li>Sub-17</li>
+      </ul>
+
+      <h3>3. Sistema de competencia</h3>
+      <p>El torneo se desarrollará en dos etapas principales para definir al campeón de cada categoría:</p>
+      <div class="fases">
+        <div class="fase">
+          <span class="fase-num">Fase I</span>
+          <h4>Temporada regular (liga)</h4>
+          <ul>
+            <li><b>Participantes:</b> 14 escuelas de fútbol.</li>
+            <li><b>Formato:</b> todos contra todos a una sola vuelta. Cada equipo disputará un total de 13 jornadas.</li>
+            <li><b>Puntuación:</b> 3 puntos por victoria, 1 por empate y 0 por derrota.</li>
+            <li><b>Clasificación:</b> los equipos ubicados en las primeras 8 posiciones de la tabla general avanzan a la siguiente ronda.</li>
+          </ul>
+        </div>
+        <div class="fase">
+          <span class="fase-num">Fase II</span>
+          <h4>Eliminación directa (playoffs)</h4>
+          <p>Los 8 clasificados se enfrentan en llaves de eliminación directa según su posición en la tabla (1º vs 8º, 2º vs 7º, etc.):</p>
+          <ul>
+            <li><b>Cuartos de final:</b> 8 equipos buscando el pase a la siguiente ronda.</li>
+            <li><b>Semifinales:</b> los 4 ganadores de la fase anterior.</li>
+            <li><b>Gran final:</b> disputa por el título entre los dos mejores equipos del torneo.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>4. Objetivo del torneo</h3>
+      <p>Más allá de la competencia, se busca que cada jornada sea una fiesta deportiva en Usulután, donde impere el respeto a los árbitros, rivales y la formación integral de nuestros jóvenes talentos.</p>
+    </article>
+  </template>
+
+  <script src="datos.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
