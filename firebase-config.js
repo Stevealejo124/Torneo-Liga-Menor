@@ -16,6 +16,7 @@ window.QUINIELA = {
     apiKey: "AIzaSyB9llCjR7b8faEmGiNaT0pKecjHeyV2xAM",
     authDomain: "reddfut-quiniela.firebaseapp.com",
     projectId: "reddfut-quiniela",
+    messagingSenderId: "753232031272",
     appId: "1:753232031272:web:a1af590f9f62706011cf1d"
   },
 

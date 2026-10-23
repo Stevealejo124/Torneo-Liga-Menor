@@ -55,13 +55,13 @@ async function arrancar() {
     import(`${CDN}/firebase-firestore.js`)
   ]);
   fb = { ...mApp, ...mAuth, ...mFs };
-  const app = fb.initializeApp(CFG.firebase);
+  const app = fb.getApps().length ? fb.getApp() : fb.initializeApp(CFG.firebase);
   fb.auth = fb.getAuth(app);
   fb.auth.languageCode = "es";
   fb.db = fb.getFirestore(app);
   if (CFG.usarEmulador) {
     fb.connectAuthEmulator(fb.auth, "http://127.0.0.1:9099", { disableWarnings: true });
-    fb.connectFirestoreEmulator(fb.db, "127.0.0.1", 8085);
+    try { fb.connectFirestoreEmulator(fb.db, "127.0.0.1", 8085); } catch (e) { /* ya conectado por avisos.js */ }
     window.__quiniela = { fb, st, recargar: async () => { await cargar(); pintar(); } };
   }
   fb.getRedirectResult(fb.auth).catch((e) => { st.error = traducir(e); });
@@ -446,7 +446,7 @@ function pintar() {
   const proxSinPublicar = js.filter((x) => !cierreDe(x.clave) && x.cierre.getTime() > Date.now());
   cont.innerHTML = `
     <div class="seccion-titulo">
-      <h2>Quiniela <span class="cat">${esc(api.T.nombre.match(/\d{4}-\d{4}/) ? api.T.nombre.match(/\d{4}-\d{4}/)[0] : "")}</span></h2>
+      <h2>Quiniela${api.T.nombre.match(/\d{4}-\d{4}/) ? ` <span class="cat">${esc(api.T.nombre.match(/\d{4}-\d{4}/)[0])}</span>` : ""}</h2>
       <span class="muted">Solo por diversión: no se apuesta nada</span>
     </div>
     <div class="q-reglas">

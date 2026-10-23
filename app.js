@@ -230,12 +230,15 @@
 
   function renderCabecera() {
     document.getElementById("org").textContent = T.organizador || "";
-    // "Torneo Apertura Liga Menor 2026-2027" -> "TORNEO APERTURA" / "LIGA MENOR 2026-2027"
+    // "Torneo Apertura: Liga Especial de Escuelas de Fútbol" -> "TORNEO APERTURA" / "LIGA ESPECIAL…"
+    // (si no hay ":", se parte a la mitad; un año "2026-2027" al final va en dorado)
     const mN = String(T.nombre || "").match(/^(.*?)\s+(\d{4}-\d{4})$/);
-    const palabras = (mN ? mN[1] : String(T.nombre || "")).split(/\s+/);
-    const corte = Math.ceil(palabras.length / 2);
+    const base = mN ? mN[1] : String(T.nombre || "");
+    let l1, l2;
+    if (base.includes(":")) { const i = base.indexOf(":"); l1 = base.slice(0, i).trim(); l2 = base.slice(i + 1).trim(); }
+    else { const w = base.split(/\s+/), c = Math.ceil(w.length / 2); l1 = w.slice(0, c).join(" "); l2 = w.slice(c).join(" "); }
     document.getElementById("nombre-torneo").innerHTML =
-      `${esc(palabras.slice(0, corte).join(" "))} <span class="l2">${esc(palabras.slice(corte).join(" "))}${mN ? ` <span class="anio">${esc(mN[2])}</span>` : ""}</span>`;
+      `${esc(l1)} <span class="l2">${esc(l2)}${mN ? ` <span class="anio">${esc(mN[2])}</span>` : ""}</span>`;
     document.getElementById("pie-org").textContent = T.organizador || "";
     document.title = `${T.nombre} · ${T.organizador}`;
     const act = T.actualizado ? "Actualizado: " + fecha(T.actualizado, { day: "numeric", month: "long", year: "numeric" }) : "";
@@ -436,6 +439,63 @@
     </button>`;
   }
 
+  /* Avisos: "te avisamos cuando se actualicen las tablas" (nunca se piden solos) */
+  const avisosUI = { cargando: false, msg: "", ok: false };
+  function avisosEstado() {
+    const local = !!window.MODO_OFFLINE || location.protocol === "file:";
+    if (local || !QUINIELA_ACTIVA || !("serviceWorker" in navigator)) return "no";
+    const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const instalada = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || navigator.standalone;
+    if (ios && !instalada && !("PushManager" in window)) return "ios";
+    if (typeof Notification === "undefined" || !("PushManager" in window)) return "no";
+    if (Notification.permission === "denied") return "bloqueado";
+    let token = null;
+    try { token = localStorage.getItem("reddfut-avisos"); } catch (e) { /* nada */ }
+    return token && Notification.permission === "granted" ? "activos" : "apagados";
+  }
+  function avisosHTML() {
+    const e = avisosEstado();
+    if (e === "no") return "";
+    const textos = {
+      apagados: ["Avisos de las tablas", "Te llega una notificación cuando se actualicen las tablas de posiciones."],
+      activos: ["Avisos activados", "Te avisaremos en este dispositivo cuando se actualicen las tablas de posiciones."],
+      bloqueado: ["Avisos bloqueados", "Los bloqueaste en este navegador. Toca el candado junto a la dirección del sitio → Notificaciones → Permitir."],
+      ios: ["Avisos de las tablas", "En iPhone primero instala el sitio en tu pantalla de inicio y ábrelo desde ahí."]
+    };
+    const [t, d] = textos[e];
+    const boton = avisosUI.cargando ? `<button class="av-btn" disabled>Activando…</button>`
+      : e === "apagados" ? `<button class="av-btn" id="btn-avisos">Activar avisos</button>`
+      : e === "activos" ? `<button class="av-quitar" id="btn-avisos-quitar">Desactivar</button>`
+      : e === "ios" ? `<button class="av-btn" id="btn-avisos-ios">Cómo activarlos</button>` : "";
+    return `<div class="avisos av-${e}" id="caja-avisos">
+      <span class="av-campana" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2Z"/></svg>${e === "activos" ? "<i></i>" : ""}</span>
+      <span class="av-txt"><b>${t}</b><span>${avisosUI.msg ? esc(avisosUI.msg) : d}</span></span>
+      ${boton}
+    </div>`;
+  }
+  function repintarAvisos() {
+    const caja = document.getElementById("caja-avisos");
+    if (caja) caja.outerHTML = avisosHTML();
+  }
+  document.addEventListener("click", async (ev) => {
+    if (ev.target.closest("#btn-avisos-ios")) {
+      alert("Para recibir avisos en tu iPhone:\n\n1. Toca el botón Compartir (el cuadro con la flecha hacia arriba).\n2. Elige \"Agregar a pantalla de inicio\" y toca \"Agregar\".\n3. Abre el torneo desde ese ícono en tu pantalla.\n4. Toca \"Activar avisos\" en Inicio.\n\n(Necesitas iOS 16.4 o más reciente.)");
+      return;
+    }
+    const on = ev.target.closest("#btn-avisos"), off = ev.target.closest("#btn-avisos-quitar");
+    if (!on && !off) return;
+    avisosUI.cargando = !!on; avisosUI.msg = ""; repintarAvisos();
+    try {
+      const m = await import("./avisos.js");
+      try {
+        if (on) await m.activar(); else await m.desactivar();
+      } catch (err) { console.warn("avisos:", err); avisosUI.msg = m.mensajeError(err); }
+    } catch (err) {
+      avisosUI.msg = "No se pudieron activar los avisos. Revisa tu conexión a internet.";
+    }
+    avisosUI.cargando = false; repintarAvisos();
+  });
+
   function renderInicio() {
     const act = T.actualizado ? fecha(T.actualizado, { day: "numeric", month: "long", year: "numeric" }) : "";
     const jUlt = JORNADAS.filter((j) => j.numero <= JA).pop();
@@ -484,6 +544,7 @@
       </section>
 
       ${promoQuiniela()}
+      ${avisosHTML()}
 
       <section class="bloque">
         <h3 class="titulo-bloque">Categorías <small>Elige una para ver su tabla</small></h3>
@@ -636,6 +697,9 @@
       navigator.serviceWorker.register("sw.js", { updateViaCache: "none" })
         .then((reg) => reg.update())
         .catch(() => {});
+      if (avisosEstado() === "activos") {
+        setTimeout(() => import("./avisos.js").then((m) => m.renovarSiHaceFalta()).catch(() => {}), 4000);
+      }
     });
   }
   window.addEventListener("beforeinstallprompt", (e) => {

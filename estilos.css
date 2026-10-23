@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Torneo Apertura Liga Menor · REDDFUT Usulután
+   Torneo Apertura: Liga Especial de Escuelas de Fútbol · REDDFUT Usulután
    Identidad: azul marino y plata del escudo, franja negra del logo,
    dorado para lo importante y letra condensada de tablero deportivo.
    ========================================================================== */
@@ -533,6 +533,21 @@ table.tabla { width: 100%; border-collapse: collapse; font-size: .95rem; }
 .q-promo b { font-family: var(--titular); font-weight: 800; font-size: 1.35rem; text-transform: uppercase; line-height: 1.05; display: block; }
 .q-promo span { font-size: .9rem; }
 .q-promo .ir { font-family: var(--titular); font-weight: 800; text-transform: uppercase; letter-spacing: .08em; background: var(--azul); color: #fff; padding: 8px 14px 7px; border-radius: 3px; white-space: nowrap; }
+
+/* Avisos (notificaciones) en Inicio */
+.avisos { display: flex; align-items: center; gap: 12px 14px; flex-wrap: wrap; margin-top: 10px;
+  background: var(--blanco); border: 1px solid var(--linea); border-left: 5px solid var(--azul-2); border-radius: var(--radio); padding: 11px 14px; }
+.avisos .av-campana { position: relative; flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--azul); color: var(--oro); }
+.avisos .av-campana i { position: absolute; top: 6px; right: 7px; width: 9px; height: 9px; border-radius: 50%; background: #2fd47c; box-shadow: 0 0 0 2px var(--azul); }
+.avisos .av-txt { flex: 1 1 200px; min-width: 0; font-size: .9rem; color: var(--gris); line-height: 1.35; }
+.avisos .av-txt b { display: block; font-family: var(--titular); font-weight: 800; text-transform: uppercase; letter-spacing: .03em; font-size: 1.1rem; color: var(--azul); line-height: 1.1; margin-bottom: 1px; }
+.avisos .av-btn { font-family: var(--titular); font-weight: 800; text-transform: uppercase; letter-spacing: .08em; font-size: .95rem;
+  background: var(--azul); color: #fff; border: 0; border-radius: 3px; padding: 9px 14px 8px; white-space: nowrap; cursor: pointer; }
+.avisos .av-btn:disabled { opacity: .6; cursor: progress; }
+.avisos .av-quitar { background: none; border: 0; color: var(--gris); text-decoration: underline; font-size: .85rem; cursor: pointer; padding: 6px 2px; }
+.avisos.av-activos { border-left-color: var(--verde); }
+.avisos.av-bloqueado { border-left-color: var(--plata-osc); }
 
 /* ---------- Ajustes para celular ---------- */
 .partido-meta:empty { display: none; }

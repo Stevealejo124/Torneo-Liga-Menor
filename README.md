@@ -1,6 +1,6 @@
-# ⚽ Torneo Apertura Liga Menor 2026-2027 · REDDFUT Usulután
+# ⚽ Torneo Apertura: Liga Especial de Escuelas de Fútbol · REDDFUT Usulután
 
-Sitio web con los resultados, la tabla de posiciones y los playoffs del **Torneo Apertura Liga Menor 2026-2027** de las escuelas de fútbol de REDDFUT Usulután.
+Sitio web con los resultados, la tabla de posiciones y los playoffs del **Torneo Apertura: Liga Especial de Escuelas de Fútbol** de las escuelas de fútbol de REDDFUT Usulután.
 Categorías: Sub-7, Sub-9, Sub-11, Sub-13 y Sub-15.
 
 **Secciones del sitio:** Inicio (portada con bienvenida, accesos rápidos, líderes por categoría y escuelas participantes) · Posiciones · Resultados · Playoffs · Reglamento.
@@ -22,6 +22,8 @@ La portada se arma sola con los datos de `datos.js`; no hay que editarla.
 | `sw.js` | No | Guarda una copia para que funcione sin internet |
 | `firebase-config.js` | Solo para activar la quiniela | Datos de Firebase y si la quiniela está activa |
 | `quiniela.js` | No | El juego de pronósticos (se carga solo al abrir la pestaña Quiniela) |
+| `avisos.js` | No | Botón "Activar avisos" de Inicio (aviso cuando se actualizan las tablas) |
+| `enviar-avisos.mjs` | No | Lo usa GitHub para mandar los avisos cuando subes resultados |
 | `letra-600.woff2`, `letra-800.woff2` | No | Letra de los títulos y marcadores (Barlow Condensed, licencia libre OFL) |
 | `icono-512.png` | No | Ícono grande de la app instalada |
 | `.nojekyll` | No | Hace que GitHub Pages publique los archivos tal cual |
@@ -32,7 +34,7 @@ La portada se arma sola con los datos de `datos.js`; no hay que editarla.
 ## Publicar en GitHub Pages (solo la primera vez)
 1. Crea una cuenta en github.com y presiona **New repository**. Ponle un nombre, por ejemplo `torneo-reddfut`, márcalo como **Public** y crea el repositorio.
 2. Presiona **Add file → Upload files** y selecciona **todos los archivos** de la carpeta `torneo-reddfut`. Todos están al mismo nivel, sin subcarpetas, así que puedes elegirlos juntos o subirlos uno por uno:
-   `index.html`, `datos.js`, `app.js`, `estilos.css`, `404.html`, `README.md`, `logo.png`, `favicon.png`, `icono-192.png`, `icono-512.png`, `apple-touch-icon.png`, `compartir.png`, `manifest.webmanifest`, `sw.js`, `letra-600.woff2`, `letra-800.woff2`, `firebase-config.js`, `quiniela.js`.
+   `index.html`, `datos.js`, `app.js`, `estilos.css`, `404.html`, `README.md`, `logo.png`, `favicon.png`, `icono-192.png`, `icono-512.png`, `apple-touch-icon.png`, `compartir.png`, `manifest.webmanifest`, `sw.js`, `letra-600.woff2`, `letra-800.woff2`, `firebase-config.js`, `quiniela.js`, `avisos.js`, `enviar-avisos.mjs`.
    - `.nojekyll` y `.gitignore` son archivos ocultos y **opcionales**. Si tu computadora no los muestra, no pasa nada: el sitio funciona igual.
 3. Presiona **Commit changes**.
 4. Entra a **Settings → Pages**. En *Branch* elige `main` y la carpeta `/ (root)`, y presiona **Save**.
@@ -92,6 +94,13 @@ Si la REDDFUT define otro cruce, puedes forzarlo: `C1: { local: "...", visitante
 Juego para que la gente adivine quién gana cada partido, por diversión (sin apuestas). Entran con su cuenta de Google, eligen un apodo y ganan 1 punto por acierto. Está **desactivado** hasta que configures Firebase: sigue la guía `GUIA_QUINIELA.md` de la carpeta **Configurar_Quiniela**.
 
 Cada semana: agrega la próxima jornada en `datos.js` con su `fecha` y sus cruces (sin resultados) antes de que se juegue, y abre la pestaña Quiniela con tu cuenta de organizador para publicarla.
+
+## Avisos (notificaciones)
+
+En Inicio hay un botón **Activar avisos**. Quien lo toca recibe una notificación cada vez que subes un `datos.js` con **resultados nuevos**: "📊 Jornada N: tablas actualizadas". Si solo corriges un marcador, no se manda nada.
+
+Para que funcione hacen falta 3 cosas (una sola vez; ver `GUIA_AVISOS.md`): el secreto `FIREBASE_CUENTA` en GitHub, el archivo `.github/workflows/avisos.yml` y las reglas de Firestore actualizadas.
+En iPhone los avisos solo funcionan si la persona instala el sitio en su pantalla de inicio (iOS 16.4 o más reciente).
 
 ## Anuncios
 

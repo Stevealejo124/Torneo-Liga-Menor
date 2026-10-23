@@ -15,7 +15,7 @@
    ===================================================================== */
 
 window.TORNEO = {
-  nombre: "Torneo Apertura Liga Menor 2026-2027",
+  nombre: "Torneo Apertura: Liga Especial de Escuelas de Fútbol",
   subtitulo: "Escuelas de fútbol infanto-juveniles de Usulután",
   organizador: "REDDFUT Usulután",
   urlSitio: "https://stevealejo124.github.io/Torneo-Liga-Menor/",
