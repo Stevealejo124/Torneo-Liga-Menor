@@ -19,7 +19,7 @@ window.TORNEO = {
   subtitulo: "Escuelas de fútbol infanto-juveniles de Usulután",
   organizador: "REDDFUT Usulután",
   urlSitio: "https://stevealejo124.github.io/Torneo-Liga-Menor/",
-  actualizado: "2026-10-18",       // fecha de la última actualización (AAAA-MM-DD)
+  actualizado: "2026-10-22",       // fecha de la última actualización (AAAA-MM-DD)
 
   // true = muestra el aviso amarillo de "datos de ejemplo"
   modoDemo: false,
@@ -89,6 +89,26 @@ window.TORNEO = {
           resultados: { "Sub-9": "8-4", "Sub-11": "6-4", "Sub-13": "4-7", "Sub-15": "6-0" } },
         { local: "Estanzuelas", visitante: "Ciudad El Triunfo",
           resultados: { "Sub-9": "2-9", "Sub-11": "6-11", "Sub-13": "11-7" } }
+      ]
+    },
+    {
+      numero: 3,
+      fecha: "2026-10-17",
+      partidos: [
+        { local: "Berlín", visitante: "Santiago de María",
+          resultados: { "Sub-9": "4-7", "Sub-11": "12-7", "Sub-13": "2-2", "Sub-15": "4-2" } },
+        { local: "El Tránsito", visitante: "Lolotique",
+          resultados: { "Sub-7": "3-1", "Sub-9": "13-1", "Sub-11": "3-3", "Sub-13": "5-2", "Sub-15": "4-2" } },
+        { local: "Jucuapa", visitante: "Topiltzin",
+          resultados: { "Sub-7": "2-6", "Sub-9": "3-12", "Sub-11": "3-7", "Sub-13": "2-3", "Sub-15": "0-0" } },
+        { local: "San Marcos", visitante: "Alegría",
+          resultados: { "Sub-9": "20-0", "Sub-11": "8-4", "Sub-13": "8-0", "Sub-15": "1-5" } },
+        { local: "Gerardo Barrios", visitante: "Mercedes Umaña",
+          resultados: { "Sub-9": "14-2", "Sub-11": "2-0 W.O.", "Sub-13": "6-2" } },
+        { local: "Puerto El Triunfo", visitante: "Ciudad El Triunfo",
+          resultados: { "Sub-9": "12-2", "Sub-11": "6-1", "Sub-13": "6-3", "Sub-15": "9-3" } },
+        { local: "La Noria", visitante: "Estanzuelas",
+          resultados: { "Sub-9": "13-4", "Sub-11": "7-0", "Sub-13": "16-0" } }
       ]
     }
   ],
