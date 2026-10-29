@@ -19,7 +19,7 @@ window.TORNEO = {
   subtitulo: "Escuelas de fútbol infanto-juveniles de Usulután",
   organizador: "REDDFUT Usulután",
   urlSitio: "https://stevealejo124.github.io/Torneo-Liga-Menor/",
-  actualizado: "2026-10-22",       // fecha de la última actualización (AAAA-MM-DD)
+  actualizado: "2026-10-29",       // fecha de la última actualización (AAAA-MM-DD)
 
   // true = muestra el aviso amarillo de "datos de ejemplo"
   modoDemo: false,
@@ -110,6 +110,26 @@ window.TORNEO = {
         { local: "La Noria", visitante: "Estanzuelas",
           resultados: { "Sub-9": "13-4", "Sub-11": "7-0", "Sub-13": "16-0" } }
       ]
+    },
+    {
+      numero: 4,
+      fecha: "2026-10-24",
+      partidos: [
+        { local: "Topiltzin", visitante: "El Tránsito",
+          resultados: { "Sub-7": "6-5", "Sub-9": "1-3", "Sub-11": "6-0", "Sub-13": "3-2", "Sub-15": "1-4" } },
+        { local: "Santiago de María", visitante: "Jucuapa",
+          resultados: { "Sub-9": "10-5", "Sub-11": "1-9", "Sub-13": "1-1", "Sub-15": "2-2" } },
+        { local: "Ciudad El Triunfo", visitante: "Gerardo Barrios",
+          resultados: { "Sub-9": "3-15", "Sub-11": "2-5", "Sub-13": "0-8", "Sub-15": "0-5" } },
+        { local: "Alegría", visitante: "La Noria",
+          resultados: { "Sub-9": "1-13", "Sub-11": "2-7", "Sub-13": "0-5", "Sub-15": "5-2" } },
+        { local: "Lolotique", visitante: "San Marcos",
+          resultados: { "Sub-9": "0-9", "Sub-11": "7-4", "Sub-13": "2-6", "Sub-15": "3-0" } },
+        { local: "Estanzuelas", visitante: "Puerto El Triunfo",
+          resultados: { "Sub-9": "2-19", "Sub-11": "6-14", "Sub-13": "6-10" } },
+        { local: "Mercedes Umaña", visitante: "Berlín",
+          resultados: { "Sub-9": "1-18", "Sub-11": "5-4", "Sub-13": "6-3" } }
+      ]
     }
   ],
 
@@ -124,7 +144,10 @@ window.TORNEO = {
   // ---- AJUSTES DE PUNTOS (sanciones). Ejemplo:
   // { escuela: "Berlín", categoria: "Sub-15", puntos: -3, motivo: "Alineación indebida" }
   // categoria puede ser "Todas".
-  ajustes: [],
+  ajustes: [
+    { escuela: "Puerto El Triunfo", categoria: "Sub-15", puntos: -3, motivo: "Decisión de la organización" },
+    { escuela: "La Noria",          categoria: "Sub-15", puntos: 3,  motivo: "Decisión de la organización" }
+  ],
 
   // ---- ANUNCIOS: aparecen al final de cada sección, sin tapar nada.
   // Para quitar uno, borra su bloque { ... }. Para cambiar textos o enlace,
