@@ -20,6 +20,9 @@ window.TORNEO = {
   organizador: "REDDFUT Usulután",
   urlSitio: "https://stevealejo124.github.io/Torneo-Liga-Menor/",
   actualizado: "2026-11-09",       // fecha de la última actualización (AAAA-MM-DD)
+  // Horario de cada categoría los sábados (24 h). Las que tienen la misma hora
+  // juegan al mismo tiempo en distintas partes de la cancha.
+  horarios: { "Sub-7": "08:00", "Sub-11": "08:00", "Sub-9": "09:30", "Sub-13": "10:00", "Sub-15": "11:10" },
 
   // true = muestra el aviso amarillo de "datos de ejemplo"
   modoDemo: false,

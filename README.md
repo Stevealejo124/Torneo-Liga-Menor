@@ -49,22 +49,20 @@ WhatsApp y Facebook solo muestran la imagen si la dirección es completa.
 
 ## Actualizar cada semana
 1. Anota los resultados en el Excel de control (`Resultados_Torneo_REDDFUT_Usulutan.xlsx`) y revisa que la columna **Revisión** muestre ✓ en todas las filas.
-2. En GitHub, abre `datos.js`, presiona ✏️ (*Edit*), agrega la jornada nueva y cambia `actualizado`.
+2. En GitHub, abre `datos.js`, presiona ✏️ (*Edit*), busca la jornada (las 13 ya están con sus partidos y canchas del calendario oficial), escribe los `resultados` y cambia `actualizado`.
 3. Presiona **Commit changes**. En 1 o 2 minutos el sitio se actualiza.
 4. Compara la tabla del sitio con la del Excel. Deben ser idénticas, porque usan los mismos criterios.
 
-Ejemplo de jornada en `datos.js` (copia el bloque, pégalo después de la última jornada y cambia los datos):
+Ejemplo: así queda un partido antes y después de agregar sus resultados:
 ```js
-{
-  numero: 3,
-  fecha: "2026-10-24",
-  partidos: [
-    { local: "Alegría", visitante: "Berlín",
-      resultados: { "Sub-7": "1-0", "Sub-9": "2-2", "Sub-11": "0-1", "Sub-13": "3-1", "Sub-15": "1-1" } },
-    // ...los otros 6 partidos
-  ]
-},
+// antes (programado)
+{ local: "Santiago de María", visitante: "San Marcos", cancha: "Santiago de María" },
+// después
+{ local: "Santiago de María", visitante: "San Marcos", cancha: "Santiago de María",
+  resultados: { "Sub-9": "2-1", "Sub-11": "0-0", "Sub-13": "3-1", "Sub-15": "1-1" } },
 ```
+
+**Contador:** en Inicio hay un contador en vivo hacia la próxima jornada. Usa la `fecha` de cada jornada y los `horarios` de cada categoría (arriba en `datos.js`: Sub-7 y Sub-11 a las 08:00, Sub-9 09:30, Sub-13 10:00, Sub-15 11:10). El sábado muestra qué categorías ya empezaron y cuánto falta para el siguiente turno. Si la comisión mueve una fecha, cambia solo la `fecha` de esa jornada (AAAA-MM-DD).
 
 **Reglas para escribir resultados** (siempre goles LOCAL - VISITANTE):
 - `"2-1"`: resultado normal.
@@ -93,7 +91,7 @@ Si la REDDFUT define otro cruce, puedes forzarlo: `C1: { local: "...", visitante
 
 Juego para que la gente adivine quién gana cada partido, por diversión (sin apuestas). Entran con su cuenta de Google, eligen un apodo y ganan 1 punto por acierto. Está **desactivado** hasta que configures Firebase: sigue la guía `GUIA_QUINIELA.md` de la carpeta **Configurar_Quiniela**.
 
-Cada semana: agrega la próxima jornada en `datos.js` con su `fecha` y sus cruces (sin resultados) antes de que se juegue, y abre la pestaña Quiniela con tu cuenta de organizador para publicarla.
+Cada semana: las jornadas ya están en `datos.js` con su `fecha` y sus cruces; revisa que la fecha sea la correcta y abre la pestaña Quiniela con tu cuenta de organizador para publicarla.
 
 ## Avisos (notificaciones)
 

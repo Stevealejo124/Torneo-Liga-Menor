@@ -247,7 +247,13 @@
       <span class="franja-txt">${esc(T.subtitulo || "")}</span>
       <span class="franja-jor" role="progressbar" aria-valuemin="0" aria-valuemax="${NJ}" aria-valuenow="${JA}" aria-label="Jornadas jugadas">
         ${JA ? `Jornada <b>${JA}</b> de ${NJ}` : "Por iniciar"} ${ticksHTML()}
-      </span>`;
+      </span>${(() => {
+        const P = proximaJornada();
+        if (!P || P.modo === "espera") return "";
+        return P.modo === "vivo"
+          ? `<span class="franja-cuenta vivo"><i></i>J${P.j.numero} en juego</span>`
+          : `<span class="franja-cuenta">J${P.j.numero} en <b data-cuenta-corta="${P.t}"></b></span>`;
+      })()}`;
 
     let html = "";
     if (T.modoDemo) html += `<div class="aviso aviso-demo">⚠️ <b>Datos de ejemplo.</b> Los nombres de las escuelas y los resultados mostrados son provisionales.</div>`;
@@ -337,7 +343,11 @@
       cuerpo = `<div class="tarjeta vacio"><span class="icono">📅</span>Los resultados de la jornada ${estado.jornada} se publicarán cuando se dispute.</div>`;
     } else {
       const sinJugar = !j.partidos.some((p) => CATS.some((c) => parseRes(p.resultados && p.resultados[c])));
-      cuerpo = (sinJugar ? `<div class="aviso-proy">📅 <b>Programación oficial.</b> Las fechas y canchas pueden cambiar por decisión de la comisión organizadora.</div>` : "")
+      const P = proximaJornada();
+      const relojJ = P && P.j && P.j.numero === j.numero
+        ? (P.modo === "vivo" ? `<div class="mini-cuenta vivo"><i></i>Se está jugando hoy</div>`
+          : `<div class="mini-cuenta">⏱️ Faltan <b data-cuenta-corta="${P.t}"></b> para esta jornada</div>`) : "";
+      cuerpo = relojJ + (sinJugar ? `<div class="aviso-proy">📅 <b>Programación oficial.</b> Las fechas y canchas pueden cambiar por decisión de la comisión organizadora.</div>` : "")
         + `<div class="partidos">${j.partidos.map((p) => {
         const r = parseRes(p.resultados && p.resultados[estado.cat]);
         const jugado = CATS.some((c) => parseRes(p.resultados && p.resultados[c]));
@@ -345,7 +355,8 @@
         if (r && r.gl != null) {
           if (r.gl > r.gv) clsV = "perdio"; else if (r.gv > r.gl) clsL = "perdio";
         }
-        const meta = [p.fecha ? fecha(p.fecha, { weekday: "short", day: "numeric", month: "short" }) : "", p.hora || "", p.cancha ? "📍 " + p.cancha : ""].filter(Boolean).join(" · ");
+        const hCat = !jugado && !p.hora && horaDe(estado.cat) ? "🕗 " + horaTxt(horaDe(estado.cat)) : "";
+        const meta = [p.fecha ? fecha(p.fecha, { weekday: "short", day: "numeric", month: "short" }) : "", p.hora || hCat, p.cancha ? "📍 " + p.cancha : ""].filter(Boolean).join(" · ");
         const todas = estado.todas ? `<div class="todas-cats">${CATS.map((c) => {
           const rc = parseRes(p.resultados && p.resultados[c]);
           const txt = !rc ? "–" : rc.gl == null ? "✕" : `${rc.gl}-${rc.gv}`;
@@ -424,6 +435,106 @@
   /* ------------------------------------------------------------------ */
   /* Render: Inicio (portada)                                           */
   /* ------------------------------------------------------------------ */
+  /* ---------- Contador en tiempo real hacia la próxima jornada ---------- */
+  const esHora = (h) => /^\d{1,2}:\d{2}$/.test(h || "");
+  const minutos = (h) => { const [a, b] = h.split(":"); return +a * 60 + +b; };
+  const HORARIOS = CATS.filter((c) => T.horarios && esHora(T.horarios[c])).map((c) => ({ c, h: T.horarios[c] }));
+  const horaDe = (c) => (HORARIOS.find((x) => x.c === c) || {}).h || null;
+  /* Turnos: categorías agrupadas por hora (las de la misma hora juegan a la vez) */
+  const TURNOS = [...new Set(HORARIOS.map((x) => x.h))].sort((a, b) => minutos(a) - minutos(b))
+    .map((h) => ({ h, cats: HORARIOS.filter((x) => x.h === h).map((x) => x.c) }));
+  const HORA_JUEGOS = TURNOS.length ? TURNOS[0].h : (esHora(T.horaJuegos) ? T.horaJuegos : "08:00");
+  /* Se da por terminada la mañana ~80 min después del último turno */
+  const FIN_JUEGOS_MS = ((TURNOS.length ? minutos(TURNOS[TURNOS.length - 1].h) - minutos(HORA_JUEGOS) : 240) + 80) * 60e3;
+  function momento(fechaISO, h) {
+    const [a, b] = h.split(":");
+    const d = new Date(`${fechaISO}T${a.padStart(2, "0")}:${b}:00-06:00`);   // hora de El Salvador
+    return isNaN(d) ? null : d.getTime();
+  }
+  function inicioJornada(j) { return j && j.fecha ? momento(j.fecha, HORA_JUEGOS) : null; }
+  const horaTxt = (h) => { const [a, b] = h.split(":").map(Number); return `${((a + 11) % 12) + 1}:${String(b).padStart(2, "0")}\u00a0${a < 12 ? "a.\u00a0m." : "p.\u00a0m."}`; };
+  function turnosHTML(j, ahora = Date.now()) {
+    if (!TURNOS.length) return "";
+    const enVivo = ahora >= inicioJornada(j);
+    const sig = enVivo ? TURNOS.find((t) => momento(j.fecha, t.h) > ahora) : null;
+    return `<div class="cuenta-turnos">${TURNOS.map((t) => {
+      const ini = momento(j.fecha, t.h);
+      const est = !enVivo ? "" : ini <= ahora ? "ya" : t === sig ? "sig" : "";
+      const etq = est === "ya" ? "✓ Ya empezó" : est === "sig" ? `Empieza en <b data-cuenta-corta="${ini}"></b>` : "";
+      return `<div class="turno ${est}"><span class="t-hora">${horaTxt(t.h)}</span><span class="t-cats">${t.cats.map(esc).join(" · ")}</span>${etq ? `<span class="t-est">${etq}</span>` : ""}</div>`;
+    }).join("")}</div>`;
+  }
+  function tieneResultados(j) {
+    return (j.partidos || []).some((p) => CATS.some((c) => parseRes(p.resultados && p.resultados[c])));
+  }
+  /* Qué toca ahora: "cuenta" (falta para la próxima), "vivo" (se está jugando hoy) o null */
+  function proximaJornada(ahora = Date.now()) {
+    const pend = JORNADAS.filter((j) => (j.partidos || []).length && !tieneResultados(j) && inicioJornada(j));
+    const vivo = pend.find((j) => ahora >= inicioJornada(j) && ahora < inicioJornada(j) + FIN_JUEGOS_MS);
+    if (vivo) return { modo: "vivo", j: vivo, t: inicioJornada(vivo) };
+    const prox = pend.find((j) => inicioJornada(j) > ahora);
+    const sinRes = pend.filter((j) => inicioJornada(j) + FIN_JUEGOS_MS <= ahora).map((j) => j.numero);
+    return prox ? { modo: "cuenta", j: prox, t: inicioJornada(prox), sinRes } : (sinRes.length ? { modo: "espera", sinRes } : null);
+  }
+  function partesCuenta(ms) {
+    const s = Math.max(0, Math.floor(ms / 1000));
+    return { d: Math.floor(s / 86400), h: Math.floor(s / 3600) % 24, m: Math.floor(s / 60) % 60, s: s % 60 };
+  }
+  const dos2 = (n) => String(n).padStart(2, "0");
+  function cuentaHTML() {
+    const P = proximaJornada();
+    if (!P) return "";
+    const listaSinRes = P.sinRes && P.sinRes.length
+      ? `<p class="cuenta-nota">✅ ${P.sinRes.length > 1 ? "Jornadas" : "Jornada"} ${P.sinRes.join(", ")} ya ${P.sinRes.length > 1 ? "se jugaron" : "se jugó"} · los resultados se publicarán pronto.</p>` : "";
+    if (P.modo === "espera") return `<section class="cuenta cuenta-espera">${listaSinRes}</section>`;
+    const j = P.j;
+    const dia = fecha(j.fecha, { weekday: "long", day: "numeric", month: "long" });
+    const hora = new Date(P.t).toLocaleTimeString("es-SV", { hour: "numeric", minute: "2-digit", timeZone: "America/El_Salvador" }).replace(/\s/g, "\u00a0");
+    const cruces = j.partidos.map((p) => `<span class="cuenta-cruce" title="${esc(p.local)} vs ${esc(p.visitante)}${p.cancha ? " · " + esc(p.cancha) : ""}">${escudo(p.local)}<i>vs</i>${escudo(p.visitante)}</span>`).join("");
+    const reloj = P.modo === "vivo"
+      ? `<div class="cuenta-vivo"><span class="punto"></span><b>Se está jugando hoy</b></div>`
+      : (() => { const c = partesCuenta(P.t - Date.now()); return `<div class="cuenta-reloj" data-cuenta="${P.t}" role="timer" aria-live="off">
+          ${[["d", "Días"], ["h", "Horas"], ["m", "Min"], ["s", "Seg"]].map(([k, t]) => `<div class="dig"><b data-k="${k}">${k === "d" ? c[k] : dos2(c[k])}</b><span>${t}</span></div>`).join("")}
+        </div>`; })();
+    return `<section class="cuenta ${P.modo === "vivo" ? "en-vivo" : ""}">
+      <div class="cuenta-cab">
+        <span class="cuenta-tit">${P.modo === "vivo" ? "En juego" : "Próxima jornada"}</span>
+        <span class="cuenta-num">J${dos2(j.numero)}</span>
+      </div>
+      ${reloj}
+      <p class="cuenta-fecha">${esc(dia)} · desde las ${esc(hora)}</p>
+      ${turnosHTML(j)}
+      <div class="cuenta-cruces">${cruces}</div>
+      <button class="cuenta-ver" data-ir="resultados" data-jor="${j.numero}">Ver los ${j.partidos.length} partidos y canchas ›</button>
+      ${listaSinRes}
+    </section>`;
+  }
+  /* Un solo reloj para todo el sitio: actualiza los números cada segundo */
+  function claveCuenta(ahora) {
+    const P0 = proximaJornada(ahora);
+    const turno = P0 && P0.modo === "vivo" ? TURNOS.filter((t) => momento(P0.j.fecha, t.h) <= ahora).length : -1;
+    return JSON.stringify(P0) + "|" + turno;
+  }
+  let modoCuenta = claveCuenta(Date.now());
+  function tic() {
+    const ahora = Date.now();
+    document.querySelectorAll("[data-cuenta]").forEach((el) => {
+      const c = partesCuenta(+el.dataset.cuenta - ahora);
+      el.querySelectorAll("b[data-k]").forEach((b) => {
+        const v = b.dataset.k === "d" ? String(c.d) : dos2(c[b.dataset.k]);
+        if (b.textContent !== v) b.textContent = v;
+      });
+    });
+    document.querySelectorAll("[data-cuenta-corta]").forEach((el) => {
+      const c = partesCuenta(+el.dataset.cuentaCorta - ahora);
+      const v = c.d ? `${c.d}d ${dos2(c.h)}h ${dos2(c.m)}m` : `${dos2(c.h)}:${dos2(c.m)}:${dos2(c.s)}`;
+      if (el.textContent !== v) el.textContent = v;
+    });
+    const m = claveCuenta(ahora);   // llegó la hora: cambia a "en juego", al siguiente turno, etc.
+    if (m !== modoCuenta) { modoCuenta = m; renderCabecera(); if (estado.tab === "inicio" || estado.tab === "resultados") render(); }
+  }
+  setInterval(tic, 1000);
+
   function promoQuiniela() {
     if (!QUINIELA_ACTIVA) return "";
     const hora = (Q.horaCierre || "07:00");
@@ -545,6 +656,7 @@
         </div>
       </section>
 
+      ${cuentaHTML()}
       ${promoQuiniela()}
       ${avisosHTML()}
 
@@ -634,6 +746,7 @@
     ({ inicio: renderInicio, posiciones: renderPosiciones, resultados: renderResultados, playoffs: renderPlayoffs, reglamento: renderReglamento, quiniela: renderQuiniela })[estado.tab]();
     app.insertAdjacentHTML("beforeend", anunciosHTML());
     guardarHash();
+    tic();
   }
 
   document.getElementById("tabs").addEventListener("click", (e) => {
@@ -654,6 +767,7 @@
       estado.tab = ir.dataset.ir;
       if (ir.dataset.cat) estado.cat = ir.dataset.cat;
       if (estado.tab === "resultados" && JA) estado.jornada = JA;
+      if (ir.dataset.jor) estado.jornada = +ir.dataset.jor;
       render();
       const barra = document.querySelector(".barra");
       window.scrollTo({ top: barra.getBoundingClientRect().top + window.scrollY - 1, behavior: "smooth" });

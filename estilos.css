@@ -582,3 +582,77 @@ table.tabla { width: 100%; border-collapse: collapse; font-size: .95rem; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; }
 }
+
+/* ------------------------------------------------------------------ */
+/* Contador hacia la próxima jornada (marcador de estadio)            */
+/* ------------------------------------------------------------------ */
+.cuenta {
+  margin-top: 14px; padding: 16px 18px 18px; border-radius: var(--radio);
+  background: var(--tinta); color: #fff; border: 1px solid #000; border-bottom: 6px solid var(--oro);
+  display: grid; gap: 12px; position: relative; overflow: hidden;
+}
+.cuenta::after { /* líneas de cancha muy tenues */
+  content: ""; position: absolute; right: -60px; top: -60px; width: 220px; height: 220px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.06); box-shadow: 0 0 0 38px rgba(255,255,255,.025); pointer-events: none;
+}
+.cuenta-espera { border-bottom-color: var(--verde); }
+.cuenta-cab { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-family: var(--titular); text-transform: uppercase; }
+.cuenta-tit { font-weight: 700; letter-spacing: .16em; font-size: .95rem; color: var(--oro); }
+.cuenta-num { font-weight: 800; font-size: 1.5rem; letter-spacing: .04em; color: var(--plata); }
+.cuenta-reloj { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.cuenta-reloj .dig {
+  background: var(--negro); border: 1px solid rgba(255,255,255,.08); border-radius: 4px; padding: 10px 4px 8px; text-align: center;
+  box-shadow: inset 0 -18px 0 rgba(255,255,255,.025);
+}
+.cuenta-reloj b {
+  display: block; font-family: var(--titular); font-weight: 800; font-size: clamp(2.4rem, 11vw, 3.6rem); line-height: .95;
+  color: var(--oro); font-variant-numeric: tabular-nums; letter-spacing: .01em;
+}
+.cuenta-reloj span { font-family: var(--titular); font-weight: 700; text-transform: uppercase; letter-spacing: .14em; font-size: .78rem; color: var(--plata-osc); }
+.cuenta-fecha { margin: 0; font-size: .95rem; color: var(--plata); }
+.cuenta-fecha::first-letter { text-transform: uppercase; }
+.cuenta-cruces { display: flex; flex-wrap: wrap; gap: 6px; }
+.cuenta-cruce {
+  display: inline-flex; align-items: center; gap: 4px; padding: 4px 7px; border-radius: 3px;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.08);
+}
+.cuenta-cruce i { font-style: normal; font-family: var(--titular); font-weight: 700; font-size: .72rem; color: var(--plata-osc); text-transform: uppercase; }
+.cuenta-ver {
+  justify-self: start; border: 0; background: var(--oro); color: var(--tinta); border-radius: 3px; padding: 10px 16px 9px;
+  font-family: var(--titular); font-weight: 800; font-size: 1.02rem; letter-spacing: .08em; text-transform: uppercase;
+}
+.cuenta-ver:hover { background: #ffc81f; }
+.cuenta-nota { margin: 0; font-size: .86rem; color: var(--plata); }
+.cuenta-vivo { display: flex; align-items: center; gap: 12px; padding: 14px 0 6px; font-family: var(--titular); text-transform: uppercase; }
+.cuenta-vivo b { font-weight: 800; font-size: clamp(1.8rem, 8vw, 2.6rem); letter-spacing: .03em; }
+.cuenta-vivo .punto, .franja-cuenta.vivo i, .mini-cuenta.vivo i {
+  width: 14px; height: 14px; border-radius: 50%; background: #e5372b; flex: none; animation: latido 1.2s ease-in-out infinite;
+}
+@keyframes latido { 0%, 100% { box-shadow: 0 0 0 0 rgba(229,55,43,.6); } 50% { box-shadow: 0 0 0 7px rgba(229,55,43,0); } }
+@media (prefers-reduced-motion: reduce) { .cuenta-vivo .punto, .franja-cuenta.vivo i, .mini-cuenta.vivo i { animation: none; } }
+
+.franja-cuenta { display: inline-flex; align-items: center; gap: 7px; padding-left: 18px; border-left: 1px solid rgba(255,255,255,.15); letter-spacing: .1em; white-space: nowrap; }
+.franja-cuenta b { color: var(--oro); font-weight: 800; font-variant-numeric: tabular-nums; }
+.franja-cuenta.vivo i { width: 9px; height: 9px; }
+@media (max-width: 600px) { .franja-cuenta { padding-left: 0; border-left: 0; } .franja-inner { row-gap: 4px; } }
+
+.mini-cuenta {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 10px 14px; border-radius: var(--radio);
+  background: var(--tinta); color: var(--plata); font-size: .95rem;
+}
+.mini-cuenta b { color: var(--oro); font-family: var(--titular); font-weight: 800; font-size: 1.15rem; letter-spacing: .04em; font-variant-numeric: tabular-nums; }
+.mini-cuenta.vivo i { width: 10px; height: 10px; }
+
+/* Turnos por categoría dentro del contador */
+.cuenta-turnos { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 6px; }
+.turno {
+  display: grid; grid-template-columns: 1fr; gap: 1px; padding: 8px 10px; border-radius: 4px;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); border-left: 3px solid var(--plata-osc);
+}
+.turno .t-hora { font-family: var(--titular); font-weight: 800; font-size: 1.15rem; color: #fff; letter-spacing: .03em; white-space: nowrap; }
+.turno .t-cats { font-family: var(--titular); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; font-size: .9rem; color: var(--plata); }
+.turno .t-est { grid-column: 1 / -1; font-size: .8rem; color: var(--plata-osc); }
+.turno .t-est b { color: var(--oro); font-variant-numeric: tabular-nums; }
+.turno.ya { border-left-color: var(--verde); opacity: .75; }
+.turno.ya .t-est { color: #7fd3a4; }
+.turno.sig { border-left-color: var(--oro); background: rgba(242,183,5,.1); }
