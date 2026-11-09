@@ -282,6 +282,10 @@ window.TORNEO = {
     { escuela: "La Noria",          categoria: "Sub-15", puntos: 3,  motivo: "Decisión de la organización" }
   ],
 
+  // ---- APÓYANOS: correo al que llegan fotos, videos, escudos, ubicaciones de
+  // canchas, correcciones, etc. (sección "¿Te gustaría apoyarnos?" en Inicio).
+  contacto: { correo: "cseuropa1890@gmail.com" },
+
   // ---- ANUNCIOS: aparecen al final de cada sección, sin tapar nada.
   // Para quitar uno, borra su bloque { ... }. Para cambiar textos o enlace,
   // edita aquí. "estilo" puede ser "retro" (oscuro) o "claro".
@@ -292,15 +296,15 @@ window.TORNEO = {
       titulo: "¿Te creés DT?",
       texto: "Elegí un club de la liga salvadoreña, armá la plantilla, fichá en el mercado de pases y peleá el ascenso. Gratis y desde el navegador.",
       boton: "Jugar gratis",
-      url: "https://7320256-arch.github.io/Retro-Football-Manager-SV/"
+      url: "https://7320256-arch.github.io/"
     },
     {
       estilo: "claro",
       marca: "Christopher Alejo · Jiquilisco, Usulután",
       titulo: "Herramientas digitales para tu negocio",
-      texto: "Menús digitales con pedidos por WhatsApp, marcadores deportivos para torneos y sitios web sencillos. Sin instalar nada.",
+      texto: "Menús digitales con pedidos por WhatsApp, marcadores deportivos en vivo para torneos, apps a medida y sitios web sencillos. Sin instalar nada.",
       boton: "Ver proyectos",
-      url: "https://7320256-arch.github.io/Portafolio-/"
+      url: "https://stevealejo124.github.io/Portafolio-/"
     }
   ],
 

@@ -662,3 +662,62 @@ table.tabla { width: 100%; border-collapse: collapse; font-size: .95rem; }
 .turno.ya { border-left-color: var(--verde); opacity: .75; }
 .turno.ya .t-est { color: #7fd3a4; }
 .turno.sig { border-left-color: var(--oro); background: rgba(242,183,5,.1); }
+
+/* ------------------------------------------------------------------ */
+/* ¿Te gustaría apoyarnos?                                            */
+/* ------------------------------------------------------------------ */
+.pista-escudo { margin: 10px 2px 0; font-size: .9rem; color: var(--gris); }
+.pista-escudo a, .pie-apoyo a { color: inherit; font-weight: 700; text-decoration: underline; text-decoration-color: var(--oro); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.pie-apoyo { margin-top: 10px !important; }
+.pie-apoyo a { color: var(--oro); text-decoration: none; font-family: var(--titular); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-size: .98rem; }
+
+.apoyo {
+  position: relative; overflow: hidden; scroll-margin-top: 70px;
+  background: var(--blanco); border: 1px solid var(--linea); border-radius: var(--radio);
+  display: grid; grid-template-columns: 1fr; gap: 0;
+}
+@media (min-width: 860px) { .apoyo { grid-template-columns: minmax(260px, .9fr) 1.6fr; } }
+.apoyo-cab {
+  position: relative; padding: 22px 22px 20px; background: var(--azul); color: #fff;
+  background-image: repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 34px, transparent 34px 68px);
+}
+.apoyo-cab::after { /* cinta dorada, como la del escudo */
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: var(--oro);
+}
+@media (min-width: 860px) { .apoyo-cab { grid-row: span 3; } .apoyo-cab::after { left: auto; top: 0; width: 6px; height: auto; } }
+.apoyo-sobre { font-family: var(--titular); font-weight: 700; letter-spacing: .18em; text-transform: uppercase; font-size: .88rem; color: var(--oro); }
+.apoyo-cab h3 {
+  margin: 4px 0 10px; font-family: var(--titular); font-weight: 800; text-transform: uppercase;
+  font-size: clamp(2rem, 8vw, 2.6rem); line-height: .95; letter-spacing: .01em;
+}
+.apoyo-cab p { margin: 0; color: var(--plata); font-size: .95rem; }
+
+.apoyo-lista { display: grid; grid-template-columns: 1fr; }
+@media (min-width: 560px) { .apoyo-lista { grid-template-columns: 1fr 1fr; } }
+.apoyo-op {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px;
+  padding: 14px 16px; color: inherit; text-decoration: none;
+  border-bottom: 1px solid var(--linea); transition: background .12s;
+}
+@media (min-width: 560px) { .apoyo-op:nth-child(odd) { border-right: 1px solid var(--linea); } }
+.apoyo-op:hover, .apoyo-op:focus-visible { background: #f7f5ef; }
+.apoyo-ico {
+  width: 44px; height: 44px; display: grid; place-items: center; border-radius: 4px;
+  background: var(--papel); color: var(--azul); box-shadow: inset 0 -3px 0 var(--oro);
+}
+.apoyo-txt b { display: block; font-family: var(--titular); font-weight: 800; text-transform: uppercase; letter-spacing: .04em; font-size: 1.12rem; color: var(--azul); line-height: 1.1; }
+.apoyo-txt small { display: block; color: var(--gris); font-size: .84rem; margin-top: 2px; }
+.apoyo-ir { font-family: var(--titular); font-weight: 800; font-size: 1.5rem; color: var(--oro-osc); }
+
+.apoyo-correo {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px 14px; flex-wrap: wrap;
+  padding: 14px 16px; background: var(--papel);
+}
+.apoyo-correo-txt small { display: block; font-size: .78rem; color: var(--gris); text-transform: uppercase; letter-spacing: .1em; }
+.apoyo-correo-txt b { font-size: 1.02rem; color: var(--tinta); word-break: break-all; }
+.apoyo-copiar {
+  border: 1.5px solid var(--azul); background: var(--blanco); color: var(--azul); border-radius: 3px; padding: 8px 14px 7px;
+  font-family: var(--titular); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-size: .95rem;
+}
+.apoyo-copiar.ok { background: var(--verde); border-color: var(--verde); color: #fff; }
+.apoyo-nota { margin: 0; padding: 0 16px 14px; background: var(--papel); font-size: .8rem; color: var(--gris); }

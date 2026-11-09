@@ -700,8 +700,87 @@
         <div class="escuelas tarjeta">
           ${escuelas.map((e) => `<div class="escuela">${escudo(e.nombre, true)}<span>${esc(e.nombre)}</span></div>`).join("")}
         </div>
+        ${CORREO && escuelas.some((e) => !LOGOS.has(e.nombre)) ? `<p class="pista-escudo">¿Tienes el escudo oficial de tu escuela? <a href="#apoyar" data-ir-apoyo>Envíanoslo</a> y lo ponemos en las tablas.</p>` : ""}
+      </section>
+
+      ${apoyoHTML()}`;
+  }
+
+  /* ---------- "¿Te gustaría apoyarnos?": todo llega al correo del organizador ---------- */
+  const CORREO = (T.contacto && T.contacto.correo) || "";
+  const SVG = (d) => `<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="${d}"/></svg>`;
+  const APOYOS = [
+    { id: "fotos", ico: "M4 8h3l2-3h6l2 3h3v11H4z M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z", t: "Fotos y videos", d: "De los partidos, los equipos o la afición.",
+      asunto: "Fotos y videos del torneo",
+      cuerpo: "Hola, les comparto fotos o videos del torneo.\n\nEscuela(s): \nJornada o fecha: \nCategoría: \n\n(Adjunta las fotos aquí. Si los videos pesan mucho, pega el enlace de Google Drive o YouTube.)" },
+    { id: "escudo", ico: "M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z M9 12l2 2 4-4", t: "Escudo de tu escuela", d: "El logo oficial, para mostrarlo en las tablas.",
+      asunto: "Escudo de mi escuela",
+      cuerpo: "Hola, les envío el escudo oficial de mi escuela.\n\nEscuela: \n\n(Adjunta el escudo o logo, de preferencia en buena calidad.)" },
+    { id: "cancha", ico: "M12 21s-6-5.6-6-11a6 6 0 0 1 12 0c0 5.4-6 11-6 11z M12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z", t: "Ubicación de una cancha", d: "Dirección o enlace de Google Maps del estadio.",
+      asunto: "Ubicación de una cancha",
+      cuerpo: "Hola, les comparto la ubicación de una cancha.\n\nCancha o estadio: \nEscuela que juega de local ahí: \nDirección o enlace de Google Maps: \n" },
+    { id: "resultado", ico: "M9 4h6v3H9z M7 5H5v16h14V5h-2 M8 12h8 M8 16h5", t: "Corregir un dato", d: "Un resultado, un nombre o una fecha que no cuadra.",
+      asunto: "Corrección de un dato",
+      cuerpo: "Hola, encontré un dato que hay que corregir.\n\nJornada: \nPartido: \nCategoría: \nDato correcto: \n\n(Si tienes foto de la hoja del partido, adjúntala.)" },
+    { id: "apoyar", ico: "M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z", t: "Apoyar al torneo", d: "Con tu negocio, transporte, hidratación, premios…",
+      asunto: "Quiero apoyar al torneo",
+      cuerpo: "Hola, me gustaría apoyar al torneo.\n\nNombre o negocio: \nCómo me gustaría apoyar: \n" },
+    { id: "otro", ico: "M4 6h16v12H4z M4 7l8 6 8-6", t: "Otro mensaje", d: "Ideas, dudas o lo que quieras contarnos.",
+      asunto: "Mensaje sobre el torneo", cuerpo: "Hola,\n\n" }
+  ];
+  function enlaceCorreo(a) {
+    const cuerpo = a.cuerpo + "\n\n— Enviado desde el sitio del torneo " + (T.organizador || "");
+    return `mailto:${CORREO}?subject=${encodeURIComponent((T.organizador || "Torneo") + " · " + a.asunto)}&body=${encodeURIComponent(cuerpo)}`;
+  }
+  function apoyoHTML() {
+    if (!CORREO) return "";
+    return `
+      <section class="bloque apoyo" id="apoyar">
+        <div class="apoyo-cab">
+          <span class="apoyo-sobre">Entre todos</span>
+          <h3>¿Te gustaría apoyarnos?</h3>
+          <p>Este sitio se arma con lo que la gente del torneo comparte. Si tienes fotos, videos, el escudo de tu escuela o la ubicación de una cancha, mándalo por correo. También puedes escribir para cualquier otra cosa.</p>
+        </div>
+        <div class="apoyo-lista">
+          ${APOYOS.map((a) => `<a class="apoyo-op" href="${esc(enlaceCorreo(a))}">
+            <span class="apoyo-ico">${SVG(a.ico)}</span>
+            <span class="apoyo-txt"><b>${esc(a.t)}</b><small>${esc(a.d)}</small></span>
+            <span class="apoyo-ir" aria-hidden="true">›</span>
+          </a>`).join("")}
+        </div>
+        <div class="apoyo-correo">
+          <span class="apoyo-correo-txt"><small>Escríbenos a</small><b>${esc(CORREO)}</b></span>
+          <button type="button" class="apoyo-copiar" data-copiar="${esc(CORREO)}">Copiar correo</button>
+        </div>
+        <p class="apoyo-nota">Al tocar una opción se abre tu correo con el mensaje listo para llenar. Adjunta las fotos o el escudo antes de enviarlo.</p>
       </section>`;
   }
+  document.addEventListener("click", async (ev) => {
+    const b = ev.target.closest("[data-copiar]");
+    if (!b) return;
+    const txt = b.dataset.copiar;
+    let ok = false;
+    try { await navigator.clipboard.writeText(txt); ok = true; } catch (e) {
+      const t = document.createElement("textarea");
+      t.value = txt; t.setAttribute("readonly", ""); t.style.position = "fixed"; t.style.opacity = "0";
+      document.body.appendChild(t); t.select();
+      try { ok = document.execCommand("copy"); } catch (e2) { ok = false; }
+      t.remove();
+    }
+    const antes = "Copiar correo";
+    b.textContent = ok ? "¡Copiado!" : txt;
+    b.classList.toggle("ok", ok);
+    setTimeout(() => { b.textContent = antes; b.classList.remove("ok"); }, 2200);
+  });
+  /* Enlaces "Apóyanos" fuera de Inicio (pie de página, escuelas) */
+  document.addEventListener("click", (ev) => {
+    const l = ev.target.closest("[data-ir-apoyo]");
+    if (!l) return;
+    ev.preventDefault();
+    if (estado.tab !== "inicio") { estado.tab = "inicio"; render(); }
+    const s = document.getElementById("apoyar");
+    if (s) s.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 
   function renderReglamento() {
     app.innerHTML = "";
