@@ -777,9 +777,9 @@
     const l = ev.target.closest("[data-ir-apoyo]");
     if (!l) return;
     ev.preventDefault();
-    if (estado.tab !== "inicio") { estado.tab = "inicio"; render(); }
-    const s = document.getElementById("apoyar");
-    if (s) s.scrollIntoView({ behavior: "smooth", block: "start" });
+    const bajar = (suave) => { const s = document.getElementById("apoyar"); if (s) s.scrollIntoView({ behavior: suave ? "smooth" : "auto", block: "start" }); };
+    if (estado.tab === "inicio") bajar(true);
+    else conCortina("inicio", () => { estado.tab = "inicio"; render(); bajar(false); });
   });
 
   function renderReglamento() {
@@ -838,6 +838,47 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* Cortina "wipe" al cambiar de pestaña                               */
+  /* Sube 5 barras azul/dorado, se cambia el contenido mientras la      */
+  /* pantalla está tapada y las barras se van hacia arriba.             */
+  /* ------------------------------------------------------------------ */
+  let animando = false;
+  const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+  const sinMovimiento = () => !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  function nombreTab(tab) {
+    const b = document.querySelector(`#tabs button[data-tab="${tab}"]`);
+    return b ? b.textContent.trim() : tab;
+  }
+  async function conCortina(tab, cambiar) {
+    if (animando) return;                       // doble toque mientras anima: se ignora
+    const ov = document.getElementById("wipe-overlay");
+    if (!ov || sinMovimiento()) { cambiar(); return; }
+    animando = true;
+    document.getElementById("wipe-title").textContent = nombreTab(tab);
+    const org = document.getElementById("wipe-org");
+    if (org) org.textContent = T.organizador || "";
+    ov.classList.remove("leave");
+    ov.classList.add("is-active", "cover");    // 1) las barras suben y tapan
+    await esperar(520);
+    try { cambiar(); } catch (e) { console.error(e); }   // 2) cambio real, con la pantalla tapada
+    await esperar(160);                         // el nombre se alcanza a leer
+    ov.classList.remove("cover");
+    ov.classList.add("leave");                  // 3) las barras se van hacia arriba
+    await esperar(520);
+    ov.classList.remove("is-active", "leave"); // 4) limpieza
+    animando = false;
+  }
+  function irATab(tab, extra) {
+    if (tab === estado.tab) { if (extra) extra(); render(); return; }
+    conCortina(tab, () => {
+      estado.tab = tab;
+      if (extra) extra();
+      render();
+      window.scrollTo({ top: 0, behavior: "auto" });
+    });
+  }
+
+  /* ------------------------------------------------------------------ */
   function render() {
     renderNav();
     ({ inicio: renderInicio, posiciones: renderPosiciones, resultados: renderResultados, playoffs: renderPlayoffs, reglamento: renderReglamento, quiniela: renderQuiniela })[estado.tab]();
@@ -849,8 +890,7 @@
   document.getElementById("tabs").addEventListener("click", (e) => {
     const b = e.target.closest("button[data-tab]");
     if (!b) return;
-    estado.tab = b.dataset.tab;
-    render();
+    irATab(b.dataset.tab);
   });
   document.getElementById("cats").addEventListener("click", (e) => {
     const b = e.target.closest("button[data-cat]");
@@ -861,13 +901,20 @@
   app.addEventListener("click", (e) => {
     const ir = e.target.closest("[data-ir]");
     if (ir) {
-      estado.tab = ir.dataset.ir;
-      if (ir.dataset.cat) estado.cat = ir.dataset.cat;
-      if (estado.tab === "resultados" && JA) estado.jornada = JA;
-      if (ir.dataset.jor) estado.jornada = +ir.dataset.jor;
-      render();
-      const barra = document.querySelector(".barra");
-      window.scrollTo({ top: barra.getBoundingClientRect().top + window.scrollY - 1, behavior: "smooth" });
+      const destino = ir.dataset.ir;
+      const aplicar = () => {
+        estado.tab = destino;
+        if (ir.dataset.cat) estado.cat = ir.dataset.cat;
+        if (estado.tab === "resultados" && JA) estado.jornada = JA;
+        if (ir.dataset.jor) estado.jornada = +ir.dataset.jor;
+        render();
+      };
+      const subirABarra = (suave) => {
+        const barra = document.querySelector(".barra");
+        window.scrollTo({ top: barra.getBoundingClientRect().top + window.scrollY - 1, behavior: suave ? "smooth" : "auto" });
+      };
+      if (destino === estado.tab) { aplicar(); subirABarra(true); }
+      else conCortina(destino, () => { aplicar(); subirABarra(false); });
       return;
     }
     const bj = e.target.closest("button[data-jornada]");
