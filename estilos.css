@@ -146,6 +146,12 @@ main.contenedor { padding-top: 24px; padding-bottom: 40px; min-height: 50vh; }
   box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.35), 0 1px 0 rgba(0,0,0,.15);
 }
 .escudo.grande { width: 36px; height: 42px; font-size: .86rem; }
+.escudo.con-logo {
+  border-radius: 0; padding: 0; box-shadow: none; background-color: transparent;
+  background-repeat: no-repeat; background-position: center; background-size: contain;
+  filter: drop-shadow(0 1px 0 rgba(0,0,0,.18));
+}
+.escudo.con-logo.grande { width: 40px; height: 42px; }
 
 /* ---------- Tabla de posiciones ---------- */
 .tabla-wrap { overflow-x: auto; }

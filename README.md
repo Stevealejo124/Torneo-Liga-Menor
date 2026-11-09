@@ -15,6 +15,7 @@ La portada se arma sola con los datos de `datos.js`; no hay que editarla.
 | `app.js` | No | Calcula tablas, llaves y campeón |
 | `404.html` | No | Página que aparece si alguien abre un enlace que no existe |
 | `logo.png` | No | Logo oficial de REDDFUT Usulután (encabezado) |
+| `escudo-topiltzin.png` | No | Escudo oficial de CD Topiltzin (se activa con `logo:` en `datos.js`) |
 | `favicon.png`, `icono-192.png` | No | Ícono de la pestaña del navegador |
 | `apple-touch-icon.png` | No | Ícono cuando guardan el sitio en la pantalla del celular |
 | `compartir.png` | No | Imagen que aparece al compartir el enlace por WhatsApp o Facebook |
@@ -34,7 +35,7 @@ La portada se arma sola con los datos de `datos.js`; no hay que editarla.
 ## Publicar en GitHub Pages (solo la primera vez)
 1. Crea una cuenta en github.com y presiona **New repository**. Ponle un nombre, por ejemplo `torneo-reddfut`, márcalo como **Public** y crea el repositorio.
 2. Presiona **Add file → Upload files** y selecciona **todos los archivos** de la carpeta `torneo-reddfut`. Todos están al mismo nivel, sin subcarpetas, así que puedes elegirlos juntos o subirlos uno por uno:
-   `index.html`, `datos.js`, `app.js`, `estilos.css`, `404.html`, `README.md`, `logo.png`, `favicon.png`, `icono-192.png`, `icono-512.png`, `apple-touch-icon.png`, `compartir.png`, `manifest.webmanifest`, `sw.js`, `letra-600.woff2`, `letra-800.woff2`, `firebase-config.js`, `quiniela.js`, `avisos.js`, `enviar-avisos.mjs`.
+   `index.html`, `datos.js`, `app.js`, `estilos.css`, `404.html`, `README.md`, `logo.png`, `escudo-topiltzin.png`, `favicon.png`, `icono-192.png`, `icono-512.png`, `apple-touch-icon.png`, `compartir.png`, `manifest.webmanifest`, `sw.js`, `letra-600.woff2`, `letra-800.woff2`, `firebase-config.js`, `quiniela.js`, `avisos.js`, `enviar-avisos.mjs`.
    - `.nojekyll` y `.gitignore` son archivos ocultos y **opcionales**. Si tu computadora no los muestra, no pasa nada: el sitio funciona igual.
 3. Presiona **Commit changes**.
 4. Entra a **Settings → Pages**. En *Branch* elige `main` y la carpeta `/ (root)`, y presiona **Save**.

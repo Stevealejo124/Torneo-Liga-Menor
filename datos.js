@@ -35,6 +35,7 @@ window.TORNEO = {
   // "corto" = siglas del escudo. "color" (opcional) = color del escudo.
   // "sinCategorias" (opcional) = categorías en que la escuela NO participa
   //  (no aparecerá en esa tabla).
+  // "logo" (opcional) = imagen del escudo oficial (PNG, en la misma carpeta).
   escuelas: [
     { nombre: "Alegría",            corto: "ALE" },
     { nombre: "Berlín",             corto: "BER" },
@@ -49,7 +50,7 @@ window.TORNEO = {
     { nombre: "Puerto El Triunfo",  corto: "PET" },
     { nombre: "San Marcos",         corto: "SMC" },
     { nombre: "Santiago de María",  corto: "SDM" },
-    { nombre: "Topiltzin",          corto: "TOP" }
+    { nombre: "Topiltzin",          corto: "TOP", logo: "escudo-topiltzin.png" }
   ],
 
   // ---- JORNADAS: ya están las 13 fechas del calendario oficial (con su cancha).

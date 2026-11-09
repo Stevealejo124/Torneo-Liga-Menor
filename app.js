@@ -70,9 +70,27 @@
     };
   }
 
+  /* Escudos oficiales: una regla CSS por escuela (la imagen se carga una sola vez) */
+  const LOGOS = new Map();
+  (function estilosLogos() {
+    const reglas = [];
+    (T.escuelas || []).forEach((e, i) => {
+      if (!e.logo) return;
+      const cls = "logo-" + i;
+      LOGOS.set(e.nombre, cls);
+      reglas.push(`.escudo.${cls}{background-image:url("${String(e.logo).replace(/"/g, "")}")}`);
+    });
+    if (reglas.length) {
+      const st = document.createElement("style");
+      st.textContent = reglas.join("\n");
+      document.head.appendChild(st);
+    }
+  })();
+
   function escudo(nombre, grande) {
     const e = ESCUELAS.get(nombre);
     if (!e) return `<span class="escudo${grande ? " grande" : ""}" style="background:#cbd2db">?</span>`;
+    if (LOGOS.has(nombre)) return `<span class="escudo con-logo ${LOGOS.get(nombre)}${grande ? " grande" : ""}" role="img" aria-label="Escudo de ${esc(nombre)}"></span>`;
     return `<span class="escudo${grande ? " grande" : ""}" style="background:${esc(e.color)}" aria-hidden="true">${esc(e.corto)}</span>`;
   }
 
