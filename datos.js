@@ -19,7 +19,7 @@ window.TORNEO = {
   subtitulo: "Escuelas de fútbol infanto-juveniles de Usulután",
   organizador: "REDDFUT Usulután",
   urlSitio: "https://stevealejo124.github.io/Torneo-Liga-Menor/",
-  actualizado: "2026-10-29",       // fecha de la última actualización (AAAA-MM-DD)
+  actualizado: "2026-11-09",       // fecha de la última actualización (AAAA-MM-DD)
 
   // true = muestra el aviso amarillo de "datos de ejemplo"
   modoDemo: false,
@@ -129,6 +129,26 @@ window.TORNEO = {
           resultados: { "Sub-9": "2-19", "Sub-11": "6-14", "Sub-13": "6-10" } },
         { local: "Mercedes Umaña", visitante: "Berlín",
           resultados: { "Sub-9": "1-18", "Sub-11": "5-4", "Sub-13": "6-3" } }
+      ]
+    },
+    {
+      numero: 5,
+      fecha: "2026-10-31",
+      partidos: [
+        { local: "Gerardo Barrios", visitante: "Estanzuelas",
+          resultados: { "Sub-7": "8-1", "Sub-9": "20-2", "Sub-11": "22-1", "Sub-13": "9-0" } },
+        { local: "Puerto El Triunfo", visitante: "La Noria",
+          resultados: { "Sub-9": "9-1", "Sub-11": "2-9", "Sub-15": "16-0" } },
+        { local: "San Marcos", visitante: "Topiltzin",
+          resultados: { "Sub-9": "1-5", "Sub-11": "0-6", "Sub-13": "2-2", "Sub-15": "0-3" } },
+        { local: "Lolotique", visitante: "Alegría",
+          resultados: { "Sub-9": "6-2", "Sub-11": "19-2", "Sub-13": "5-2", "Sub-15": "4-1" } },
+        { local: "Berlín", visitante: "Ciudad El Triunfo",
+          resultados: { "Sub-9": "15-7", "Sub-11": "4-6", "Sub-13": "4-2", "Sub-15": "13-0" } },
+        { local: "El Tránsito", visitante: "Santiago de María",
+          resultados: { "Sub-9": "12-7", "Sub-11": "6-5", "Sub-13": "3-2", "Sub-15": "4-0" } },
+        { local: "Jucuapa", visitante: "Mercedes Umaña",
+          resultados: { "Sub-9": "2-0 W.O.", "Sub-11": "3-1", "Sub-13": "1-1" } }
       ]
     }
   ],
