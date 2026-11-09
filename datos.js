@@ -49,65 +49,70 @@ window.TORNEO = {
     { nombre: "Topiltzin",          corto: "TOP" }
   ],
 
-  // ---- JORNADAS: agrega una nueva cada semana (copia y pega un bloque)
+  // ---- JORNADAS: ya están las 13 fechas del calendario oficial (con su cancha).
+  // Cada semana solo agrega los "resultados" a los partidos de esa fecha:
+  //   { local: "A", visitante: "B", cancha: "X",
+  //     resultados: { "Sub-9": "2-1", "Sub-11": "0-0" } }
   // Si una categoría no se jugó, simplemente no la pongas.
+  // Si la comisión cambia una fecha, cambia "fecha" (AAAA-MM-DD).
   jornadas: [
     {
       numero: 1,
-      fecha: "2026-10-10",
+      fecha: "2026-10-03",
       partidos: [
-        { local: "Alegría", visitante: "Estanzuelas",
-          resultados: { "Sub-7": "8-0", "Sub-11": "14-1", "Sub-13": "4-4" } },
-        { local: "Ciudad El Triunfo", visitante: "La Noria",
-          resultados: { "Sub-7": "3-5", "Sub-11": "0-10", "Sub-13": "0-3", "Sub-15": "2-6" } },
-        { local: "Lolotique", visitante: "Jucuapa",
-          resultados: { "Sub-7": "11-1", "Sub-9": "2-6", "Sub-11": "3-1", "Sub-13": "2-3", "Sub-15": "2-2" } },
-        { local: "Santiago de María", visitante: "Gerardo Barrios",
-          resultados: { "Sub-9": "5-10", "Sub-11": "1-10", "Sub-13": "6-3", "Sub-15": "2-3" } },
-        { local: "Topiltzin", visitante: "Berlín",
-          resultados: { "Sub-9": "12-0", "Sub-11": "12-0", "Sub-13": "4-2", "Sub-15": "3-2" } },
-        { local: "San Marcos", visitante: "El Tránsito",
-          resultados: { "Sub-9": "3-3", "Sub-11": "3-1", "Sub-13": "3-4", "Sub-15": "4-2" } },
-        { local: "Mercedes Umaña", visitante: "Puerto El Triunfo",
-          resultados: { "Sub-9": "0-9", "Sub-11": "2-3", "Sub-13": "2-1", "Sub-15": "0-2 W.O." } }
+        { local: "Puerto El Triunfo", visitante: "Santiago de María", cancha: "Puerto El Triunfo",
+          resultados: { "Sub-9": "8-4", "Sub-11": "6-4", "Sub-13": "4-7", "Sub-15": "6-0" } },
+        { local: "Estanzuelas", visitante: "Ciudad El Triunfo", cancha: "Estanzuelas",
+          resultados: { "Sub-9": "2-9", "Sub-11": "6-11", "Sub-13": "11-7" } },
+        { local: "El Tránsito", visitante: "Alegría", cancha: "El Tránsito",
+          resultados: { "Sub-7": "2-0", "Sub-9": "21-1", "Sub-11": "3-2", "Sub-13": "12-2", "Sub-15": "3-4" } },
+        { local: "Jucuapa", visitante: "San Marcos", cancha: "Jucuapa",
+          resultados: { "Sub-7": "3-0", "Sub-9": "4-6", "Sub-11": "3-4", "Sub-13": "3-3", "Sub-15": "4-1" } },
+        { local: "Berlín", visitante: "Lolotique", cancha: "Berlín",
+          resultados: { "Sub-7": "0-2", "Sub-9": "12-0", "Sub-11": "1-14", "Sub-13": "5-4", "Sub-15": "2-2" } },
+        { local: "Gerardo Barrios", visitante: "Topiltzin", cancha: "San Rafael Oriente",
+          resultados: { "Sub-7": "2-0", "Sub-9": "1-9", "Sub-11": "2-2", "Sub-13": "4-3", "Sub-15": "2-0" } },
+        { local: "La Noria", visitante: "Mercedes Umaña", cancha: "La Noria",
+          resultados: { "Sub-9": "2-0 W.O.", "Sub-11": "2-0 W.O.", "Sub-13": "2-0 W.O.", "Sub-15": "2-0 W.O." } }
       ]
     },
     {
       numero: 2,
+      fecha: "2026-10-10",
       partidos: [
-        { local: "La Noria", visitante: "Mercedes Umaña",
-          resultados: { "Sub-9": "2-0 W.O.", "Sub-11": "2-0 W.O.", "Sub-13": "2-0 W.O.", "Sub-15": "2-0 W.O." } },
-        { local: "El Tránsito", visitante: "Alegría",
-          resultados: { "Sub-7": "2-0", "Sub-9": "21-1", "Sub-11": "3-2", "Sub-13": "12-2", "Sub-15": "3-4" } },
-        { local: "Lolotique", visitante: "Berlín",
-          resultados: { "Sub-7": "2-0", "Sub-9": "0-12", "Sub-11": "14-1", "Sub-13": "4-5", "Sub-15": "2-2" } },
-        { local: "Gerardo Barrios", visitante: "Topiltzin",
-          resultados: { "Sub-7": "2-0", "Sub-9": "1-9", "Sub-11": "2-2", "Sub-13": "4-3", "Sub-15": "2-0" } },
-        { local: "Jucuapa", visitante: "San Marcos",
-          resultados: { "Sub-7": "3-0", "Sub-9": "4-6", "Sub-11": "3-4", "Sub-13": "3-3", "Sub-15": "4-1" } },
-        { local: "Puerto El Triunfo", visitante: "Santiago de María",
-          resultados: { "Sub-9": "8-4", "Sub-11": "6-4", "Sub-13": "4-7", "Sub-15": "6-0" } },
-        { local: "Estanzuelas", visitante: "Ciudad El Triunfo",
-          resultados: { "Sub-9": "2-9", "Sub-11": "6-11", "Sub-13": "11-7" } }
+        { local: "Santiago de María", visitante: "Gerardo Barrios", cancha: "Santiago de María",
+          resultados: { "Sub-9": "5-10", "Sub-11": "1-10", "Sub-13": "6-3", "Sub-15": "2-3" } },
+        { local: "Topiltzin", visitante: "Berlín", cancha: "Jiquilisco",
+          resultados: { "Sub-9": "12-0", "Sub-11": "12-0", "Sub-13": "4-2", "Sub-15": "3-2" } },
+        { local: "Alegría", visitante: "Estanzuelas", cancha: "Alegría",
+          resultados: { "Sub-7": "8-0", "Sub-11": "14-1", "Sub-13": "4-4" } },
+        { local: "San Marcos", visitante: "El Tránsito", cancha: "San Marcos",
+          resultados: { "Sub-9": "3-3", "Sub-11": "3-1", "Sub-13": "3-4", "Sub-15": "4-2" } },
+        { local: "Mercedes Umaña", visitante: "Puerto El Triunfo", cancha: "Mercedes Umaña",
+          resultados: { "Sub-9": "0-9", "Sub-11": "2-3", "Sub-13": "2-1", "Sub-15": "0-2 W.O." } },
+        { local: "Ciudad El Triunfo", visitante: "La Noria", cancha: "Ciudad El Triunfo",
+          resultados: { "Sub-7": "3-5", "Sub-11": "0-10", "Sub-13": "0-3", "Sub-15": "2-6" } },
+        { local: "Lolotique", visitante: "Jucuapa", cancha: "Lolotique",
+          resultados: { "Sub-7": "11-1", "Sub-9": "2-6", "Sub-11": "3-1", "Sub-13": "2-3", "Sub-15": "2-2" } }
       ]
     },
     {
       numero: 3,
       fecha: "2026-10-17",
       partidos: [
-        { local: "Berlín", visitante: "Santiago de María",
+        { local: "Berlín", visitante: "Santiago de María", cancha: "Berlín",
           resultados: { "Sub-9": "4-7", "Sub-11": "12-7", "Sub-13": "2-2", "Sub-15": "4-2" } },
-        { local: "El Tránsito", visitante: "Lolotique",
+        { local: "El Tránsito", visitante: "Lolotique", cancha: "El Tránsito",
           resultados: { "Sub-7": "3-1", "Sub-9": "13-1", "Sub-11": "3-3", "Sub-13": "5-2", "Sub-15": "4-2" } },
-        { local: "Jucuapa", visitante: "Topiltzin",
+        { local: "Jucuapa", visitante: "Topiltzin", cancha: "Jucuapa",
           resultados: { "Sub-7": "2-6", "Sub-9": "3-12", "Sub-11": "3-7", "Sub-13": "2-3", "Sub-15": "0-0" } },
-        { local: "San Marcos", visitante: "Alegría",
+        { local: "San Marcos", visitante: "Alegría", cancha: "San Marcos",
           resultados: { "Sub-9": "20-0", "Sub-11": "8-4", "Sub-13": "8-0", "Sub-15": "1-5" } },
-        { local: "Gerardo Barrios", visitante: "Mercedes Umaña",
+        { local: "Gerardo Barrios", visitante: "Mercedes Umaña", cancha: "San Rafael Oriente",
           resultados: { "Sub-9": "14-2", "Sub-11": "2-0 W.O.", "Sub-13": "6-2" } },
-        { local: "Puerto El Triunfo", visitante: "Ciudad El Triunfo",
+        { local: "Puerto El Triunfo", visitante: "Ciudad El Triunfo", cancha: "Puerto El Triunfo",
           resultados: { "Sub-9": "12-2", "Sub-11": "6-1", "Sub-13": "6-3", "Sub-15": "9-3" } },
-        { local: "La Noria", visitante: "Estanzuelas",
+        { local: "La Noria", visitante: "Estanzuelas", cancha: "La Noria",
           resultados: { "Sub-9": "13-4", "Sub-11": "7-0", "Sub-13": "16-0" } }
       ]
     },
@@ -115,19 +120,19 @@ window.TORNEO = {
       numero: 4,
       fecha: "2026-10-24",
       partidos: [
-        { local: "Topiltzin", visitante: "El Tránsito",
-          resultados: { "Sub-7": "6-5", "Sub-9": "1-3", "Sub-11": "6-0", "Sub-13": "3-2", "Sub-15": "1-4" } },
-        { local: "Santiago de María", visitante: "Jucuapa",
+        { local: "Santiago de María", visitante: "Jucuapa", cancha: "Santiago de María",
           resultados: { "Sub-9": "10-5", "Sub-11": "1-9", "Sub-13": "1-1", "Sub-15": "2-2" } },
-        { local: "Ciudad El Triunfo", visitante: "Gerardo Barrios",
+        { local: "Ciudad El Triunfo", visitante: "Gerardo Barrios", cancha: "Ciudad El Triunfo",
           resultados: { "Sub-9": "3-15", "Sub-11": "2-5", "Sub-13": "0-8", "Sub-15": "0-5" } },
-        { local: "Alegría", visitante: "La Noria",
+        { local: "Alegría", visitante: "La Noria", cancha: "Alegría",
           resultados: { "Sub-9": "1-13", "Sub-11": "2-7", "Sub-13": "0-5", "Sub-15": "5-2" } },
-        { local: "Lolotique", visitante: "San Marcos",
+        { local: "Lolotique", visitante: "San Marcos", cancha: "Lolotique",
           resultados: { "Sub-9": "0-9", "Sub-11": "7-4", "Sub-13": "2-6", "Sub-15": "3-0" } },
-        { local: "Estanzuelas", visitante: "Puerto El Triunfo",
+        { local: "Estanzuelas", visitante: "Puerto El Triunfo", cancha: "Estanzuelas",
           resultados: { "Sub-9": "2-19", "Sub-11": "6-14", "Sub-13": "6-10" } },
-        { local: "Mercedes Umaña", visitante: "Berlín",
+        { local: "Topiltzin", visitante: "El Tránsito", cancha: "Jiquilisco",
+          resultados: { "Sub-7": "6-5", "Sub-9": "1-3", "Sub-11": "6-0", "Sub-13": "3-2", "Sub-15": "1-4" } },
+        { local: "Mercedes Umaña", visitante: "Berlín", cancha: "Mercedes Umaña",
           resultados: { "Sub-9": "1-18", "Sub-11": "5-4", "Sub-13": "6-3" } }
       ]
     },
@@ -135,20 +140,124 @@ window.TORNEO = {
       numero: 5,
       fecha: "2026-10-31",
       partidos: [
-        { local: "Gerardo Barrios", visitante: "Estanzuelas",
-          resultados: { "Sub-7": "8-1", "Sub-9": "20-2", "Sub-11": "22-1", "Sub-13": "9-0" } },
-        { local: "Puerto El Triunfo", visitante: "La Noria",
-          resultados: { "Sub-9": "9-1", "Sub-11": "2-9", "Sub-15": "16-0" } },
-        { local: "San Marcos", visitante: "Topiltzin",
-          resultados: { "Sub-9": "1-5", "Sub-11": "0-6", "Sub-13": "2-2", "Sub-15": "0-3" } },
-        { local: "Lolotique", visitante: "Alegría",
-          resultados: { "Sub-9": "6-2", "Sub-11": "19-2", "Sub-13": "5-2", "Sub-15": "4-1" } },
-        { local: "Berlín", visitante: "Ciudad El Triunfo",
-          resultados: { "Sub-9": "15-7", "Sub-11": "4-6", "Sub-13": "4-2", "Sub-15": "13-0" } },
-        { local: "El Tránsito", visitante: "Santiago de María",
+        { local: "El Tránsito", visitante: "Santiago de María", cancha: "El Tránsito",
           resultados: { "Sub-9": "12-7", "Sub-11": "6-5", "Sub-13": "3-2", "Sub-15": "4-0" } },
-        { local: "Jucuapa", visitante: "Mercedes Umaña",
-          resultados: { "Sub-9": "2-0 W.O.", "Sub-11": "3-1", "Sub-13": "1-1" } }
+        { local: "Lolotique", visitante: "Alegría", cancha: "Lolotique",
+          resultados: { "Sub-9": "6-2", "Sub-11": "19-2", "Sub-13": "5-2", "Sub-15": "4-1" } },
+        { local: "Jucuapa", visitante: "Mercedes Umaña", cancha: "Jucuapa",
+          resultados: { "Sub-9": "2-0 W.O.", "Sub-11": "3-1", "Sub-13": "1-1" } },
+        { local: "Berlín", visitante: "Ciudad El Triunfo", cancha: "Berlín",
+          resultados: { "Sub-9": "15-7", "Sub-11": "4-6", "Sub-13": "4-2", "Sub-15": "13-0" } },
+        { local: "San Marcos", visitante: "Topiltzin", cancha: "San Marcos",
+          resultados: { "Sub-9": "1-5", "Sub-11": "0-6", "Sub-13": "2-2", "Sub-15": "0-3" } },
+        { local: "Gerardo Barrios", visitante: "Estanzuelas", cancha: "San Rafael Oriente",
+          resultados: { "Sub-7": "8-1", "Sub-9": "20-2", "Sub-11": "22-1", "Sub-13": "9-0" } },
+        { local: "Puerto El Triunfo", visitante: "La Noria", cancha: "Puerto El Triunfo",
+          resultados: { "Sub-9": "9-1", "Sub-11": "2-9", "Sub-15": "16-0" } }
+      ]
+    },
+    {
+      numero: 6,
+      fecha: "2026-11-07",      // fecha estimada (el calendario decía 2026-10-31; se viene jugando una semana después)
+      partidos: [
+        { local: "Santiago de María", visitante: "San Marcos", cancha: "Santiago de María" },
+        { local: "La Noria", visitante: "Gerardo Barrios", cancha: "La Noria" },
+        { local: "Ciudad El Triunfo", visitante: "Jucuapa", cancha: "Ciudad El Triunfo" },
+        { local: "Alegría", visitante: "Puerto El Triunfo", cancha: "Alegría" },
+        { local: "Estanzuelas", visitante: "Berlín", cancha: "Estanzuelas" },
+        { local: "Topiltzin", visitante: "Lolotique", cancha: "Jiquilisco" },
+        { local: "Mercedes Umaña", visitante: "El Tránsito", cancha: "Mercedes Umaña" }
+      ]
+    },
+    {
+      numero: 7,
+      fecha: "2026-11-14",      // fecha estimada (el calendario decía 2026-11-07; se viene jugando una semana después)
+      partidos: [
+        { local: "Lolotique", visitante: "Santiago de María", cancha: "Lolotique" },
+        { local: "Topiltzin", visitante: "Alegría", cancha: "Jiquilisco" },
+        { local: "El Tránsito", visitante: "Ciudad El Triunfo", cancha: "El Tránsito" },
+        { local: "Jucuapa", visitante: "Estanzuelas", cancha: "Jucuapa" },
+        { local: "Berlín", visitante: "La Noria", cancha: "Berlín" },
+        { local: "San Marcos", visitante: "Mercedes Umaña", cancha: "San Marcos" },
+        { local: "Gerardo Barrios", visitante: "Puerto El Triunfo", cancha: "San Rafael Oriente" }
+      ]
+    },
+    {
+      numero: 8,
+      fecha: "2026-11-21",      // fecha estimada (el calendario decía 2026-11-14; se viene jugando una semana después)
+      partidos: [
+        { local: "Santiago de María", visitante: "Topiltzin", cancha: "Santiago de María" },
+        { local: "Puerto El Triunfo", visitante: "Berlín", cancha: "Puerto El Triunfo" },
+        { local: "La Noria", visitante: "Jucuapa", cancha: "La Noria" },
+        { local: "Ciudad El Triunfo", visitante: "San Marcos", cancha: "Ciudad El Triunfo" },
+        { local: "Alegría", visitante: "Gerardo Barrios", cancha: "Alegría" },
+        { local: "Estanzuelas", visitante: "El Tránsito", cancha: "Estanzuelas" },
+        { local: "Mercedes Umaña", visitante: "Lolotique", cancha: "Mercedes Umaña" }
+      ]
+    },
+    {
+      numero: 9,
+      fecha: "2026-11-28",      // fecha estimada (el calendario decía 2026-11-21; se viene jugando una semana después)
+      partidos: [
+        { local: "Santiago de María", visitante: "Alegría", cancha: "Santiago de María" },
+        { local: "San Marcos", visitante: "Estanzuelas", cancha: "San Marcos" },
+        { local: "Berlín", visitante: "Gerardo Barrios", cancha: "Berlín" },
+        { local: "Jucuapa", visitante: "Puerto El Triunfo", cancha: "Jucuapa" },
+        { local: "El Tránsito", visitante: "La Noria", cancha: "El Tránsito" },
+        { local: "Lolotique", visitante: "Ciudad El Triunfo", cancha: "Lolotique" },
+        { local: "Topiltzin", visitante: "Mercedes Umaña", cancha: "Jiquilisco" }
+      ]
+    },
+    {
+      numero: 10,
+      fecha: "2026-12-05",      // fecha estimada (el calendario decía 2026-11-28; se viene jugando una semana después)
+      partidos: [
+        { local: "Mercedes Umaña", visitante: "Santiago de María", cancha: "Mercedes Umaña" },
+        { local: "Estanzuelas", visitante: "Lolotique", cancha: "Estanzuelas" },
+        { local: "Alegría", visitante: "Berlín", cancha: "Alegría" },
+        { local: "Ciudad El Triunfo", visitante: "Topiltzin", cancha: "Ciudad El Triunfo" },
+        { local: "Gerardo Barrios", visitante: "Jucuapa", cancha: "San Rafael Oriente" },
+        { local: "Puerto El Triunfo", visitante: "El Tránsito", cancha: "Puerto El Triunfo" },
+        { local: "La Noria", visitante: "San Marcos", cancha: "La Noria" }
+      ]
+    },
+    {
+      numero: 11,
+      fecha: "2026-12-12",      // fecha estimada (el calendario decía 2026-12-05; se viene jugando una semana después)
+      partidos: [
+        { local: "Santiago de María", visitante: "Ciudad El Triunfo", cancha: "Santiago de María" },
+        { local: "San Marcos", visitante: "Puerto El Triunfo", cancha: "San Marcos" },
+        { local: "Jucuapa", visitante: "Berlín", cancha: "Jucuapa" },
+        { local: "El Tránsito", visitante: "Gerardo Barrios", cancha: "El Tránsito" },
+        { local: "Lolotique", visitante: "La Noria", cancha: "Lolotique" },
+        { local: "Topiltzin", visitante: "Estanzuelas", cancha: "Jiquilisco" },
+        { local: "Mercedes Umaña", visitante: "Alegría", cancha: "Mercedes Umaña" }
+      ]
+    },
+    {
+      numero: 12,
+      fecha: "2026-12-19",      // fecha estimada (el calendario decía 2026-12-12; se viene jugando una semana después)
+      partidos: [
+        { local: "Estanzuelas", visitante: "Santiago de María", cancha: "Estanzuelas" },
+        { local: "Jucuapa", visitante: "Alegría", cancha: "Jucuapa" },
+        { local: "Ciudad El Triunfo", visitante: "Mercedes Umaña", cancha: "Ciudad El Triunfo" },
+        { local: "Berlín", visitante: "El Tránsito", cancha: "Berlín" },
+        { local: "Gerardo Barrios", visitante: "San Marcos", cancha: "San Rafael Oriente" },
+        { local: "Puerto El Triunfo", visitante: "Lolotique", cancha: "Puerto El Triunfo" },
+        { local: "La Noria", visitante: "Topiltzin", cancha: "La Noria" }
+      ]
+    },
+    {
+      numero: 13,
+      fecha: "2026-12-26",      // fecha estimada (el calendario decía 2026-12-19; se viene jugando una semana después)
+      partidos: [
+        { local: "Santiago de María", visitante: "La Noria", cancha: "Santiago de María" },
+        { local: "Mercedes Umaña", visitante: "Estanzuelas", cancha: "Mercedes Umaña" },
+        { local: "San Marcos", visitante: "Berlín", cancha: "San Marcos" },
+        { local: "Topiltzin", visitante: "Puerto El Triunfo", cancha: "Jiquilisco" },
+        { local: "Lolotique", visitante: "Gerardo Barrios", cancha: "Lolotique" },
+        { local: "El Tránsito", visitante: "Jucuapa", cancha: "El Tránsito" },
+        { local: "Alegría", visitante: "Ciudad El Triunfo", cancha: "Alegría" }
       ]
     }
   ],

@@ -77,6 +77,11 @@ function decidir() {
   const antes = leerTorneo(datosAnteriores());
   if (!antes) { resumen("No hay versión anterior de datos.js para comparar: no se envía aviso."); return null; }
   const jA = jugadosPorJornada(antes);
+  const total = (m) => [...m.values()].reduce((a, b) => a + b, 0);
+  if (total(jN) <= total(jA)) {
+    resumen("datos.js cambió, pero no hay resultados nuevos: no se envía aviso.");
+    return null;
+  }
   const conNuevos = [...jN].filter(([num, n]) => n > (jA.get(num) || 0)).map(([num]) => num);
   if (conNuevos.length) return avisoTablas(T, Math.max(...conNuevos));
 

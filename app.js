@@ -336,14 +336,16 @@
     if (!j || !(j.partidos || []).length) {
       cuerpo = `<div class="tarjeta vacio"><span class="icono">📅</span>Los resultados de la jornada ${estado.jornada} se publicarán cuando se dispute.</div>`;
     } else {
-      cuerpo = `<div class="partidos">${j.partidos.map((p) => {
+      const sinJugar = !j.partidos.some((p) => CATS.some((c) => parseRes(p.resultados && p.resultados[c])));
+      cuerpo = (sinJugar ? `<div class="aviso-proy">📅 <b>Programación oficial.</b> Las fechas y canchas pueden cambiar por decisión de la comisión organizadora.</div>` : "")
+        + `<div class="partidos">${j.partidos.map((p) => {
         const r = parseRes(p.resultados && p.resultados[estado.cat]);
         const jugado = CATS.some((c) => parseRes(p.resultados && p.resultados[c]));
         let clsL = "", clsV = "";
         if (r && r.gl != null) {
           if (r.gl > r.gv) clsV = "perdio"; else if (r.gv > r.gl) clsL = "perdio";
         }
-        const meta = [p.fecha ? fecha(p.fecha, { weekday: "short", day: "numeric", month: "short" }) : "", p.hora || "", p.cancha || ""].filter(Boolean).join(" · ");
+        const meta = [p.fecha ? fecha(p.fecha, { weekday: "short", day: "numeric", month: "short" }) : "", p.hora || "", p.cancha ? "📍 " + p.cancha : ""].filter(Boolean).join(" · ");
         const todas = estado.todas ? `<div class="todas-cats">${CATS.map((c) => {
           const rc = parseRes(p.resultados && p.resultados[c]);
           const txt = !rc ? "–" : rc.gl == null ? "✕" : `${rc.gl}-${rc.gv}`;
