@@ -335,9 +335,10 @@ window.TORNEO = {
   // ---- AJUSTES DE PUNTOS (sanciones). Ejemplo:
   // { escuela: "Berlín", categoria: "Sub-15", puntos: -3, motivo: "Alineación indebida" }
   // categoria puede ser "Todas".
+  // mostrarNota: false = los puntos se siguen aplicando, pero sin asterisco ni nota.
   ajustes: [
-    { escuela: "Puerto El Triunfo", categoria: "Sub-15", puntos: -3, motivo: "Decisión de la organización" },
-    { escuela: "La Noria",          categoria: "Sub-15", puntos: 3,  motivo: "Decisión de la organización" }
+    { escuela: "Puerto El Triunfo", categoria: "Sub-15", puntos: -3, motivo: "Decisión de la organización", mostrarNota: false },
+    { escuela: "La Noria",          categoria: "Sub-15", puntos: 3,  motivo: "Decisión de la organización", mostrarNota: false }
   ],
 
   // ---- APÓYANOS: correo al que llegan fotos, videos, escudos, ubicaciones de

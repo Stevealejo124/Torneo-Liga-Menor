@@ -146,7 +146,7 @@
     (T.ajustes || []).forEach((a) => {
       if (a.categoria !== cat && a.categoria !== "Todas") return;
       const f = por.get(a.escuela);
-      if (f) { f.ajuste += Number(a.puntos) || 0; f.motivos.push(a); }
+      if (f) { f.ajuste += Number(a.puntos) || 0; if (a.mostrarNota !== false) f.motivos.push(a); }
     });
 
     filas.forEach((f) => { f.dg = f.gf - f.gc; f.pts = f.g * 3 + f.e + f.ajuste; });
@@ -300,7 +300,7 @@
   /* ------------------------------------------------------------------ */
   function renderPosiciones() {
     const tabla = calcularTabla(estado.cat);
-    const conAjuste = tabla.filter((f) => f.ajuste);
+    const conAjuste = tabla.filter((f) => f.ajuste && f.motivos.length);
     const filas = tabla.map((f, i) => {
       const pos = i + 1;
       const cls = [pos <= NCLAS ? "clasifica" : "", pos === NCLAS ? "corte" : ""].join(" ");
@@ -312,7 +312,7 @@
         <td class="opt">${f.g}</td><td class="opt">${f.e}</td><td class="opt">${f.p}</td>
         <td class="opt">${f.gf}</td><td class="opt">${f.gc}</td>
         <td>${f.dg > 0 ? "+" + f.dg : f.dg}</td>
-        <td class="pts">${f.pts}${f.ajuste ? `<span class="ajuste">*</span>` : ""}</td>
+        <td class="pts">${f.pts}${f.ajuste && f.motivos.length ? `<span class="ajuste">*</span>` : ""}</td>
         <td class="opt2">${forma ? `<span class="forma">${forma}</span>` : "–"}</td>
       </tr>`;
     }).join("");
