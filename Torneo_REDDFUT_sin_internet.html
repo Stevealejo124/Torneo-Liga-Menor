@@ -895,6 +895,83 @@ body.hoja-abierta { overflow: hidden; }
 @media (max-width: 360px) { .ha-qr-fila { grid-template-columns: 112px 1fr; gap: 10px; } }
 .ha-caja-qr h2 { font-size: clamp(1.5rem, 6.4vw, 2rem); }
 
+/* ------------------------------------------------------------------ */
+/* Pestañas: con 7 secciones, en celular se deslizan de lado          */
+/* ------------------------------------------------------------------ */
+@media (max-width: 760px) {
+  .tabs, .tabs.con-6 { display: flex; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity;
+    mask-image: linear-gradient(90deg, #000 88%, transparent); -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs button, .tabs.con-6 button { flex: 0 0 auto; padding: 13px 13px 11px; font-size: .9rem; letter-spacing: .05em; scroll-snap-align: start; }
+  .tabs button:last-child { margin-right: 28px; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Canchas y estadios                                                 */
+/* ------------------------------------------------------------------ */
+.canchas-grid { display: grid; gap: 16px; }
+@media (min-width: 900px) {
+  .canchas-grid { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: start; }
+  .canchas-mapa { position: sticky; top: 64px; }
+}
+.mapa { margin: 0; padding: 0; overflow: hidden; background: var(--tinta); border-top: 5px solid var(--oro); }
+.mapa svg { display: block; width: 100%; height: auto; }
+.m-mar { fill: #0a1f3a; }
+.m-ola { stroke: rgba(255,255,255,.05); stroke-width: 1.4; }
+.m-otro { fill: #12294a; stroke: rgba(195,204,216,.22); stroke-width: 1.5; }
+.m-dep { stroke-width: 2.5; stroke-linejoin: round; }
+.m-usu { fill: #1b3d6b; stroke: var(--oro); }
+.m-smi { fill: #142f55; stroke: rgba(242,183,5,.55); stroke-dasharray: 7 5; }
+.m-nom { font-family: var(--titular); font-weight: 800; font-size: 34px; letter-spacing: .3em; fill: rgba(255,255,255,.17); }
+.m-nom.chico { font-size: 22px; }
+.m-mar-t { font-family: var(--titular); font-weight: 700; font-size: 22px; letter-spacing: .5em; fill: rgba(195,204,216,.35); }
+.m-punto { cursor: pointer; }
+.m-halo { fill: transparent; }
+.m-dot { fill: var(--c); stroke: #fff; stroke-width: 5; transition: r .15s; }
+.m-punto.aprox .m-dot { stroke-dasharray: 7 4.5; }
+.m-etq { font-family: var(--titular); font-weight: 800; font-size: 36px; letter-spacing: .04em; fill: #fff;
+  paint-order: stroke; stroke: #0a1f3a; stroke-width: 8px; stroke-linejoin: round; }
+.m-punto:hover .m-dot, .m-punto:focus-visible .m-dot { r: 18; }
+.m-punto.sel .m-dot { r: 19; stroke: var(--oro); stroke-dasharray: none; }
+.m-punto.sel .m-halo { fill: rgba(242,183,5,.22); stroke: var(--oro); stroke-width: 2; animation: m-pulso 1.6s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+.m-punto.sel .m-etq { fill: var(--oro); }
+@keyframes m-pulso { from { transform: scale(.6); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .m-punto.sel .m-halo { animation: none; } }
+.mapa figcaption { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 9px 14px 10px; font-size: .8rem; color: var(--plata); background: rgba(0,0,0,.2); }
+.mapa figcaption span { display: inline-flex; align-items: center; gap: 6px; }
+.m-ley { width: 12px; height: 12px; border-radius: 50%; background: var(--oro); border: 2px solid #fff; display: inline-block; }
+.m-ley.aprox { background: transparent; border-style: dashed; }
+.canchas-ayuda { margin: 8px 2px 0; font-size: .84rem; color: var(--gris); }
+.canchas-lista { display: grid; gap: 12px; }
+.cancha { padding: 14px 16px 12px; border-left: 4px solid transparent; scroll-margin-top: 80px; transition: border-color .2s, box-shadow .2s; }
+.cancha.sel { border-left-color: var(--oro); box-shadow: 0 0 0 2px rgba(242,183,5,.45), 0 6px 18px rgba(11,37,69,.12); }
+.cancha-cab { display: flex; gap: 12px; align-items: center; }
+.cancha-cab .escudo { flex: none; }
+.cancha-local { font-family: var(--titular); font-weight: 700; font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--oro-osc); }
+.cancha h3 { margin: 1px 0 2px; font-family: var(--titular); font-weight: 800; font-size: 1.35rem; line-height: 1.05; text-transform: uppercase; color: var(--azul); }
+.cancha-lugar { font-size: .88rem; color: var(--gris); }
+.cancha-datos { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0; margin: 12px 0 0; background: #f7f5f0; border: 1px solid var(--linea); border-radius: 4px; overflow: hidden; }
+.cancha-datos div { padding: 7px 10px 6px; box-shadow: inset -1px -1px 0 var(--linea); }
+.cancha-datos dt { font-family: var(--titular); font-weight: 700; font-size: .74rem; letter-spacing: .12em; text-transform: uppercase; color: var(--gris); }
+.cancha-datos dd { margin: 1px 0 0; font-weight: 700; font-size: .92rem; color: var(--tinta); }
+.cancha-det { margin: 10px 0 0; font-size: .92rem; color: #2b3644; }
+.cancha-prox { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-top: 10px; padding: 8px 10px; border-radius: 4px; background: var(--azul); color: #fff; font-size: .86rem; }
+.cancha-prox > span:first-child { font-family: var(--titular); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--oro); font-size: .78rem; }
+.cancha-prox b { font-family: var(--titular); letter-spacing: .04em; text-transform: uppercase; }
+.cancha-prox .cruce { display: inline-flex; align-items: center; gap: 6px; }
+.cancha-prox .cruce i { color: var(--plata-osc); font-style: normal; font-size: .78rem; }
+.cancha-prox .escudo { width: 24px; height: 27px; font-size: .5rem; }
+.cancha-pie { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 12px; }
+.cancha-btn { display: inline-flex; align-items: center; border: 1.5px solid var(--azul); background: var(--azul); color: #fff; border-radius: 3px; padding: 6px 12px 5px;
+  font-family: var(--titular); font-weight: 800; font-size: .9rem; letter-spacing: .07em; text-transform: uppercase; text-decoration: none; cursor: pointer; }
+.cancha-btn.sec { background: transparent; color: var(--azul); }
+.cancha-ubic { flex-basis: 100%; font-size: .76rem; color: var(--gris); }
+.cancha-ubic.ok::before { content: "● "; color: var(--verde); }
+.canchas-nota { margin: 16px 2px 4px; font-size: .84rem; color: var(--gris); }
+.canchas-nota a { color: var(--azul); font-weight: 700; }
+.ir-cancha { border: 0; background: none; padding: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: underline; text-decoration-color: rgba(201,150,0,.6); text-underline-offset: 3px; }
+.ir-cancha:hover { color: var(--azul); }
+
 </style>
 </head>
 <body>
@@ -927,6 +1004,7 @@ body.hoja-abierta { overflow: hidden; }
           <button role="tab" data-tab="inicio">Inicio</button>
           <button role="tab" data-tab="posiciones">Posiciones</button>
           <button role="tab" data-tab="resultados">Resultados</button>
+          <button role="tab" data-tab="canchas">Canchas</button>
           <button role="tab" data-tab="playoffs">Playoffs</button>
           <button role="tab" data-tab="quiniela" id="tab-quiniela" hidden>Quiniela</button>
           <button role="tab" data-tab="reglamento">Reglamento</button>
@@ -1049,6 +1127,60 @@ window.TORNEO = {
     { nombre: "San Marcos",         corto: "SMC" },
     { nombre: "Santiago de María",  corto: "SDM" },
     { nombre: "Topiltzin",          corto: "TOP", logo: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAACeCAMAAACCYfHCAAABgFBMVEWmo59dVllgYGBSaZjcp2zn5+csJiGgjm+np6eZmZno0J1dRSqgWithYWHSs5FmOSOTb2Pp5NUxMTGOOgmaqsbTaBVLOUwyR2h6jqnU09QeNoSLi4spMFhgYF/EekU0Jyd9gXv90328wLM5NTU9QT89YJR5kMCBfH6Dg34AAFV/fwBAQD9+foCqVaqAfoOFfISqqlWwxLC///+/0d3vhzPFv7/GvMbAvcDBwb4MNYcAAAD6+/gDAwSteUsEKXcONHm3hlMCK4QMJVf+/v5ZWVjp6urt59MVFhcqSIqruMsKFTEvRnRxh601NTYpKCnR1dNOZ5bEiVQ2VpCGmLd+fn4nOGzTm3FMR0tuZmtPVW+3xdOYdE/R2eO1UwqHWjOPakmLd2nEydNVVVVuSCsyNlSsSQwKG0Zmeqh4VTEAG3OXp8WSQw/b4+fKxbWQo7vopnSPZTnTpHNTNhd4dXBROC4ZQYc9PT3GVQTtxXkIDSSYlpCyiGbHklhZc6RrWE5JKQ4vKHugAAAAgHRSTlP/7J7//ybm/x9f////Xf////+n/////v3/UP+X+Rr/H////2fx//9MVQMCvXEDZf8DDQT//ygbXl//AP/+////////B/7///z///7///r6//////8C///6/v///////////wP/////////////////////////BP///////////8F4iDsAABoVSURBVHicxZyJX9ratoCTgqBiHVqn9vSce86d3zwPIZJNxGCQGURGBQpWQbAqWmf91+9ae4cQIIGgfX3rVyliSL6stdewh2zOaya73qk3/NYPk9w719abKe+0GQpnwcdvb/xY2ean4Lr2AAPewLsfjIfCw3VtatD7BvS3s/kj5QsQvrFp4s/et3D0jvBjZQes/CbweUiHw4C73unYxsYt+cGAwu3GRmzG+20sIPC5QIHSj+YTCFw1Nh34PAZw1xvg4cjNH84nCBJcNzvkKMMmfvP/xCcIm3Dld4ONcADwm3dme0IHkSVJlmTtrYy/0V9kECLIE5yICF+oo3wLWAN+9k5HgW+8g8hIIkFDlaRUpNlMOwR4T46W0ygJIglXkSNHSrhKqfRwPNYOK3XlERqEDJId7yDIpSYeI+nQkSwl4iKVVoQIVwp7L1ZTjSP4T5EioqKE4Ojm+lEidYVflUdyoqPszASmLQBBuTzlG6VBWT0NVVsMpNRYF3U5lYRW931LOqKvy3iQIHHap9VQOpFKCXqTGOKjjhL98G+fzQG/UQf5YqYzOCORqGbppbuacogGeZR0QPEIjypJTXgNyVLaeJhYKjQjCRXbhImpKOGU97MpoPctc5ABBUpC6qhZKFWbCTyhnOhdKh6iF0ynC/R/UoLXtAON3owgvxRigE1xSJRSiKgqGUbcHMjKPcB/8s70ZxDNECSkKyaEf1S7dOlIAhtdAVQrneInqSrqroFUTVRaQSow06ci7Bb6RS2J8eUUmEbuw/zS7yg6IDjIHwGedFuDLKiplAqMa0rvnCHqq5EUtq1Qo0FZ4RKCHMZ3DgRU6OGRND0asdIS3Cp1mlIikm6WuueKfKTtgsQLaUdfk0RXfqtnlC5gYCCDkAi9WiglCcabx1PJMrucQFJUEdgkwkoXkEmGtj4Jrb0OX7mizTDUAF0TNUKPaDYe6bf/RF8hZF5pBhMIy8o/9wEC30/bBgcJx3WkBppPOUqkuyqEVontUIGw0aImhJhIvVmt9r5E7SyV6HtsLux3vBdCT10gMpqhJVHctCQ3lVBE1ZQDmnJN92vws/cfjRnkquePYgpdVSFSAwlbrHVqqqNOIIYeHcxZKE8pFEqnJAqUllCvnAoRUK4yY8N3qUHihDGH6J2ICrtXeoAWbLJT/z6tA0IZhg6iZxDW5kVGWaUtLSEICXYmFBWvDNY3eDSqCgGPaEyi6Ouk+6cjif2pe2oFdYUfRbTQ9Ehv2dH1FnTl3AfaBaCA096p/hILr19KCI6SWGomSIs2aYMG2ckfJcEY4U4liV2S3iLqKSLogBQVwpTMomiqIcvMw7SYEEJLK2u6s9ACO/BNN7GWQbpCbyfRECTIpYmISm0RNrRBQahqKCTS9fGIpjZHD/CoG5FEB6MRJHpmUVlOO8gjbTmP2hGK4eS6K2O8RsBvgf4SS3KwJgYSgi8+RnpqSrB7pCgRbPOSGgkVCssRFX+5gsCkVTBqwuEA/GaoEC8pYoo1Wpnoviee4lnjDWMMjxijDbjy9gwQAuDPNEIbSixJ1yBtY4leQjvV7lFKnEaONJ+TaKmi1VsQg4R8J8yqLQGzLgYWiERH6WZakA2pMY1O3KSBqEudMgISmpW90xxAIt82MWY4bEytxEcHjaqqXqWkJd2NJMkkkWJAzC0+5OWBZClr6RwcLQJJkzVLbCWPtJUmlugn8f5vUVf+by8HNX62l0G0v0X0diGKyxLNsUoBosfIOgf+mMn5/Q+5ERUValRIOSLLIZomVRoZZC10D9zyJnUUzqs1wP5L99pK6wp4Q5EULQPH8OX9fl9ycWy5i9WuLDig8dIoUJWYMz0O2oRmZY520r8MFjBql7Cg9uwzUiQhx/t9vqTbbn8VlEmEVLqgrEvU5xR16BrgylluxrTEIsJ6HM0aQTJ7l1ysVOZ8Tn/YJp92GVlStdRZGG7U4Cjb3DuLPpIE1cyVPM6susi5pA/1N+QgI/G6tRNxnJYiw0aSEDBr2ckc3X0YkDzy+ZPlSb5jRDHtB0loYpdpkT/p+cN+5PMn868+lVHAS1xo4tcDCj7K5/eT7zqkA07yhoMy8HUDWchU0RTYGbAU4mbC0Pd4GfftxvZPHHSUbl8FCI2VNUCI0fk+kEwul89RxfrvcxMNMjBBJ37L/bw9kEYmF9oAAeTeHzZQhCGrFPEPvmSyMlHw6YqEPVDuQ/S1Y22k0m2BSR1QDnfgE5/vF/BswCMvcm7Ida4AF3C9djAr3+Xz33cVRXJ+qlX4+AG098LYA07MQ7nFv9aNfboCK6ytyHkdL+nPv9w86MReDmuFV7lxzt9VYDIv04qr6NeZ7/lXNJ9bLKo5HO94DeBHt25hP3aRSX7xF/2TiTLfoIATxz4A4P/EJnHj/GAtmu8pkFo411NfcmRpOFaoEwPg9PYEbkwGA4bcs/BDDvRXSfp6Gq3YrDTMZZOOInG0oLbtxsQ/oBQDIFRahO95x33y4UXRTxfwkXfebxyd9rINGPa7+4HDOmDyHkvqnvpAowYFvsDWOzjK9Y37nXeSciHs78sWkM1oSAE8p+8yk+eTPT53hejlXia8lg9PWMBhovsZ+sXfsOa/tQ+Y7BivsuZ/8lFA/9mzq5Iv9+ydvIc/y4SE87lKET6rlCuLOUgpthkJ9ZFdjo2r2gaE6xtUSH3YD+nMf3Dx/OTn3T2Xvof0Fs4vwt98uiST/k7e7qU2KWCAY1NzNt1YdsBV7nuEMu+nFi4e1y49Pl+xp8D7MMkVe2ia2f2VSk61CfiFTX8C4NQE5QJ/DyrpEcos55bLxzVPkbJqATCZz9/7jWwP/kqeD5MJmuGOBgg/E7gxYXVVvvs7bXS+4tlBNsv0BSTw0XGW78NL3uc+2gXrAUKi+zsKOEE2lnPYNUrq7VCzYnlrLXbMkMpnxzWXizfGG797MTxxSkYfmfH+66SAWFtRjYT7AM+ePM9lTZe1C9dzcdGv4yWT95gfJ80pEk7Oev+eAk7ixlidUifI0N9Y4VIsn108F9m74+eLms+v8wFeLiOwiChPUjlsatMldHRrkqI6p3U/WO3H2qCvePy8QN+Bu5yVMfBogp/xRV+xWCmCA+ev7APu6IBeOsVuGzBMO+hw7Usk5H1dwBqFOavVLi663gG/nsG7uW4U9BcX0ZHtAkKi20UvZjMktrMxrQ5QORcx5jMUsPZMfaRce352lamlaxfPzwc+g2hlBI5u2oHc2NiYYYBeWi7YzsZy2Md0WHPVCasGKeAZvvNcXDwfo6uAp7guyrorJ5P05eGeRhw7RQ4Oy+zijB0dRLcaQDIXrZN0fFGPkbCbAXou0F0OFi6eF8CkB8fHB+Vyz1O0SJ3LQ82Qz+fyNi6y2V2/wOEkxMzGRJ33J0p4UMu6YqTC3NjjQQN7wK5gYMjL1OJdtiTqLqd17mR7uWSzu3yBTUMMjgGPEBwv3Hoqnp0dHEA7c21pgAh0vHCJBga+izINOZBXHh7AvO7F/GSllp7oKGDAfjYm7CX8dHxA5XjBRdueb+HM7y/WPBfI9wyvfhazwdIYE8v8Fpg2PMkIDQC+7c3VTdJ5pxfJnjHAAzAqzSA1KPmgBYKhz549lPmslt0Cn17oegowFyt5u0MMhE546lNhI8qF4ZvGcVEpe9CV4wUMzKioGjREf9lzQANKGdz4sqxVOD0BW9sScGLXlAHQMhub3TFlzhxrSjw79hSLZ8fguJcXx2WeFtgYuF0XtTMW/bqu8pB88LNxpPGmxmEZ43TsH6zcOBwmQ6OzrCmR7OIZyAGmjkuP5+npieefnjzZ47MixGvQHk3IYPm9hyT6cdIPUQbr/46dMLipL1ygc3W0XDC9rbBzrwLpydSDMvwT0F16niocx8235+H1jnPnnmrHnljY303NtWPMLJVcmE6X2Qwy6CN/6Glw2vvBanSBZPbm57/uLeZ4Mrwmh8Rcl9ncHRdXcKlCtY2A8HPHVXL8GRY3x66Yp/YMpi4Xi4sT1Vy3OJPYm9CmbmwRZ4jv6zkwft27X+QzhE6bgI3hh2zGAI/j2jjno8TnuTt3BcTtvkPMzmK57InFamW/T3MUv4+3DYiJbpotaeX0BRVWcYbcfz3/en7+1en8+vVeK0coXzSb+5c7rhpXlKUqx/FPWQ9KdgsaY8UNyqxk6zm/1hAZZHFwZGcEYHSqBzi6XJAl91ddgNLJUy8hrii/fseFqvE4d9c59lxEo9FPkkSo1NeyT7lKhS+jg3tqx8UHrBb8c/68vSbIEl0v1X0eNQYHUa/opAKBAgJZOMM+jkXXOhxK58lzeYlwgmZ+OoMsfapvPeWK/OV27FM9Wl5cTN77oZjRCeu12qol4E5vxa0GODNydEEqr6A8zHOOnqfU/5jd4rjKk+ficq1Ouh5A+mRtq/NrQmvc4fDHMF9knRm4i7nr/cNVK4vriU5fljJmrF9eXLleuXYqLa6uH5XJbuVy/OXl5RqRBr5KWLCUJSmT5d3r+dXs6mqGEJyPz+e0Y+auD/f3M+aXI90FC3ouHlsuACEItzT3fkE/aXhr6/LCk80I5jOOAAd2TTp993tz+yCHc7XLDNH7TfXa6ty1hZFZJp7uAe6OLReI/LSyMpd1LJwcnlzWtc/q0dilVVqQ+DK6/TnkkV/m5vZBW9eUsgaq7J7z5Dpr8WWcf9AWwHHawqNxVT+R+ZWVrEzqCycnJwv1UYfiFbKLe+fneyjO5C8rKwjI5Pr6cC67Ws9kMqtzlibGROftb4M4Bjem6pfy/8mjh9RRi6MRP5WdoDsEPEfAuTmNDZV4CK8rh+z/mkXkRicODADamLKT8tpscN1o6J7oI0pZ5zyDg3++p2wGpb66muVrcydABmgr8HN4YBlmbns+ogFO06UpY8O8bhFEfH/5yfAFIl+lCIBA2fzknN/TZLE+MGJJ4Jh6vf7kbvOfLC/DfKQPMOCdcMqOZKgW9YtI6no1yHn4CtQKbje17t65kzfLG7LgaIb+PLyCoidsWGbXCMgGCSebskN3eX9JlSpfRegqkQ5/x7Vn2+6tCujw3JcZDj+SpEYKy4+ErSS0ODPrcu72t8EXTNkRZmhoi3/SFmlyPGS+dpDrxOPuPd/Q9SGgJ5ohTjVfoNATHFsdXiL6kik7DTGs8YU4BerCePtuKSgGucEQgsoLLScs1k8YhWbin/sBP9txYzOpLxye5BhfVVvPLf6+HQyKSrp/tZXkOA2lVdlOO7/d2Phd17A9QHTjFwACokdbG9blExVuKah0lzqiyKg87tFsYbeJEKOPdAF3vdM7L5p5J0KKUxhfbzlztY2AcW25nSSlTnFdq92zG6pVI2Bg7QWAWP21xLjY7mRdTIGKggupuSBdUUmLyStoeY/DfUNr2ex7qqS3THmSKTsND35wZSuuXoLIgHhBEGCr0gXLwURDSqUnUR4VY6LrefG3iYbSNZGlbCUI4W9jG2SjLQYpIHxyl6NxkXOEQkc23HYI8G3v4asu4K538hU+0Hd3zgJHFBW4vZETg8GlpSUA5KL1uyqEHC7tsPWcS/9Z9WGZPkD6MN1Ez6pJ/OLX+T0ADG4zwFgcAYGvHY3Gop27ajt+9YJZWEOXs1+DE0zZgciZ8t5XSLgQYqrsycftDW4pHocYHc/GgBAQ9UXDkwKaPa4xwSAhPQuPFR8INDhO4+OVOJUt4AOJcXRp98Typdfl7MvFk7ixnCkyPAPgRjS4xHy4owHemSxLtSFsJcCQF7PV6DbLhboTrHtOe/Jg0XaHajC+xDxYrEaZgAYfX2DiDXRis0eGAm9txhk5u/d1/vzrnnOR57NccH5JbG9tQAPU+ERRs3H1RSbGLmcvExsAv9ktFyQeTZss85gd5AwHlhXFNuNjgFysHq1Hs3ExWItNvC6lP9EZAD/bq/oFcpD0J328VkxdfcHoB+ElPtsDFNGNoxCr2+8PF+oTIm4OPD5pfCrMNRYQUu/BytzcU6/WI9F4EOJfMN4OamkOVdjBkcK2eEo7gHSAQ5sfGC9fBh6ENgBO2xjrJ9At288aL7RzF2xDbFlqMxujDttxBaDbv4cwmFmliKwpYjE49oFPw7BMP2CAFtVjAMnJ4eGhsb8pyZmneHu+3Z6db88yKyvtINY0YjBeoEtYKSJ2AKUw5yA5riPwqREDwXRYZtpMgzbKBTIHfIZSHsrkZmiN+z0dop4PBmeRsd1dZX+nDYtkLmlPn6zPOt3zv92c38yGM3kim0+ZsCVvATPAceUC6GBu38BHy+TlR+HjHQ6fc+0KDz264FK7rfnK7KYeYwggvq8lnTezN875G3fOPTu/ljJvkGxYxsJJxq23XTDwofLwAQ5ZIA4Oh6Xd0IK3o9ktjjo1PqDUi4EEtPj+5P2cHwnd8ze/Oc9n3eYhEpx4ywKQlQuWgERY3d/X2p8kfYwUQo/aBKGUuOt0KrENtnXEUxCborjUafR9WebnTt6/P/E7nTcos+7O3Ueza+0M7mZgBJxaHeUlmcOV/VVNecuFU0OZTFK/drKMb3s7hg1xaYkbUJD86+y5hjjrdDrP52fdCbO4c8ueZDI3MSsXhr5U5+sYAA/3kQ+UdzRUJktXfCfb3XDiDgjjkcGzyI4bJyC+fw+GBsSbm/P5jpkG4R7/YqFBr8WUXWb/+hDHlCH+yZKcaPYpT1ei6uh4QIcuj3u2za2rQwfIiXn3zY2TapG1xXu3Y7gZYqL7r749P/oATd14bv96PyPw19cLjaujAirPPIipiQT/KySQdMI0Eq+FEXD25gERD/yz0AxNVkttDjqxEfCz968m5QKZu65lJP768DK1HGqmpMEBc8PdU01JFoMHRO6A2kBmH86oocNmt4HVqtcKcNr7v2ZuDID1uesVfyjkmLiD1idh8I5ziNM3sw8HgLhgNv67Yxw3GgSEqt+sW1K/Xrm+PlxcnrB3OyyEc0M7dIMSb5wPByeHZoB0bNXaSbymU3b1uf1anUzefxwSec3ZmXXPnzvBhd2bZgPAhD2NaAloUfXri2VfS0jy4dnK/Pn5b243J5vOrdCVACN2qnjtuv5xIktuh9vt/u2cnzdtL2yi3dLEbMqOvGjR83g29oBeOBzu5N1c2GFqjp3h3UiGADdux/c9J3UXIkhsUwV68xD11ywOpMtCv1kCBgL0Oc/xm5Gsm8diaz7hKK6IpV7mMC8FtWp1hBfjXgExRBx81rMnWLU7oMPrSNld2Yw/y6yEHTcSIg10OYedBAineapECzuvJQg+Ht5K4AgvPvc87pKCqkr4NHApEhLF+Ohjv5ht2TOwIc4uduBjlnaWI2IVn4DHrTwS6nKhsK7K5i2SPVB71WwpSpMUREXFR2CV4SKCCU6a7NBy7c3g7mAmmzJ5p95QRBMloq0ipwBXEEtsCwPlUUocpQQZPAD78UglI3Hi9DTRfaQ9XhVLkMPjYuvK7K7pZ5u0VHO9tbGtFRwS+IsLy8+dofvVnvJHOK6qjfSG42KhEYmfqum06oBSRngMhQh9tj4Bei6sl+KnBZxDiQ8/g60Lw4u9sblzGSK+iZraWT7Crnniz6KYVsRl2rrScbrfRAlc52gJN28BDcP7liJGmmKLfFS5aoj15wsWriftMLypwO7QtlvmW6thPTFtbmdJPYqkiCLGE/hMPj78XWiJ6UZBLCTog/UhCdqpEsEH5BXwCyXVwHtQq4pSHaqy+/EgA38z2Z3OfO83qsQZ14aJnfExerUgNvH5/jS0RbGKw4AlMZSg26WEiPwIb9gOFmDVFk6TOdCZzevErm/MeL2mm+dZATJ/ZnY2CYpyKqXtJCDGgSUBKl0+ovsRhKQG2DeSaFUhrBToTiPikUzX01hqb/vTTCBgjjcC0Is7bXxg2xAO+zM+me/4D7rJDGiuVQJtImAc4l0abVqiG+NEpEgBujBWsZJ8ob6RnQkwm00IyOz8k7mzUEiiPiriKd0aSlQE1CTd46GqiE2658gp5mDswpg3Pua62Z+moAqwwhsNCM4yHZjS7Gx6DSnRXBaIoxk6VRvrrZZaBcW10qFqRFIdDquobMSLvpkaob2xgEws7SxoQZlo+2pcCVeqqmJlJQljJue6gQ/xLBqfTUBovd6pt9Z2xvxh+LyXm0c9+KD5hlVkmVCDgekpsLOlEh0Rs3G0xoi9LbTAx1tGlgkBvTh06GVB8XY4+TlKpUjfZhv4/8f10KnF1iXMdbd5dN3xeDYBWVA0rxQlhxhppE5DONyBje9KhSipxE9bosMab+ungNc7uFfjawC1IsfMzlAdCgmxtF4VHxuRUimunEpCqUqLl4EASASZ4UUxstjR3iSANG7P8EPJD+qbUKOgSFjuCalHR0hR5ZR4JF3JCX1/n64YXHe4KHg1IDWJVikagiLULolGCLflOhVVuaGKjgYA0vUUSqkf71Z33ZGB7+WAFHG6PyjKqtIislpqpZtiFZpnQVFCYYFuzSKVjBu0GGuWCfAmBPRCvTbVLXKot0DJgJvPrWGPI4V1DrTHAlj7SILU19tzrluzfLAR+F4FCEr8uVvkMCVeHdHd8zJVnDhMPzakRlwU1qBHUFJoLxNvQ2K+8Q/2At8rAdHOUyz5saDIdtlqKaAucOi0IySmoTpIRBKyxqcHPq/dyPJKQO/utJduFQfO0l1ee6Wy4cv1UqlABzV6u15pRcGM7cD3esABfya6Hmm13Z/iNLy3L8V7GWAgEJgKaEHxdtSuSCyyRMdUfN8fsMv5xrqHj81Puu3F5ZfivRgQqrBp7PlZV4qGwDe5674ekELCv79mt02VqOG9e7FvfA9A62ESPbJMUBT8nwCyHv5gj0DrrLn+GZrBa/FeC0iLnMBbl8FZiNZZe0Vk+a6Axkrxi9BXUr04svTJ6wG1ShERtzcNrvtd8L4LIB2YnWI9fIr3gprFWr4LoCH52e2s2ZbvBEgNOvMu+85uZ822/A1+6TgxV+eb/AAAAABJRU5ErkJggg==" }
+  ],
+
+  // ---- CANCHAS Y ESTADIOS: una por escuela local. "cancha" debe ser igual al que usan los partidos.
+  // lat/lng = punto en el mapa. exacta: true si viene de un código Plus de Google Maps;
+  // false = centro del pueblo (aproximada). Los campos vacíos simplemente no se muestran.
+  canchas: [
+    { cancha: "Jiquilisco", escuela: "Topiltzin", nombre: "Estadio Topiltzín", lugar: "Jiquilisco, Usulután",
+      aforo: "≈ 2,500", superficie: "Césped natural", club: "C.D. Topiltzín",
+      detalle: "Estadio municipal en el casco urbano de Jiquilisco, a un costado de las calles principales del centro.",
+      plus: "8CFG+GVF Jiquilisco", lat: 13.3238, lng: -88.5728, exacta: true, fuente: "Soccerway · Google Maps" },
+    { cancha: "Puerto El Triunfo", escuela: "Puerto El Triunfo", nombre: "Estadio Mar y Plata", lugar: "4.ª Calle Poniente, Puerto El Triunfo",
+      aforo: "≈ 1,000", club: "A.D. Puerto El Triunfo",
+      detalle: "Graderías sencillas, en remodelación para sumar asientos. A unos pasos está el Polideportivo del puerto.",
+      plus: "7FG2+7VM Puerto El Triunfo", lat: 13.2757, lng: -88.5478, exacta: true, fuente: "Google Maps · publicaciones locales" },
+    { cancha: "Santiago de María", escuela: "Santiago de María", nombre: "Estadio Leonidas Flores Cárdenas", lugar: "Colonia El Estadio, Santiago de María",
+      aforo: "1,000 a 3,000 (las fuentes no coinciden)", club: "A.C.D. Santiagueño",
+      detalle: "El estadio municipal y el más histórico de la zona: recibió partidos de Primera División en los años 70 y 80. En 2022 estrenó butacas tipo cine.",
+      plus: "FGQR+5G6 Santiago de María", lat: 13.4879, lng: -88.4587, exacta: true, fuente: "Diario1 · Wikipedia · Google Maps" },
+    { cancha: "La Noria", escuela: "La Noria", nombre: "Cancha de Cantón La Noria", lugar: "Cantón La Noria, Jiquilisco",
+      aforo: "≈ 500 a 800", superficie: "Empastada",
+      detalle: "Campo comunal abierto en la zona de Tierra Blanca. El público se acomoda a los costados de la cancha.",
+      plus: "98VC+G4 Jiquilisco", lat: 13.39376, lng: -88.67965, exacta: true, fuente: "Google Maps · información local" },
+    { cancha: "Jucuapa", escuela: "Jucuapa", nombre: "Estadio Municipal de Jucuapa", lugar: "Jucuapa, Usulután",
+      aforo: "≈ 5,000", club: "C.D. Aspirante",
+      detalle: "Casa del C.D. Aspirante, el club histórico de Jucuapa.",
+      lat: 13.5139, lng: -88.3847, exacta: false, fuente: "Ficha del C.D. Aspirante (Wikipedia)" },
+    { cancha: "Ciudad El Triunfo", escuela: "Ciudad El Triunfo", nombre: "Estadio Municipal de Ciudad El Triunfo", lugar: "Ciudad El Triunfo, Usulután",
+      detalle: "Escenario de partidos de los Juegos Deportivos Estudiantiles.",
+      lat: 13.5593, lng: -88.4290, exacta: false, fuente: "INDES" },
+    { cancha: "El Tránsito", escuela: "El Tránsito", nombre: "Cancha César Antonio Angulo", lugar: "El Tránsito, San Miguel",
+      club: "C.D. UDET",
+      detalle: "En 2026 recibió un partido de la Copa Presidente (Racing Gualuca vs. Águila).",
+      lat: 13.3550, lng: -88.3472, exacta: false, fuente: "INDES" },
+    { cancha: "San Rafael Oriente", escuela: "Gerardo Barrios", nombre: "Cancha Municipal de San Rafael Oriente", lugar: "San Rafael Oriente, San Miguel",
+      club: "C.D. Gerardo Barrios",
+      detalle: "En algunos registros aparece como Cancha La Merced.",
+      lat: 13.3784, lng: -88.3540, exacta: false, fuente: "Registros de la Liga de Plata" },
+    { cancha: "Alegría", escuela: "Alegría", nombre: "Cancha Alegría", lugar: "Alegría, Usulután",
+      detalle: "En el casco urbano, a unos 250 metros al noroeste de la iglesia.",
+      lat: 13.5003, lng: -88.4895, exacta: false, fuente: "Mapcarta" },
+    { cancha: "Mercedes Umaña", escuela: "Mercedes Umaña", nombre: "Cancha Municipal de Mercedes Umaña", lugar: "Mercedes Umaña, Usulután",
+      plus: "HG57+V85 Mercedes Umaña", lat: 13.5596, lng: -88.4866, exacta: true, fuente: "Directorio TodosBiz" },
+    { cancha: "San Marcos", escuela: "San Marcos", nombre: "Cancha de San Marcos", lugar: "San Marcos Lempa, Jiquilisco",
+      detalle: "Escuela de la comunidad San Marcos Lempa. Nombre de la cancha por confirmar.",
+      lat: 13.4213, lng: -88.6957, exacta: false },
+    { cancha: "Lolotique", escuela: "Lolotique", nombre: "Polideportivo de Lolotique", lugar: "Barrio El Calvario, Lolotique (San Miguel)",
+      detalle: "Le dicen el “Poli Hoyo”: está construido en una montañita y es la sede de una escuela de fútbol con unos 150 niños y jóvenes.",
+      lat: 13.5561, lng: -88.3509, exacta: false, fuente: "El Diario de Hoy" },
+    { cancha: "Berlín", escuela: "Berlín", nombre: "Campo “El 11”", lugar: "Barrio San José, Berlín",
+      detalle: "Uno de los estadios con más renombre del oriente del país; ahí hizo historia el Berlinés.",
+      lat: 13.4971, lng: -88.5303, exacta: false, fuente: "El Gráfico" },
+    { cancha: "Estanzuelas", escuela: "Estanzuelas", nombre: "Cancha de Estanzuelas", lugar: "Estanzuelas, Usulután",
+      detalle: "Nombre y datos de la cancha por confirmar.",
+      lat: 13.6438, lng: -88.4936, exacta: false }
   ],
 
   // ---- JORNADAS: ya están las 13 fechas del calendario oficial (con su cancha).
@@ -1577,17 +1709,19 @@ window.QUINIELA = {
   /* ------------------------------------------------------------------ */
   const Q = window.QUINIELA;
   const QUINIELA_ACTIVA = !!(Q && Q.activa && Q.firebase && Q.firebase.apiKey && !/PEGA/.test(Q.firebase.apiKey));
-  const TABS = ["inicio", "posiciones", "resultados", "playoffs", "reglamento"].concat(QUINIELA_ACTIVA ? ["quiniela"] : []);
+  const TABS = ["inicio", "posiciones", "resultados", "canchas", "playoffs", "reglamento"].concat(QUINIELA_ACTIVA ? ["quiniela"] : []);
   const JA = jornadaActual();
   const estado = {
     tab: "inicio",
     cat: store.get("reddfut-cat") || CATS[0],
     jornada: JA || 1,
-    todas: store.get("reddfut-todas") === "1"
+    todas: store.get("reddfut-todas") === "1",
+    cancha: ""
   };
   (function leerHash() {
     const partes = decodeURIComponent(location.hash.replace(/^#\/?/, "")).split("/");
     if (TABS.includes(partes[0])) estado.tab = partes[0];
+    if (estado.tab === "canchas") { estado.cancha = partes[1] || ""; return; }
     const c = CATS.find((x) => x.toLowerCase() === (partes[1] || "").toLowerCase());
     if (c) estado.cat = c;
     const jn = parseInt(partes[2], 10);
@@ -1597,7 +1731,8 @@ window.QUINIELA = {
 
   function guardarHash() {
     let h = "#/" + estado.tab;
-    if (!["reglamento", "inicio", "quiniela"].includes(estado.tab)) h += "/" + estado.cat.toLowerCase();
+    if (estado.tab === "canchas") { if (estado.cancha) h += "/" + estado.cancha; }
+    else if (!["reglamento", "inicio", "quiniela"].includes(estado.tab)) h += "/" + estado.cat.toLowerCase();
     if (estado.tab === "resultados") h += "/" + estado.jornada;
     try { history.replaceState(null, "", h); } catch (e) { /* vista previa */ }
     store.set("reddfut-cat", estado.cat);
@@ -1649,8 +1784,10 @@ window.QUINIELA = {
     document.querySelectorAll("#tabs button").forEach((b) => {
       b.setAttribute("aria-selected", b.dataset.tab === estado.tab ? "true" : "false");
     });
+    const sel = document.querySelector('#tabs button[aria-selected="true"]'), cont = document.getElementById("tabs");
+    if (sel && cont.scrollWidth > cont.clientWidth) cont.scrollTo({ left: sel.offsetLeft - (cont.clientWidth - sel.offsetWidth) / 2, behavior: "auto" });
     const cats = document.getElementById("cats");
-    document.getElementById("barra-cats").classList.toggle("oculto", ["reglamento", "inicio", "quiniela"].includes(estado.tab));
+    document.getElementById("barra-cats").classList.toggle("oculto", ["reglamento", "inicio", "quiniela", "canchas"].includes(estado.tab));
     cats.innerHTML = CATS.map((c) => `<button data-cat="${esc(c)}" aria-pressed="${c === estado.cat}">${esc(c)}</button>`).join("");
   }
 
@@ -1738,14 +1875,14 @@ window.QUINIELA = {
           if (r.gl > r.gv) clsV = "perdio"; else if (r.gv > r.gl) clsL = "perdio";
         }
         const hCat = !jugado && !p.hora && horaDe(estado.cat) ? "🕗 " + horaTxt(horaDe(estado.cat)) : "";
-        const meta = [p.fecha ? fecha(p.fecha, { weekday: "short", day: "numeric", month: "short" }) : "", p.hora || hCat, p.cancha ? "📍 " + p.cancha : ""].filter(Boolean).join(" · ");
+        const meta = [p.fecha ? esc(fecha(p.fecha, { weekday: "short", day: "numeric", month: "short" })) : "", esc(p.hora || hCat), botonCancha(p.cancha)].filter(Boolean).join(" · ");
         const todas = estado.todas ? `<div class="todas-cats">${CATS.map((c) => {
           const rc = parseRes(p.resultados && p.resultados[c]);
           const txt = !rc ? "–" : rc.gl == null ? "✕" : `${rc.gl}-${rc.gv}`;
           return `<div class="${c === estado.cat ? "actual" : ""}" title="${rc && rc.texto ? esc(rc.texto) : ""}">${esc(c)}<b>${txt}</b></div>`;
         }).join("")}</div>` : "";
         return `<article class="partido tarjeta">
-          <div class="partido-meta">${esc(meta)}</div>
+          <div class="partido-meta">${meta}</div>
           <div class="partido-fila">
             <div class="eq local ${clsL}"><span class="n">${esc(p.local)}</span>${escudo(p.local, true)}</div>
             ${marcadorHTML(r, jugado)}
@@ -2180,6 +2317,121 @@ window.QUINIELA = {
   }
 
   /* ------------------------------------------------------------------ */
+  /* Render: Canchas y estadios (mapa propio, funciona sin internet)    */
+  /* ------------------------------------------------------------------ */
+  /* Mapa base de los departamentos: lo genera herramientas/canchas/generar_mapa.py */
+  /* MAPA-INICIO */ const MAPA = {"w":1000,"h":1100,"lng0":-88.77,"lat0":13.685,"k":2056.122,"kx":0.97271,"deps":{"Usulután":"M496.0 42.9L491.6 47.0L488.6 57.7L463.9 69.4L449.6 87.9L437.8 95.3L434.8 118.7L429.8 125.2L418.5 129.5L410.0 142.0L404.7 153.7L405.3 166.8L396.8 179.6L375.8 186.9L360.0 197.2L339.5 201.8L324.8 200.4L304.2 208.8L298.3 209.2L285.5 201.4L276.3 201.2L270.5 209.4L274.0 223.3L272.6 229.8L268.8 236.3L262.0 237.2L252.2 247.4L253.2 265.3L250.3 270.6L240.7 280.3L221.8 272.1L209.3 282.2L201.1 297.5L208.1 314.6L208.3 325.0L197.6 347.8L194.5 383.3L182.5 431.1L186.9 457.9L182.4 465.9L166.5 474.1L158.7 481.9L145.3 532.8L119.2 550.3L103.6 572.0L98.5 608.1L79.1 648.6L78.9 670.7L95.5 696.0L96.7 711.3L88.9 719.6L52.5 741.5L36.2 767.1L-0.8 793.5L-12.5 806.8L-30.0 818.5L-30.0 910.3L12.1 925.8L66.0 939.7L306.3 981.9L511.1 1031.2L595.6 1057.4L706.2 1072.1L736.3 1078.9L750.2 1072.2L802.6 1059.9L871.9 1050.7L945.4 1055.8L1030.0 1067.2L1030.0 774.1L1022.6 768.2L1010.7 769.1L1008.0 773.9L1003.2 772.0L1002.0 769.4L1005.8 764.3L1004.2 759.2L1001.7 764.5L993.3 767.8L993.6 771.9L987.9 768.9L990.0 776.0L982.6 775.6L983.0 783.6L974.0 777.3L962.0 788.7L969.2 802.0L966.0 810.1L955.5 819.4L954.8 826.3L952.0 826.6L951.2 842.5L954.2 850.4L978.3 872.9L962.2 883.2L952.4 880.0L901.9 892.0L895.4 860.9L882.3 834.8L888.9 815.3L941.2 763.0L947.7 743.3L937.9 730.2L947.7 713.8L937.9 700.8L921.6 694.2L901.9 707.3L888.3 705.0L830.0 707.3L833.3 684.4L830.0 668.0L810.5 661.5L761.4 628.9L771.2 566.8L771.2 514.5L767.9 504.7L754.9 514.5L738.6 517.7L738.6 498.2L758.2 462.2L767.9 432.7L767.9 409.9L777.7 396.8L794.0 390.3L794.0 374.0L777.7 331.5L777.7 289.1L758.2 240.0L758.2 200.9L767.9 184.4L787.5 168.1L794.0 155.1L794.0 145.3L777.7 125.7L771.2 106.1L784.4 83.3L784.4 57.1L774.5 34.3L764.7 37.5L745.1 50.6L722.3 50.6L692.8 37.5L670.0 14.7L640.5 -24.5L614.4 -21.2L592.2 -9.0L565.4 -24.5L560.5 -30.0L558.7 -30.0L567.6 -18.1L560.0 -0.4L540.7 20.0Z","San Vicente":"M-30.0 573.9L-20.0 587.1L-27.8 601.4L-21.9 607.6L-24.6 611.3L-22.0 628.6L-25.0 636.9L-30.0 642.2L-30.0 818.5L-12.5 806.8L-0.8 793.5L36.2 767.1L52.5 741.5L88.9 719.6L96.7 711.3L95.5 696.0L78.9 670.7L79.1 648.6L98.5 608.1L103.6 572.0L119.2 550.3L145.3 532.8L158.7 481.9L166.5 474.1L182.4 465.9L186.9 457.9L182.5 431.1L194.5 383.3L197.6 347.8L208.3 325.0L208.1 314.6L201.1 297.5L209.3 282.2L221.8 272.1L240.7 280.3L250.3 270.6L253.2 265.3L252.2 247.4L262.0 237.2L268.8 236.3L272.6 229.8L274.0 223.3L270.5 209.4L276.3 201.2L285.5 201.4L298.3 209.2L304.2 208.8L324.8 200.4L339.5 201.8L360.0 197.2L375.8 186.9L396.8 179.6L405.3 166.8L404.7 153.7L410.0 142.0L418.5 129.5L429.8 125.2L434.8 118.7L437.8 95.3L449.6 87.9L463.9 69.4L488.6 57.7L491.6 47.0L496.0 42.9L540.7 20.0L560.0 -0.4L567.6 -18.1L558.7 -30.0L-30.0 -30.0L-30.0 562.6L-29.3 563.2L-30.0 567.3Z","San Miguel":"M1017.4 25.7L1017.9 22.3L1008.8 12.8L999.2 -30.0L560.5 -30.0L565.4 -24.5L592.2 -9.0L614.4 -21.2L640.5 -24.5L670.0 14.7L692.8 37.5L722.3 50.6L745.1 50.6L764.7 37.5L774.5 34.3L784.4 57.1L784.4 83.3L771.2 106.1L777.7 125.7L794.0 145.3L794.0 155.1L787.5 168.1L767.9 184.4L758.2 200.9L758.2 240.0L777.7 289.1L777.7 331.5L794.0 374.0L794.0 390.3L777.7 396.8L767.9 409.9L767.9 432.7L758.2 462.2L738.6 498.2L738.6 517.7L754.9 514.5L767.9 504.7L771.2 514.5L771.2 566.8L761.4 628.9L810.5 661.5L830.0 668.0L833.3 684.4L830.0 707.3L888.3 705.0L901.9 707.3L921.6 694.2L937.9 700.8L947.7 713.8L937.9 730.2L947.7 743.3L941.2 763.0L888.9 815.3L882.3 834.8L895.4 860.9L901.9 892.0L952.4 880.0L962.2 883.2L978.3 872.9L954.2 850.4L951.2 842.5L952.0 826.6L954.8 826.3L955.5 819.4L966.0 810.1L969.2 802.0L962.0 788.7L974.0 777.3L983.0 783.6L982.6 775.6L990.0 776.0L987.9 768.9L993.6 771.9L993.3 767.8L1001.7 764.5L1004.2 759.2L1005.8 764.3L1002.0 769.4L1003.2 772.0L1008.0 773.9L1010.7 769.1L1022.6 768.2L1030.0 774.1L1030.0 15.2L1029.2 14.3Z","Morazán":"M1008.8 12.8L1017.9 22.3L1017.4 25.7L1029.2 14.3L1030.0 15.2L1030.0 -30.0L999.2 -30.0Z","La Paz":"M-24.6 611.3L-21.9 607.6L-27.8 601.4L-20.0 587.1L-30.0 573.9L-30.0 567.3L-29.3 563.2L-30.0 562.6L-30.0 642.2L-25.0 636.9L-22.0 628.6Z"}}; /* MAPA-FIN */
+  const CANCHAS = (T.canchas || []).filter((c) => c && c.cancha);
+  const slugC = (t) => String(t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const canchaDe = (nombre) => CANCHAS.find((c) => c.cancha === nombre);
+  function botonCancha(nombre) {
+    if (!nombre) return "";
+    return canchaDe(nombre)
+      ? `<button class="ir-cancha" type="button" data-ir="canchas" data-cancha="${esc(slugC(nombre))}">📍 ${esc(nombre)}</button>`
+      : `<span>📍 ${esc(nombre)}</span>`;
+  }
+  function proximoEn(c, ahora = Date.now()) {
+    for (const j of JORNADAS) {
+      if (tieneResultados(j)) continue;
+      const ini = inicioJornada(j);
+      if (ini && ini + FIN_JUEGOS_MS < ahora) continue;
+      const p = (j.partidos || []).find((x) => x.cancha === c.cancha);
+      if (p) return { j, p };
+    }
+    return null;
+  }
+  function enlaceMapa(c) {
+    const q = c.exacta && c.lat ? `${c.lat},${c.lng}` : `${c.nombre}, ${c.lugar}, El Salvador`;
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+  }
+  function mapaHTML() {
+    if (typeof MAPA === "undefined") return "";
+    const X = (c) => (c.lng - MAPA.lng0) * MAPA.k * MAPA.kx, Y = (c) => (MAPA.lat0 - c.lat) * MAPA.k;
+    const LADO = { "Alegría": "arriba", "Berlín": "izq", "Mercedes Umaña": "izq", "Jiquilisco": "izq" };
+    const dep = (n, cls) => MAPA.deps[n] ? `<path class="${cls}" d="${MAPA.deps[n]}"/>` : "";
+    const otros = Object.keys(MAPA.deps).filter((n) => n !== "Usulután" && n !== "San Miguel");
+    const puntos = CANCHAS.filter((c) => typeof c.lat === "number").map((c) => {
+      const x = X(c).toFixed(1), y = Y(c).toFixed(1), e = ESCUELAS.get(c.escuela);
+      const lado = LADO[c.cancha] || "der", izq = lado === "izq", arriba = lado === "arriba";
+      const corto = e ? e.corto : c.cancha.slice(0, 3).toUpperCase();
+      const sel = estado.cancha === slugC(c.cancha) ? " sel" : "";
+      return `<a class="m-punto${c.exacta ? "" : " aprox"}${sel}" href="#/canchas/${slugC(c.cancha)}" data-cancha="${slugC(c.cancha)}" aria-label="${esc(c.nombre)} (${esc(c.escuela || "")})">
+        <circle class="m-halo" cx="${x}" cy="${y}" r="34"/>
+        <circle class="m-dot" cx="${x}" cy="${y}" r="14" style="--c:${e ? esc(e.color) : "#0b2545"}"/>
+        <text class="m-etq" x="${(+x + (arriba ? 0 : izq ? -22 : 22)).toFixed(1)}" y="${(+y + (arriba ? -24 : 11)).toFixed(1)}" text-anchor="${arriba ? "middle" : izq ? "end" : "start"}">${esc(corto)}</text>
+      </a>`;
+    }).join("");
+    const tx = (lng, lat, t, cls) => `<text class="${cls}" x="${((lng - MAPA.lng0) * MAPA.k * MAPA.kx).toFixed(0)}" y="${((MAPA.lat0 - lat) * MAPA.k).toFixed(0)}">${t}</text>`;
+    return `<figure class="mapa tarjeta">
+      <svg viewBox="0 0 ${MAPA.w} ${MAPA.h}" role="img" aria-label="Mapa de las canchas del torneo en Usulután y San Miguel">
+        <defs><pattern id="m-olas" width="26" height="14" patternUnits="userSpaceOnUse"><path d="M0 10q6.5-6 13 0t13 0" fill="none" class="m-ola"/></pattern></defs>
+        <rect class="m-mar" width="${MAPA.w}" height="${MAPA.h}"/>
+        <rect width="${MAPA.w}" height="${MAPA.h}" fill="url(#m-olas)"/>
+        ${otros.map((n) => dep(n, "m-otro")).join("")}
+        ${dep("San Miguel", "m-dep m-smi")}${dep("Usulután", "m-dep m-usu")}
+        ${tx(-88.66, 13.45, "USULUTÁN", "m-nom")}<text class="m-nom chico" x="${MAPA.w - 18}" y="${((MAPA.lat0 - 13.435) * MAPA.k).toFixed(0)}" text-anchor="end">SAN MIGUEL</text>
+        ${tx(-88.76, 13.66, "SAN VICENTE", "m-nom chico")}${tx(-88.70, 13.175, "OCÉANO PACÍFICO", "m-mar-t")}
+        ${puntos}
+      </svg>
+      <figcaption><span><i class="m-ley"></i> Ubicación exacta</span><span><i class="m-ley aprox"></i> Aproximada (centro del pueblo)</span></figcaption>
+    </figure>`;
+  }
+  function tarjetaCancha(c) {
+    const id = slugC(c.cancha), e = ESCUELAS.get(c.escuela);
+    const datos = [["Aforo", c.aforo], ["Superficie", c.superficie], ["Club", c.club], ["Código Plus", c.plus]]
+      .filter((d) => d[1]).map((d) => `<div><dt>${d[0]}</dt><dd>${esc(d[1])}</dd></div>`).join("");
+    const px = proximoEn(c);
+    const prox = px ? `<div class="cancha-prox"><span>Próximo partido aquí</span><b>J${px.j.numero} · ${esc(fecha(px.j.fecha, { weekday: "short", day: "numeric", month: "short" }))}</b>
+        <span class="cruce">${escudo(px.p.local)} ${esc(px.p.local)} <i>vs</i> ${esc(px.p.visitante)} ${escudo(px.p.visitante)}</span></div>` : "";
+    return `<article class="cancha tarjeta${estado.cancha === id ? " sel" : ""}" id="cancha-${id}" data-cancha="${id}">
+      <header class="cancha-cab">
+        ${e ? escudo(c.escuela, true) : ""}
+        <div>
+          <span class="cancha-local">Local: ${esc(c.escuela || c.cancha)}</span>
+          <h3>${esc(c.nombre || c.cancha)}</h3>
+          <span class="cancha-lugar">${esc(c.lugar || c.cancha)}</span>
+        </div>
+      </header>
+      ${datos ? `<dl class="cancha-datos">${datos}</dl>` : ""}
+      ${c.detalle ? `<p class="cancha-det">${esc(c.detalle)}</p>` : ""}
+      ${prox}
+      <footer class="cancha-pie">
+        <button type="button" class="cancha-btn" data-ver-mapa="${id}">Ver en el mapa</button>
+        <a class="cancha-btn sec" href="${esc(enlaceMapa(c))}" target="_blank" rel="noopener">Cómo llegar ↗</a>
+        <span class="cancha-ubic ${c.exacta ? "ok" : ""}">${c.exacta ? "Ubicación exacta" : "Ubicación aproximada"}${c.fuente ? ` · Fuente: ${esc(c.fuente)}` : ""}</span>
+      </footer>
+    </article>`;
+  }
+  function renderCanchas() {
+    const lista = [...CANCHAS].sort((a, b) => String(a.escuela || a.cancha).localeCompare(String(b.escuela || b.cancha), "es"));
+    const exactas = CANCHAS.filter((c) => c.exacta).length;
+    app.innerHTML = `
+      <div class="seccion-titulo">
+        <h2>Canchas <span class="cat">y estadios</span></h2>
+        <span class="muted">${CANCHAS.length} canchas · Usulután y San Miguel</span>
+      </div>
+      <div class="canchas-grid">
+        <div class="canchas-mapa">${mapaHTML()}
+          <p class="canchas-ayuda">Toca un punto para ver su ficha. ${exactas} de ${CANCHAS.length} tienen la ubicación exacta.</p>
+        </div>
+        <div class="canchas-lista">${lista.map(tarjetaCancha).join("")}</div>
+      </div>
+      <p class="canchas-nota">Datos de fuentes públicas (fichas de clubes, prensa y mapas). Las canchas de cada jornada las define la comisión organizadora.
+        ${CORREO ? `¿Tu escuela juega en otra cancha o ves un dato que no cuadra? <a href="${esc(enlaceCorreo(APOYOS.find((a) => a.id === "cancha")))}">Escríbenos</a>.` : ""}</p>`;
+  }
+  function marcarCancha(id, desplazar) {
+    estado.cancha = id;
+    app.querySelectorAll(".cancha.sel, .m-punto.sel").forEach((x) => x.classList.remove("sel"));
+    app.querySelectorAll(`[data-cancha="${id}"]`).forEach((x) => { if (x.matches(".cancha, .m-punto")) x.classList.add("sel"); });
+    guardarHash();
+    const destino = desplazar === "mapa" ? app.querySelector(".mapa") : app.querySelector(`#cancha-${id}`);
+    if (destino && desplazar) {
+      const barra = document.querySelector(".barra").getBoundingClientRect().height;
+      window.scrollTo({ top: destino.getBoundingClientRect().top + window.scrollY - barra - 12, behavior: sinMovimiento() ? "auto" : "smooth" });
+    }
+  }
+
+  /* ------------------------------------------------------------------ */
   /* Render: Quiniela (se carga aparte, solo con internet)              */
   /* ------------------------------------------------------------------ */
   const URL_SITIO = T.urlSitio || "";
@@ -2269,7 +2521,7 @@ window.QUINIELA = {
   /* ------------------------------------------------------------------ */
   function render() {
     renderNav();
-    ({ inicio: renderInicio, posiciones: renderPosiciones, resultados: renderResultados, playoffs: renderPlayoffs, reglamento: renderReglamento, quiniela: renderQuiniela })[estado.tab]();
+    ({ inicio: renderInicio, posiciones: renderPosiciones, resultados: renderResultados, playoffs: renderPlayoffs, reglamento: renderReglamento, quiniela: renderQuiniela, canchas: renderCanchas })[estado.tab]();
     app.insertAdjacentHTML("beforeend", anunciosHTML());
     guardarHash();
     tic();
@@ -2295,16 +2547,22 @@ window.QUINIELA = {
         if (ir.dataset.cat) estado.cat = ir.dataset.cat;
         if (estado.tab === "resultados" && JA) estado.jornada = JA;
         if (ir.dataset.jor) estado.jornada = +ir.dataset.jor;
+        if (destino === "canchas") estado.cancha = ir.dataset.cancha || "";
         render();
       };
       const subirABarra = (suave) => {
         const barra = document.querySelector(".barra");
         window.scrollTo({ top: barra.getBoundingClientRect().top + window.scrollY - 1, behavior: suave ? "smooth" : "auto" });
       };
-      if (destino === estado.tab) { aplicar(); subirABarra(true); }
-      else conCortina(destino, () => { aplicar(); subirABarra(false); });
+      const enfocar = (suave) => (destino === "canchas" && ir.dataset.cancha) ? marcarCancha(ir.dataset.cancha, true) : subirABarra(suave);
+      if (destino === estado.tab) { aplicar(); enfocar(true); }
+      else conCortina(destino, () => { aplicar(); if (destino === "canchas" && ir.dataset.cancha) { estado.cancha = ir.dataset.cancha; const c = app.querySelector("#cancha-" + ir.dataset.cancha); if (c) window.scrollTo({ top: c.getBoundingClientRect().top + window.scrollY - document.querySelector(".barra").getBoundingClientRect().height - 12 }); } else subirABarra(false); });
       return;
     }
+    const mp = e.target.closest(".m-punto");
+    if (mp) { e.preventDefault(); marcarCancha(mp.dataset.cancha, true); return; }
+    const vm = e.target.closest("[data-ver-mapa]");
+    if (vm) { marcarCancha(vm.dataset.verMapa, "mapa"); return; }
     const bj = e.target.closest("button[data-jornada]");
     if (bj) { estado.jornada = +bj.dataset.jornada; render(); return; }
     const bm = e.target.closest("button[data-mover]");
@@ -2529,6 +2787,7 @@ window.QUINIELA = {
     if (!hoja.hidden && !hoja.querySelector(".ha-caja-qr")) hoja.innerHTML = contenidoHoja(hojaMsg, hojaDesdeQR);
   });
   window.addEventListener("appinstalled", () => { promptInstalar = null; if (!hoja.hidden) abrirHoja("¡Listo! La app quedó instalada."); });
+  if (estado.tab === "canchas" && estado.cancha) setTimeout(() => marcarCancha(estado.cancha, true), 60);
   if (QUINIELA_ACTIVA) {
     document.getElementById("tab-quiniela").hidden = false;
     document.getElementById("tabs").classList.add("con-6");

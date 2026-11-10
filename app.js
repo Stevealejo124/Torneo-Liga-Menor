@@ -213,17 +213,19 @@
   /* ------------------------------------------------------------------ */
   const Q = window.QUINIELA;
   const QUINIELA_ACTIVA = !!(Q && Q.activa && Q.firebase && Q.firebase.apiKey && !/PEGA/.test(Q.firebase.apiKey));
-  const TABS = ["inicio", "posiciones", "resultados", "playoffs", "reglamento"].concat(QUINIELA_ACTIVA ? ["quiniela"] : []);
+  const TABS = ["inicio", "posiciones", "resultados", "canchas", "playoffs", "reglamento"].concat(QUINIELA_ACTIVA ? ["quiniela"] : []);
   const JA = jornadaActual();
   const estado = {
     tab: "inicio",
     cat: store.get("reddfut-cat") || CATS[0],
     jornada: JA || 1,
-    todas: store.get("reddfut-todas") === "1"
+    todas: store.get("reddfut-todas") === "1",
+    cancha: ""
   };
   (function leerHash() {
     const partes = decodeURIComponent(location.hash.replace(/^#\/?/, "")).split("/");
     if (TABS.includes(partes[0])) estado.tab = partes[0];
+    if (estado.tab === "canchas") { estado.cancha = partes[1] || ""; return; }
     const c = CATS.find((x) => x.toLowerCase() === (partes[1] || "").toLowerCase());
     if (c) estado.cat = c;
     const jn = parseInt(partes[2], 10);
@@ -233,7 +235,8 @@
 
   function guardarHash() {
     let h = "#/" + estado.tab;
-    if (!["reglamento", "inicio", "quiniela"].includes(estado.tab)) h += "/" + estado.cat.toLowerCase();
+    if (estado.tab === "canchas") { if (estado.cancha) h += "/" + estado.cancha; }
+    else if (!["reglamento", "inicio", "quiniela"].includes(estado.tab)) h += "/" + estado.cat.toLowerCase();
     if (estado.tab === "resultados") h += "/" + estado.jornada;
     try { history.replaceState(null, "", h); } catch (e) { /* vista previa */ }
     store.set("reddfut-cat", estado.cat);
@@ -285,8 +288,10 @@
     document.querySelectorAll("#tabs button").forEach((b) => {
       b.setAttribute("aria-selected", b.dataset.tab === estado.tab ? "true" : "false");
     });
+    const sel = document.querySelector('#tabs button[aria-selected="true"]'), cont = document.getElementById("tabs");
+    if (sel && cont.scrollWidth > cont.clientWidth) cont.scrollTo({ left: sel.offsetLeft - (cont.clientWidth - sel.offsetWidth) / 2, behavior: "auto" });
     const cats = document.getElementById("cats");
-    document.getElementById("barra-cats").classList.toggle("oculto", ["reglamento", "inicio", "quiniela"].includes(estado.tab));
+    document.getElementById("barra-cats").classList.toggle("oculto", ["reglamento", "inicio", "quiniela", "canchas"].includes(estado.tab));
     cats.innerHTML = CATS.map((c) => `<button data-cat="${esc(c)}" aria-pressed="${c === estado.cat}">${esc(c)}</button>`).join("");
   }
 
@@ -374,14 +379,14 @@
           if (r.gl > r.gv) clsV = "perdio"; else if (r.gv > r.gl) clsL = "perdio";
         }
         const hCat = !jugado && !p.hora && horaDe(estado.cat) ? "🕗 " + horaTxt(horaDe(estado.cat)) : "";
-        const meta = [p.fecha ? fecha(p.fecha, { weekday: "short", day: "numeric", month: "short" }) : "", p.hora || hCat, p.cancha ? "📍 " + p.cancha : ""].filter(Boolean).join(" · ");
+        const meta = [p.fecha ? esc(fecha(p.fecha, { weekday: "short", day: "numeric", month: "short" })) : "", esc(p.hora || hCat), botonCancha(p.cancha)].filter(Boolean).join(" · ");
         const todas = estado.todas ? `<div class="todas-cats">${CATS.map((c) => {
           const rc = parseRes(p.resultados && p.resultados[c]);
           const txt = !rc ? "–" : rc.gl == null ? "✕" : `${rc.gl}-${rc.gv}`;
           return `<div class="${c === estado.cat ? "actual" : ""}" title="${rc && rc.texto ? esc(rc.texto) : ""}">${esc(c)}<b>${txt}</b></div>`;
         }).join("")}</div>` : "";
         return `<article class="partido tarjeta">
-          <div class="partido-meta">${esc(meta)}</div>
+          <div class="partido-meta">${meta}</div>
           <div class="partido-fila">
             <div class="eq local ${clsL}"><span class="n">${esc(p.local)}</span>${escudo(p.local, true)}</div>
             ${marcadorHTML(r, jugado)}
@@ -816,6 +821,121 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* Render: Canchas y estadios (mapa propio, funciona sin internet)    */
+  /* ------------------------------------------------------------------ */
+  /* Mapa base de los departamentos: lo genera herramientas/canchas/generar_mapa.py */
+  /* MAPA-INICIO */ const MAPA = {"w":1000,"h":1100,"lng0":-88.77,"lat0":13.685,"k":2056.122,"kx":0.97271,"deps":{"Usulután":"M496.0 42.9L491.6 47.0L488.6 57.7L463.9 69.4L449.6 87.9L437.8 95.3L434.8 118.7L429.8 125.2L418.5 129.5L410.0 142.0L404.7 153.7L405.3 166.8L396.8 179.6L375.8 186.9L360.0 197.2L339.5 201.8L324.8 200.4L304.2 208.8L298.3 209.2L285.5 201.4L276.3 201.2L270.5 209.4L274.0 223.3L272.6 229.8L268.8 236.3L262.0 237.2L252.2 247.4L253.2 265.3L250.3 270.6L240.7 280.3L221.8 272.1L209.3 282.2L201.1 297.5L208.1 314.6L208.3 325.0L197.6 347.8L194.5 383.3L182.5 431.1L186.9 457.9L182.4 465.9L166.5 474.1L158.7 481.9L145.3 532.8L119.2 550.3L103.6 572.0L98.5 608.1L79.1 648.6L78.9 670.7L95.5 696.0L96.7 711.3L88.9 719.6L52.5 741.5L36.2 767.1L-0.8 793.5L-12.5 806.8L-30.0 818.5L-30.0 910.3L12.1 925.8L66.0 939.7L306.3 981.9L511.1 1031.2L595.6 1057.4L706.2 1072.1L736.3 1078.9L750.2 1072.2L802.6 1059.9L871.9 1050.7L945.4 1055.8L1030.0 1067.2L1030.0 774.1L1022.6 768.2L1010.7 769.1L1008.0 773.9L1003.2 772.0L1002.0 769.4L1005.8 764.3L1004.2 759.2L1001.7 764.5L993.3 767.8L993.6 771.9L987.9 768.9L990.0 776.0L982.6 775.6L983.0 783.6L974.0 777.3L962.0 788.7L969.2 802.0L966.0 810.1L955.5 819.4L954.8 826.3L952.0 826.6L951.2 842.5L954.2 850.4L978.3 872.9L962.2 883.2L952.4 880.0L901.9 892.0L895.4 860.9L882.3 834.8L888.9 815.3L941.2 763.0L947.7 743.3L937.9 730.2L947.7 713.8L937.9 700.8L921.6 694.2L901.9 707.3L888.3 705.0L830.0 707.3L833.3 684.4L830.0 668.0L810.5 661.5L761.4 628.9L771.2 566.8L771.2 514.5L767.9 504.7L754.9 514.5L738.6 517.7L738.6 498.2L758.2 462.2L767.9 432.7L767.9 409.9L777.7 396.8L794.0 390.3L794.0 374.0L777.7 331.5L777.7 289.1L758.2 240.0L758.2 200.9L767.9 184.4L787.5 168.1L794.0 155.1L794.0 145.3L777.7 125.7L771.2 106.1L784.4 83.3L784.4 57.1L774.5 34.3L764.7 37.5L745.1 50.6L722.3 50.6L692.8 37.5L670.0 14.7L640.5 -24.5L614.4 -21.2L592.2 -9.0L565.4 -24.5L560.5 -30.0L558.7 -30.0L567.6 -18.1L560.0 -0.4L540.7 20.0Z","San Vicente":"M-30.0 573.9L-20.0 587.1L-27.8 601.4L-21.9 607.6L-24.6 611.3L-22.0 628.6L-25.0 636.9L-30.0 642.2L-30.0 818.5L-12.5 806.8L-0.8 793.5L36.2 767.1L52.5 741.5L88.9 719.6L96.7 711.3L95.5 696.0L78.9 670.7L79.1 648.6L98.5 608.1L103.6 572.0L119.2 550.3L145.3 532.8L158.7 481.9L166.5 474.1L182.4 465.9L186.9 457.9L182.5 431.1L194.5 383.3L197.6 347.8L208.3 325.0L208.1 314.6L201.1 297.5L209.3 282.2L221.8 272.1L240.7 280.3L250.3 270.6L253.2 265.3L252.2 247.4L262.0 237.2L268.8 236.3L272.6 229.8L274.0 223.3L270.5 209.4L276.3 201.2L285.5 201.4L298.3 209.2L304.2 208.8L324.8 200.4L339.5 201.8L360.0 197.2L375.8 186.9L396.8 179.6L405.3 166.8L404.7 153.7L410.0 142.0L418.5 129.5L429.8 125.2L434.8 118.7L437.8 95.3L449.6 87.9L463.9 69.4L488.6 57.7L491.6 47.0L496.0 42.9L540.7 20.0L560.0 -0.4L567.6 -18.1L558.7 -30.0L-30.0 -30.0L-30.0 562.6L-29.3 563.2L-30.0 567.3Z","San Miguel":"M1017.4 25.7L1017.9 22.3L1008.8 12.8L999.2 -30.0L560.5 -30.0L565.4 -24.5L592.2 -9.0L614.4 -21.2L640.5 -24.5L670.0 14.7L692.8 37.5L722.3 50.6L745.1 50.6L764.7 37.5L774.5 34.3L784.4 57.1L784.4 83.3L771.2 106.1L777.7 125.7L794.0 145.3L794.0 155.1L787.5 168.1L767.9 184.4L758.2 200.9L758.2 240.0L777.7 289.1L777.7 331.5L794.0 374.0L794.0 390.3L777.7 396.8L767.9 409.9L767.9 432.7L758.2 462.2L738.6 498.2L738.6 517.7L754.9 514.5L767.9 504.7L771.2 514.5L771.2 566.8L761.4 628.9L810.5 661.5L830.0 668.0L833.3 684.4L830.0 707.3L888.3 705.0L901.9 707.3L921.6 694.2L937.9 700.8L947.7 713.8L937.9 730.2L947.7 743.3L941.2 763.0L888.9 815.3L882.3 834.8L895.4 860.9L901.9 892.0L952.4 880.0L962.2 883.2L978.3 872.9L954.2 850.4L951.2 842.5L952.0 826.6L954.8 826.3L955.5 819.4L966.0 810.1L969.2 802.0L962.0 788.7L974.0 777.3L983.0 783.6L982.6 775.6L990.0 776.0L987.9 768.9L993.6 771.9L993.3 767.8L1001.7 764.5L1004.2 759.2L1005.8 764.3L1002.0 769.4L1003.2 772.0L1008.0 773.9L1010.7 769.1L1022.6 768.2L1030.0 774.1L1030.0 15.2L1029.2 14.3Z","Morazán":"M1008.8 12.8L1017.9 22.3L1017.4 25.7L1029.2 14.3L1030.0 15.2L1030.0 -30.0L999.2 -30.0Z","La Paz":"M-24.6 611.3L-21.9 607.6L-27.8 601.4L-20.0 587.1L-30.0 573.9L-30.0 567.3L-29.3 563.2L-30.0 562.6L-30.0 642.2L-25.0 636.9L-22.0 628.6Z"}}; /* MAPA-FIN */
+  const CANCHAS = (T.canchas || []).filter((c) => c && c.cancha);
+  const slugC = (t) => String(t).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const canchaDe = (nombre) => CANCHAS.find((c) => c.cancha === nombre);
+  function botonCancha(nombre) {
+    if (!nombre) return "";
+    return canchaDe(nombre)
+      ? `<button class="ir-cancha" type="button" data-ir="canchas" data-cancha="${esc(slugC(nombre))}">📍 ${esc(nombre)}</button>`
+      : `<span>📍 ${esc(nombre)}</span>`;
+  }
+  function proximoEn(c, ahora = Date.now()) {
+    for (const j of JORNADAS) {
+      if (tieneResultados(j)) continue;
+      const ini = inicioJornada(j);
+      if (ini && ini + FIN_JUEGOS_MS < ahora) continue;
+      const p = (j.partidos || []).find((x) => x.cancha === c.cancha);
+      if (p) return { j, p };
+    }
+    return null;
+  }
+  function enlaceMapa(c) {
+    const q = c.exacta && c.lat ? `${c.lat},${c.lng}` : `${c.nombre}, ${c.lugar}, El Salvador`;
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+  }
+  function mapaHTML() {
+    if (typeof MAPA === "undefined") return "";
+    const X = (c) => (c.lng - MAPA.lng0) * MAPA.k * MAPA.kx, Y = (c) => (MAPA.lat0 - c.lat) * MAPA.k;
+    const LADO = { "Alegría": "arriba", "Berlín": "izq", "Mercedes Umaña": "izq", "Jiquilisco": "izq" };
+    const dep = (n, cls) => MAPA.deps[n] ? `<path class="${cls}" d="${MAPA.deps[n]}"/>` : "";
+    const otros = Object.keys(MAPA.deps).filter((n) => n !== "Usulután" && n !== "San Miguel");
+    const puntos = CANCHAS.filter((c) => typeof c.lat === "number").map((c) => {
+      const x = X(c).toFixed(1), y = Y(c).toFixed(1), e = ESCUELAS.get(c.escuela);
+      const lado = LADO[c.cancha] || "der", izq = lado === "izq", arriba = lado === "arriba";
+      const corto = e ? e.corto : c.cancha.slice(0, 3).toUpperCase();
+      const sel = estado.cancha === slugC(c.cancha) ? " sel" : "";
+      return `<a class="m-punto${c.exacta ? "" : " aprox"}${sel}" href="#/canchas/${slugC(c.cancha)}" data-cancha="${slugC(c.cancha)}" aria-label="${esc(c.nombre)} (${esc(c.escuela || "")})">
+        <circle class="m-halo" cx="${x}" cy="${y}" r="34"/>
+        <circle class="m-dot" cx="${x}" cy="${y}" r="14" style="--c:${e ? esc(e.color) : "#0b2545"}"/>
+        <text class="m-etq" x="${(+x + (arriba ? 0 : izq ? -22 : 22)).toFixed(1)}" y="${(+y + (arriba ? -24 : 11)).toFixed(1)}" text-anchor="${arriba ? "middle" : izq ? "end" : "start"}">${esc(corto)}</text>
+      </a>`;
+    }).join("");
+    const tx = (lng, lat, t, cls) => `<text class="${cls}" x="${((lng - MAPA.lng0) * MAPA.k * MAPA.kx).toFixed(0)}" y="${((MAPA.lat0 - lat) * MAPA.k).toFixed(0)}">${t}</text>`;
+    return `<figure class="mapa tarjeta">
+      <svg viewBox="0 0 ${MAPA.w} ${MAPA.h}" role="img" aria-label="Mapa de las canchas del torneo en Usulután y San Miguel">
+        <defs><pattern id="m-olas" width="26" height="14" patternUnits="userSpaceOnUse"><path d="M0 10q6.5-6 13 0t13 0" fill="none" class="m-ola"/></pattern></defs>
+        <rect class="m-mar" width="${MAPA.w}" height="${MAPA.h}"/>
+        <rect width="${MAPA.w}" height="${MAPA.h}" fill="url(#m-olas)"/>
+        ${otros.map((n) => dep(n, "m-otro")).join("")}
+        ${dep("San Miguel", "m-dep m-smi")}${dep("Usulután", "m-dep m-usu")}
+        ${tx(-88.66, 13.45, "USULUTÁN", "m-nom")}<text class="m-nom chico" x="${MAPA.w - 18}" y="${((MAPA.lat0 - 13.435) * MAPA.k).toFixed(0)}" text-anchor="end">SAN MIGUEL</text>
+        ${tx(-88.76, 13.66, "SAN VICENTE", "m-nom chico")}${tx(-88.70, 13.175, "OCÉANO PACÍFICO", "m-mar-t")}
+        ${puntos}
+      </svg>
+      <figcaption><span><i class="m-ley"></i> Ubicación exacta</span><span><i class="m-ley aprox"></i> Aproximada (centro del pueblo)</span></figcaption>
+    </figure>`;
+  }
+  function tarjetaCancha(c) {
+    const id = slugC(c.cancha), e = ESCUELAS.get(c.escuela);
+    const datos = [["Aforo", c.aforo], ["Superficie", c.superficie], ["Club", c.club], ["Código Plus", c.plus]]
+      .filter((d) => d[1]).map((d) => `<div><dt>${d[0]}</dt><dd>${esc(d[1])}</dd></div>`).join("");
+    const px = proximoEn(c);
+    const prox = px ? `<div class="cancha-prox"><span>Próximo partido aquí</span><b>J${px.j.numero} · ${esc(fecha(px.j.fecha, { weekday: "short", day: "numeric", month: "short" }))}</b>
+        <span class="cruce">${escudo(px.p.local)} ${esc(px.p.local)} <i>vs</i> ${esc(px.p.visitante)} ${escudo(px.p.visitante)}</span></div>` : "";
+    return `<article class="cancha tarjeta${estado.cancha === id ? " sel" : ""}" id="cancha-${id}" data-cancha="${id}">
+      <header class="cancha-cab">
+        ${e ? escudo(c.escuela, true) : ""}
+        <div>
+          <span class="cancha-local">Local: ${esc(c.escuela || c.cancha)}</span>
+          <h3>${esc(c.nombre || c.cancha)}</h3>
+          <span class="cancha-lugar">${esc(c.lugar || c.cancha)}</span>
+        </div>
+      </header>
+      ${datos ? `<dl class="cancha-datos">${datos}</dl>` : ""}
+      ${c.detalle ? `<p class="cancha-det">${esc(c.detalle)}</p>` : ""}
+      ${prox}
+      <footer class="cancha-pie">
+        <button type="button" class="cancha-btn" data-ver-mapa="${id}">Ver en el mapa</button>
+        <a class="cancha-btn sec" href="${esc(enlaceMapa(c))}" target="_blank" rel="noopener">Cómo llegar ↗</a>
+        <span class="cancha-ubic ${c.exacta ? "ok" : ""}">${c.exacta ? "Ubicación exacta" : "Ubicación aproximada"}${c.fuente ? ` · Fuente: ${esc(c.fuente)}` : ""}</span>
+      </footer>
+    </article>`;
+  }
+  function renderCanchas() {
+    const lista = [...CANCHAS].sort((a, b) => String(a.escuela || a.cancha).localeCompare(String(b.escuela || b.cancha), "es"));
+    const exactas = CANCHAS.filter((c) => c.exacta).length;
+    app.innerHTML = `
+      <div class="seccion-titulo">
+        <h2>Canchas <span class="cat">y estadios</span></h2>
+        <span class="muted">${CANCHAS.length} canchas · Usulután y San Miguel</span>
+      </div>
+      <div class="canchas-grid">
+        <div class="canchas-mapa">${mapaHTML()}
+          <p class="canchas-ayuda">Toca un punto para ver su ficha. ${exactas} de ${CANCHAS.length} tienen la ubicación exacta.</p>
+        </div>
+        <div class="canchas-lista">${lista.map(tarjetaCancha).join("")}</div>
+      </div>
+      <p class="canchas-nota">Datos de fuentes públicas (fichas de clubes, prensa y mapas). Las canchas de cada jornada las define la comisión organizadora.
+        ${CORREO ? `¿Tu escuela juega en otra cancha o ves un dato que no cuadra? <a href="${esc(enlaceCorreo(APOYOS.find((a) => a.id === "cancha")))}">Escríbenos</a>.` : ""}</p>`;
+  }
+  function marcarCancha(id, desplazar) {
+    estado.cancha = id;
+    app.querySelectorAll(".cancha.sel, .m-punto.sel").forEach((x) => x.classList.remove("sel"));
+    app.querySelectorAll(`[data-cancha="${id}"]`).forEach((x) => { if (x.matches(".cancha, .m-punto")) x.classList.add("sel"); });
+    guardarHash();
+    const destino = desplazar === "mapa" ? app.querySelector(".mapa") : app.querySelector(`#cancha-${id}`);
+    if (destino && desplazar) {
+      const barra = document.querySelector(".barra").getBoundingClientRect().height;
+      window.scrollTo({ top: destino.getBoundingClientRect().top + window.scrollY - barra - 12, behavior: sinMovimiento() ? "auto" : "smooth" });
+    }
+  }
+
+  /* ------------------------------------------------------------------ */
   /* Render: Quiniela (se carga aparte, solo con internet)              */
   /* ------------------------------------------------------------------ */
   const URL_SITIO = T.urlSitio || "";
@@ -905,7 +1025,7 @@
   /* ------------------------------------------------------------------ */
   function render() {
     renderNav();
-    ({ inicio: renderInicio, posiciones: renderPosiciones, resultados: renderResultados, playoffs: renderPlayoffs, reglamento: renderReglamento, quiniela: renderQuiniela })[estado.tab]();
+    ({ inicio: renderInicio, posiciones: renderPosiciones, resultados: renderResultados, playoffs: renderPlayoffs, reglamento: renderReglamento, quiniela: renderQuiniela, canchas: renderCanchas })[estado.tab]();
     app.insertAdjacentHTML("beforeend", anunciosHTML());
     guardarHash();
     tic();
@@ -931,16 +1051,22 @@
         if (ir.dataset.cat) estado.cat = ir.dataset.cat;
         if (estado.tab === "resultados" && JA) estado.jornada = JA;
         if (ir.dataset.jor) estado.jornada = +ir.dataset.jor;
+        if (destino === "canchas") estado.cancha = ir.dataset.cancha || "";
         render();
       };
       const subirABarra = (suave) => {
         const barra = document.querySelector(".barra");
         window.scrollTo({ top: barra.getBoundingClientRect().top + window.scrollY - 1, behavior: suave ? "smooth" : "auto" });
       };
-      if (destino === estado.tab) { aplicar(); subirABarra(true); }
-      else conCortina(destino, () => { aplicar(); subirABarra(false); });
+      const enfocar = (suave) => (destino === "canchas" && ir.dataset.cancha) ? marcarCancha(ir.dataset.cancha, true) : subirABarra(suave);
+      if (destino === estado.tab) { aplicar(); enfocar(true); }
+      else conCortina(destino, () => { aplicar(); if (destino === "canchas" && ir.dataset.cancha) { estado.cancha = ir.dataset.cancha; const c = app.querySelector("#cancha-" + ir.dataset.cancha); if (c) window.scrollTo({ top: c.getBoundingClientRect().top + window.scrollY - document.querySelector(".barra").getBoundingClientRect().height - 12 }); } else subirABarra(false); });
       return;
     }
+    const mp = e.target.closest(".m-punto");
+    if (mp) { e.preventDefault(); marcarCancha(mp.dataset.cancha, true); return; }
+    const vm = e.target.closest("[data-ver-mapa]");
+    if (vm) { marcarCancha(vm.dataset.verMapa, "mapa"); return; }
     const bj = e.target.closest("button[data-jornada]");
     if (bj) { estado.jornada = +bj.dataset.jornada; render(); return; }
     const bm = e.target.closest("button[data-mover]");
@@ -1165,6 +1291,7 @@
     if (!hoja.hidden && !hoja.querySelector(".ha-caja-qr")) hoja.innerHTML = contenidoHoja(hojaMsg, hojaDesdeQR);
   });
   window.addEventListener("appinstalled", () => { promptInstalar = null; if (!hoja.hidden) abrirHoja("¡Listo! La app quedó instalada."); });
+  if (estado.tab === "canchas" && estado.cancha) setTimeout(() => marcarCancha(estado.cancha, true), 60);
   if (QUINIELA_ACTIVA) {
     document.getElementById("tab-quiniela").hidden = false;
     document.getElementById("tabs").classList.add("con-6");
