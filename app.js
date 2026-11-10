@@ -882,7 +882,7 @@
   }
   function tarjetaCancha(c) {
     const id = slugC(c.cancha), e = ESCUELAS.get(c.escuela);
-    const datos = [["Aforo", c.aforo], ["Superficie", c.superficie], ["Club", c.club], ["Código Plus", c.plus]]
+    const datos = [["Aforo", c.aforo], ["Superficie", c.superficie], ["Código Plus", c.plus]]
       .filter((d) => d[1]).map((d) => `<div><dt>${d[0]}</dt><dd>${esc(d[1])}</dd></div>`).join("");
     const px = proximoEn(c);
     const prox = px ? `<div class="cancha-prox"><span>Próximo partido aquí</span><b>J${px.j.numero} · ${esc(fecha(px.j.fecha, { weekday: "short", day: "numeric", month: "short" }))}</b>
