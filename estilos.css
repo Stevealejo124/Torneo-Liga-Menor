@@ -955,3 +955,13 @@ body.hoja-abierta { overflow: hidden; }
 .canchas-nota a { color: var(--azul); font-weight: 700; }
 .ir-cancha { border: 0; background: none; padding: 0; font: inherit; color: inherit; cursor: pointer; text-decoration: underline; text-decoration-color: rgba(201,150,0,.6); text-underline-offset: 3px; }
 .ir-cancha:hover { color: var(--azul); }
+
+/* Dos escudos en la cabecera: RedDFUT + Escuelitas Usulután */
+.logo { display: flex; align-items: center; gap: 10px; flex: none; }
+.logo .logo-2 { height: 100px; }
+@media (max-width: 480px) {
+  .logo { gap: 4px; }
+  .logo img { height: 64px; }
+  .logo .logo-2 { height: 62px; }
+}
+@media (min-width: 761px) { .cabecera h1 { font-size: clamp(2rem, 4.3vw, 3.05rem); } }
