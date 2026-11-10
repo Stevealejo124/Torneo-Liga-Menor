@@ -531,7 +531,8 @@
   function claveCuenta(ahora) {
     const P0 = proximaJornada(ahora);
     const turno = P0 && P0.modo === "vivo" ? TURNOS.filter((t) => momento(P0.j.fecha, t.h) <= ahora).length : -1;
-    return JSON.stringify(P0) + "|" + turno;
+    const q = QUINIELA_ACTIVA ? quinielaAhora(ahora) : null;
+    return JSON.stringify(P0) + "|" + turno + "|" + (q ? q.j.numero + (q.abierta ? "a" : "c") : "");
   }
   let modoCuenta = claveCuenta(Date.now());
   function tic() {
@@ -553,20 +554,43 @@
   }
   setInterval(tic, 1000);
 
+  /* Ventana de la quiniela de cada jornada (igual que quiniela.js):
+     abre "diasAntes" días antes del primer partido y cierra el día de juego a la horaCierre. */
+  function ventanaQuiniela(j) {
+    if (!j || !j.fecha) return null;
+    const dias = Number.isFinite(Number(Q && Q.diasAntes)) ? Number(Q.diasAntes) : 2;
+    const hc = (j.cierre && String(j.cierre).match(/(\d{1,2}:\d{2})$/)) ? String(j.cierre).match(/(\d{1,2}:\d{2})$/)[1] : ((Q && Q.horaCierre) || "07:00");
+    const cierre = momento(j.cierre ? String(j.cierre).slice(0, 10) : j.fecha, hc);
+    const apertura = j.apertura ? momento(String(j.apertura).slice(0, 10), String(j.apertura).slice(11, 16) || HORA_JUEGOS)
+      : momento(j.fecha, HORA_JUEGOS) - dias * 864e5;
+    return cierre && apertura ? { apertura, cierre } : null;
+  }
+  function quinielaAhora(ahora = Date.now()) {
+    for (const j of JORNADAS) {
+      if (!(j.partidos || []).length || tieneResultados(j)) continue;
+      const v = ventanaQuiniela(j);
+      if (!v || v.cierre <= ahora) continue;
+      return { j, ...v, abierta: ahora >= v.apertura };
+    }
+    return null;
+  }
   function promoQuiniela() {
     if (!QUINIELA_ACTIVA) return "";
-    const hora = (Q.horaCierre || "07:00");
-    const ahora = Date.now();
-    const prox = JORNADAS.find((j) => {
-      if (!(j.partidos || []).length || !(j.cierre || j.fecha)) return false;
-      const txt = j.cierre ? String(j.cierre) : `${j.fecha} ${hora}`;
-      const m = txt.match(/^(\d{4}-\d{2}-\d{2})[ T](\d{1,2}):(\d{2})/);
-      return m && new Date(`${m[1]}T${m[2].padStart(2, "0")}:${m[3]}:00-06:00`).getTime() > ahora;
-    });
+    const q = quinielaAhora();
+    const fechaHora = (ms) => new Date(ms).toLocaleString("es-SV", { weekday: "long", day: "numeric", month: "short", hour: "numeric", minute: "2-digit", timeZone: "America/El_Salvador" });
+    let tit = "Quiniela del torneo", txt = "Adivina los resultados de cada jornada y compite en la tabla. Solo por diversión.", ir = "Ver tabla ›";
+    if (q && q.abierta) {
+      tit = `Quiniela · Jornada ${q.j.numero} abierta`;
+      txt = `Elige hasta 2 partidos por categoría. Cierra en <strong class="q-cuenta" data-cuenta-corta="${q.cierre}"></strong>.`;
+      ir = "Jugar ›";
+    } else if (q) {
+      tit = `Quiniela · Jornada ${q.j.numero}`;
+      txt = `Se abre el ${esc(fechaHora(q.apertura))} · faltan <strong class="q-cuenta" data-cuenta-corta="${q.apertura}"></strong>.`;
+      ir = "Ver ›";
+    }
     return `<button class="q-promo" data-ir="quiniela">
-      <span><b>${prox ? `Quiniela · Jornada ${prox.numero} abierta` : "Quiniela del torneo"}</b>
-      <span>${prox ? "¿Quién gana este sábado? Haz tus pronósticos y suma puntos." : "Adivina los resultados de cada jornada y compite en la tabla. Solo por diversión."}</span></span>
-      <span class="ir">${prox ? "Jugar ›" : "Ver tabla ›"}</span>
+      <span><b>${tit}</b><span>${txt}</span></span>
+      <span class="ir">${ir}</span>
     </button>`;
   }
 
@@ -938,10 +962,183 @@
   const esIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const yaInstalada = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
 
-  function instalarHTML() {
-    if (esArchivoLocal || yaInstalada) return "";
-    if (promptInstalar || esIOS) return `<button class="btn-secundario" id="btn-instalar">📲 Instalar en tu celular</button>`;
-    return "";
+  /* Código QR del sitio, guardado aquí mismo para que se vea aunque no haya internet.
+     Lo genera herramientas/qr/generar_qr.py (solo hay que correrlo si cambia urlSitio). */
+  /* QR-INICIO */ const QR_APP = { url: "https://stevealejo124.github.io/Torneo-Liga-Menor/?app=1", n: 41, hueco: [16, 9], d: "M0 0h7v1h-7zM8 0h1v1h-1zM10 0h4v1h-4zM16 0h3v1h-3zM20 0h2v1h-2zM23 0h6v1h-6zM30 0h3v1h-3zM34 0h7v1h-7zM0 1h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM11 1h1v1h-1zM15 1h1v1h-1zM17 1h3v1h-3zM21 1h1v1h-1zM24 1h4v1h-4zM29 1h1v1h-1zM32 1h1v1h-1zM34 1h1v1h-1zM40 1h1v1h-1zM0 2h1v1h-1zM2 2h3v1h-3zM6 2h1v1h-1zM9 2h1v1h-1zM11 2h1v1h-1zM14 2h1v1h-1zM18 2h3v1h-3zM22 2h1v1h-1zM24 2h2v1h-2zM28 2h5v1h-5zM34 2h1v1h-1zM36 2h3v1h-3zM40 2h1v1h-1zM0 3h1v1h-1zM2 3h3v1h-3zM6 3h1v1h-1zM8 3h3v1h-3zM14 3h1v1h-1zM17 3h1v1h-1zM20 3h1v1h-1zM23 3h1v1h-1zM25 3h3v1h-3zM30 3h1v1h-1zM34 3h1v1h-1zM36 3h3v1h-3zM40 3h1v1h-1zM0 4h1v1h-1zM2 4h3v1h-3zM6 4h1v1h-1zM8 4h2v1h-2zM11 4h1v1h-1zM14 4h4v1h-4zM20 4h8v1h-8zM34 4h1v1h-1zM36 4h3v1h-3zM40 4h1v1h-1zM0 5h1v1h-1zM6 5h1v1h-1zM8 5h2v1h-2zM12 5h3v1h-3zM20 5h1v1h-1zM22 5h1v1h-1zM24 5h1v1h-1zM27 5h1v1h-1zM29 5h1v1h-1zM31 5h1v1h-1zM34 5h1v1h-1zM40 5h1v1h-1zM0 6h7v1h-7zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM14 6h1v1h-1zM16 6h1v1h-1zM18 6h1v1h-1zM20 6h1v1h-1zM22 6h1v1h-1zM24 6h1v1h-1zM26 6h1v1h-1zM28 6h1v1h-1zM30 6h1v1h-1zM32 6h1v1h-1zM34 6h7v1h-7zM10 7h2v1h-2zM13 7h2v1h-2zM17 7h2v1h-2zM20 7h2v1h-2zM24 7h1v1h-1zM26 7h1v1h-1zM28 7h5v1h-5zM3 8h1v1h-1zM6 8h1v1h-1zM9 8h3v1h-3zM14 8h1v1h-1zM19 8h1v1h-1zM23 8h1v1h-1zM25 8h1v1h-1zM28 8h1v1h-1zM32 8h1v1h-1zM35 8h3v1h-3zM39 8h2v1h-2zM0 9h3v1h-3zM5 9h1v1h-1zM9 9h1v1h-1zM13 9h5v1h-5zM19 9h2v1h-2zM22 9h1v1h-1zM24 9h1v1h-1zM28 9h1v1h-1zM30 9h1v1h-1zM32 9h1v1h-1zM34 9h1v1h-1zM37 9h4v1h-4zM0 10h2v1h-2zM3 10h2v1h-2zM6 10h1v1h-1zM8 10h4v1h-4zM13 10h1v1h-1zM17 10h1v1h-1zM19 10h2v1h-2zM24 10h3v1h-3zM28 10h1v1h-1zM30 10h2v1h-2zM35 10h1v1h-1zM37 10h3v1h-3zM0 11h1v1h-1zM2 11h1v1h-1zM4 11h1v1h-1zM8 11h1v1h-1zM10 11h2v1h-2zM13 11h6v1h-6zM21 11h2v1h-2zM24 11h1v1h-1zM26 11h3v1h-3zM30 11h1v1h-1zM33 11h4v1h-4zM38 11h1v1h-1zM1 12h1v1h-1zM4 12h1v1h-1zM6 12h1v1h-1zM10 12h3v1h-3zM14 12h1v1h-1zM16 12h3v1h-3zM22 12h3v1h-3zM26 12h1v1h-1zM28 12h2v1h-2zM31 12h1v1h-1zM34 12h2v1h-2zM37 12h1v1h-1zM39 12h1v1h-1zM0 13h1v1h-1zM2 13h1v1h-1zM8 13h3v1h-3zM13 13h1v1h-1zM15 13h5v1h-5zM21 13h2v1h-2zM25 13h1v1h-1zM27 13h2v1h-2zM30 13h4v1h-4zM35 13h1v1h-1zM37 13h1v1h-1zM39 13h1v1h-1zM0 14h1v1h-1zM3 14h1v1h-1zM6 14h1v1h-1zM9 14h2v1h-2zM12 14h6v1h-6zM19 14h2v1h-2zM23 14h2v1h-2zM26 14h1v1h-1zM28 14h2v1h-2zM32 14h1v1h-1zM34 14h1v1h-1zM36 14h2v1h-2zM39 14h2v1h-2zM3 15h1v1h-1zM7 15h3v1h-3zM12 15h2v1h-2zM15 15h1v1h-1zM17 15h1v1h-1zM19 15h1v1h-1zM21 15h1v1h-1zM23 15h3v1h-3zM27 15h1v1h-1zM29 15h3v1h-3zM34 15h2v1h-2zM0 16h1v1h-1zM2 16h1v1h-1zM4 16h3v1h-3zM12 16h2v1h-2zM25 16h1v1h-1zM31 16h2v1h-2zM35 16h1v1h-1zM37 16h1v1h-1zM40 16h1v1h-1zM1 17h1v1h-1zM3 17h1v1h-1zM5 17h1v1h-1zM7 17h6v1h-6zM14 17h2v1h-2zM28 17h1v1h-1zM34 17h2v1h-2zM39 17h2v1h-2zM0 18h1v1h-1zM2 18h1v1h-1zM4 18h1v1h-1zM6 18h1v1h-1zM8 18h1v1h-1zM10 18h1v1h-1zM13 18h3v1h-3zM25 18h1v1h-1zM30 18h1v1h-1zM34 18h1v1h-1zM36 18h2v1h-2zM39 18h2v1h-2zM1 19h4v1h-4zM7 19h4v1h-4zM14 19h2v1h-2zM29 19h1v1h-1zM32 19h2v1h-2zM35 19h1v1h-1zM39 19h2v1h-2zM0 20h1v1h-1zM4 20h3v1h-3zM8 20h1v1h-1zM13 20h2v1h-2zM26 20h1v1h-1zM28 20h1v1h-1zM30 20h1v1h-1zM34 20h1v1h-1zM38 20h2v1h-2zM10 21h2v1h-2zM14 21h1v1h-1zM25 21h2v1h-2zM28 21h3v1h-3zM32 21h1v1h-1zM34 21h1v1h-1zM39 21h2v1h-2zM2 22h5v1h-5zM12 22h3v1h-3zM28 22h1v1h-1zM31 22h2v1h-2zM35 22h1v1h-1zM38 22h2v1h-2zM0 23h2v1h-2zM4 23h2v1h-2zM8 23h1v1h-1zM10 23h4v1h-4zM26 23h3v1h-3zM33 23h4v1h-4zM38 23h2v1h-2zM2 24h6v1h-6zM9 24h1v1h-1zM11 24h1v1h-1zM14 24h2v1h-2zM25 24h2v1h-2zM28 24h2v1h-2zM31 24h4v1h-4zM0 25h1v1h-1zM4 25h2v1h-2zM7 25h1v1h-1zM10 25h1v1h-1zM12 25h1v1h-1zM14 25h3v1h-3zM18 25h4v1h-4zM25 25h1v1h-1zM29 25h1v1h-1zM31 25h1v1h-1zM33 25h1v1h-1zM37 25h1v1h-1zM39 25h2v1h-2zM1 26h4v1h-4zM6 26h1v1h-1zM9 26h3v1h-3zM13 26h2v1h-2zM16 26h2v1h-2zM20 26h3v1h-3zM24 26h1v1h-1zM28 26h2v1h-2zM32 26h2v1h-2zM35 26h2v1h-2zM39 26h2v1h-2zM0 27h1v1h-1zM2 27h4v1h-4zM7 27h5v1h-5zM14 27h1v1h-1zM17 27h3v1h-3zM21 27h3v1h-3zM25 27h1v1h-1zM28 27h2v1h-2zM32 27h1v1h-1zM34 27h1v1h-1zM2 28h1v1h-1zM4 28h1v1h-1zM6 28h1v1h-1zM9 28h3v1h-3zM17 28h1v1h-1zM20 28h2v1h-2zM23 28h3v1h-3zM29 28h1v1h-1zM32 28h1v1h-1zM35 28h1v1h-1zM39 28h2v1h-2zM1 29h1v1h-1zM7 29h2v1h-2zM11 29h1v1h-1zM13 29h7v1h-7zM21 29h3v1h-3zM25 29h3v1h-3zM29 29h1v1h-1zM34 29h1v1h-1zM37 29h1v1h-1zM39 29h2v1h-2zM0 30h1v1h-1zM2 30h2v1h-2zM6 30h1v1h-1zM9 30h1v1h-1zM12 30h2v1h-2zM15 30h4v1h-4zM20 30h1v1h-1zM25 30h1v1h-1zM35 30h1v1h-1zM39 30h2v1h-2zM2 31h1v1h-1zM4 31h2v1h-2zM7 31h2v1h-2zM10 31h1v1h-1zM12 31h2v1h-2zM16 31h6v1h-6zM23 31h7v1h-7zM31 31h3v1h-3zM36 31h2v1h-2zM39 31h1v1h-1zM0 32h1v1h-1zM2 32h2v1h-2zM5 32h2v1h-2zM8 32h1v1h-1zM10 32h2v1h-2zM13 32h1v1h-1zM15 32h2v1h-2zM20 32h1v1h-1zM23 32h1v1h-1zM26 32h1v1h-1zM28 32h1v1h-1zM31 32h6v1h-6zM38 32h2v1h-2zM8 33h1v1h-1zM10 33h1v1h-1zM12 33h1v1h-1zM14 33h1v1h-1zM19 33h7v1h-7zM28 33h1v1h-1zM31 33h2v1h-2zM36 33h1v1h-1zM38 33h3v1h-3zM0 34h7v1h-7zM12 34h2v1h-2zM16 34h1v1h-1zM18 34h1v1h-1zM21 34h2v1h-2zM24 34h1v1h-1zM28 34h1v1h-1zM32 34h1v1h-1zM34 34h1v1h-1zM36 34h1v1h-1zM39 34h1v1h-1zM0 35h1v1h-1zM6 35h1v1h-1zM16 35h1v1h-1zM20 35h5v1h-5zM27 35h1v1h-1zM30 35h1v1h-1zM32 35h1v1h-1zM36 35h1v1h-1zM38 35h1v1h-1zM0 36h1v1h-1zM2 36h3v1h-3zM6 36h1v1h-1zM9 36h1v1h-1zM13 36h1v1h-1zM15 36h1v1h-1zM17 36h1v1h-1zM19 36h1v1h-1zM21 36h2v1h-2zM24 36h1v1h-1zM27 36h1v1h-1zM29 36h2v1h-2zM32 36h7v1h-7zM40 36h1v1h-1zM0 37h1v1h-1zM2 37h3v1h-3zM6 37h1v1h-1zM8 37h3v1h-3zM13 37h7v1h-7zM23 37h1v1h-1zM25 37h1v1h-1zM29 37h2v1h-2zM32 37h3v1h-3zM36 37h3v1h-3zM0 38h1v1h-1zM2 38h3v1h-3zM6 38h1v1h-1zM9 38h4v1h-4zM14 38h2v1h-2zM18 38h1v1h-1zM22 38h3v1h-3zM28 38h2v1h-2zM31 38h2v1h-2zM36 38h1v1h-1zM38 38h1v1h-1zM40 38h1v1h-1zM0 39h1v1h-1zM6 39h1v1h-1zM10 39h2v1h-2zM15 39h1v1h-1zM17 39h2v1h-2zM21 39h2v1h-2zM25 39h1v1h-1zM27 39h1v1h-1zM29 39h4v1h-4zM35 39h1v1h-1zM39 39h1v1h-1zM0 40h7v1h-7zM9 40h1v1h-1zM11 40h2v1h-2zM14 40h2v1h-2zM17 40h2v1h-2zM20 40h1v1h-1zM22 40h8v1h-8zM31 40h2v1h-2zM35 40h3v1h-3zM39 40h1v1h-1z" }; /* QR-FIN */
+  const llegoPorQR = /[?&]app=1\b/.test(location.search);
+  function logoSrc() { const i = document.querySelector('img[alt^="Logo"]'); return i ? i.src : "logo.png"; }
+  function qrHTML(clase) {
+    const t = QR_APP.n + 8, [a, h] = QR_APP.hueco, pc = (v) => (v / t * 100).toFixed(3) + "%";
+    return `<div class="qr-caja ${clase}">
+      <svg viewBox="-4 -4 ${t} ${t}" role="img" aria-label="Código QR para descargar la app" shape-rendering="crispEdges"><rect x="-4" y="-4" width="${t}" height="${t}" fill="#fff"/><path d="${QR_APP.d}" fill="#0b2545"/></svg>
+      <span class="qr-logo" style="left:${pc(a + 4)};top:${pc(a + 4)};width:${pc(h)};height:${pc(h)}"><img src="${esc(logoSrc())}" alt=""></span>
+    </div>`;
+  }
+  function seccionQR() {
+    return `<section class="ha-sec ha-sec-qr">
+      <h3>Escanea el código QR</h3>
+      <div class="ha-qr-fila">
+        <button class="ha-qr-toque" type="button" data-ha="qr-grande" aria-label="Ver el código QR en grande">${qrHTML("chico")}</button>
+        <div>
+          <p>Muéstraselo a otra persona: que apunte la <b>cámara de su teléfono</b> al código. Se le abre la app y la descarga con el botón <b>Descargar app</b>.</p>
+          <p class="ha-nota">Tú no necesitas internet para mostrarlo.</p>
+        </div>
+      </div>
+      <div class="ha-botones">
+        <button class="ha-btn" type="button" data-ha="qr-grande">⛶ Ver en grande</button>
+        <button class="ha-btn sec" type="button" data-ha="qr-guardar">Guardar imagen</button>
+      </div>
+    </section>`;
+  }
+  function vistaQRGrande() {
+    return `<div class="ha-caja ha-caja-qr" role="dialog" aria-modal="true" aria-labelledby="ha-tit">
+      <button class="ha-cerrar" type="button" data-ha="volver" aria-label="Volver">✕</button>
+      <span class="ha-sobre">${esc(T.organizador || "")}</span>
+      <h2 id="ha-tit">Escanea y descarga la app</h2>
+      ${qrHTML("grande")}
+      <p class="ha-qr-pie">Abre la <b>cámara</b> y apunta al código.<br>Luego toca <b>Descargar app</b>.</p>
+      <button class="ha-btn sec" type="button" data-ha="volver">← Volver</button>
+    </div>`;
+  }
+  async function guardarQR(boton) {
+    const W = 1080, H = 1350, c = document.createElement("canvas");
+    c.width = W; c.height = H;
+    const g = c.getContext("2d");
+    const tit = getComputedStyle(document.querySelector(".ha-caja h2") || document.body).fontFamily;
+    g.fillStyle = "#0b2545"; g.fillRect(0, 0, W, H);
+    g.fillStyle = "#f2b705"; g.fillRect(0, 0, W, 18); g.fillRect(0, H - 18, W, 18);
+    g.textAlign = "center";
+    g.fillStyle = "#f2b705"; g.font = `700 40px ${tit}`; g.fillText((T.organizador || "").toUpperCase(), W / 2, 112);
+    g.fillStyle = "#fff"; g.font = `800 86px ${tit}`; g.fillText("ESCANEA Y DESCARGA LA APP", W / 2, 205, W - 100);
+    const lado = 820, x0 = (W - lado) / 2, y0 = 270, t = QR_APP.n + 8, m = lado / t;
+    g.fillStyle = "#fff"; g.fillRect(x0, y0, lado, lado);
+    g.save(); g.translate(x0 + 4 * m, y0 + 4 * m); g.scale(m, m);
+    g.fillStyle = "#0b2545"; g.fill(new Path2D(QR_APP.d)); g.restore();
+    const [a, h] = QR_APP.hueco;
+    await new Promise((ok) => {
+      const img = new Image();
+      img.onload = () => {
+        const caja = h * m * 0.9, esc2 = Math.min(caja / img.width, caja / img.height);
+        const w = img.width * esc2, hh = img.height * esc2;
+        g.drawImage(img, x0 + (a + 4) * m + (h * m - w) / 2, y0 + (a + 4) * m + (h * m - hh) / 2, w, hh); ok();
+      };
+      img.onerror = ok; img.src = logoSrc();
+    });
+    g.fillStyle = "#fff"; g.font = `700 44px ${tit}`;
+    g.fillText(String(T.nombre || "").toUpperCase(), W / 2, 1170, W - 100);
+    g.fillStyle = "#c9d3e0"; g.font = "500 34px system-ui, sans-serif";
+    g.fillText(QR_APP.url.replace(/^https?:\/\//, "").replace(/\?app=1$/, ""), W / 2, 1240, W - 100);
+    c.toBlob((blob) => {
+      if (!blob) return;
+      const a2 = document.createElement("a");
+      a2.href = URL.createObjectURL(blob); a2.download = "QR_App_REDDFUT.png";
+      document.body.appendChild(a2); a2.click(); a2.remove();
+      setTimeout(() => URL.revokeObjectURL(a2.href), 4000);
+      boton.textContent = "✓ Imagen guardada";
+    }, "image/png");
+  }
+
+  /* Botón fijo "Descargar app": siempre visible, aunque ya esté instalada */
+  const ARCHIVO_OFFLINE = "Torneo_REDDFUT_sin_internet.html";
+  function instalarHTML() { return ""; }   // (antes había un botón en Inicio; ahora es el botón fijo)
+  const boton = document.createElement("button");
+  boton.id = "btn-app"; boton.className = "boton-app"; boton.type = "button";
+  boton.setAttribute("aria-haspopup", "dialog");
+  boton.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0l-5-5m5 5l5-5M5 20h14"/></svg><span class="largo">Descargar app</span><span class="corto">App</span>`;
+  document.body.appendChild(boton);
+  document.body.classList.add("con-boton-app");
+
+  const hoja = document.createElement("div");
+  hoja.id = "hoja-app"; hoja.className = "hoja-app"; hoja.hidden = true;
+  document.body.appendChild(hoja);
+  let ultimoFoco = null;
+  function pasos(lista) { return `<ol class="ha-pasos">${lista.map((t) => `<li>${t}</li>`).join("")}</ol>`; }
+  function contenidoHoja(msg, desdeQR) {
+    const enLinea = !esArchivoLocal;
+    const instalada = yaInstalada;
+    let principal;
+    if (esArchivoLocal) {
+      principal = `<div class="ha-estado ok">✓ Ya tienes la versión descargada</div>
+        <p>Este archivo funciona sin internet. Para instalar la app (con resultados al día y la quiniela), abre el sitio con conexión:</p>
+        ${URL_SITIO ? `<a class="ha-btn" href="${esc(URL_SITIO)}" target="_blank" rel="noopener">Abrir el sitio ↗</a>` : ""}`;
+    } else if (instalada) {
+      principal = `<div class="ha-estado ok">✓ Ya estás usando la app</div>
+        <p>Está instalada en este dispositivo. La encuentras en tu pantalla de inicio como <b>REDDFUT</b>.</p>`;
+    } else if (promptInstalar) {
+      principal = `<p>Instálala en tu ${esIOS ? "iPhone" : "celular o computadora"}: queda como una app en tu pantalla de inicio y se abre aunque no tengas internet.</p>
+        <button class="ha-btn" type="button" data-ha="instalar">📲 Instalar la app</button>`;
+    } else if (esIOS) {
+      principal = `<p>En iPhone se instala desde Safari:</p>
+        ${pasos(["Toca el botón <b>Compartir</b> (el cuadro con la flecha hacia arriba).", "Elige <b>Agregar a pantalla de inicio</b>.", "Toca <b>Agregar</b>."])}`;
+    } else {
+      principal = `<p>Si ya la instalaste, búscala en tu pantalla de inicio como <b>REDDFUT</b>. Si no:</p>
+        ${pasos(["Abre el menú del navegador (<b>⋮</b> arriba a la derecha).", "Toca <b>Instalar aplicación</b> o <b>Agregar a la pantalla principal</b>.", "Confirma con <b>Instalar</b>."])}`;
+    }
+    return `<div class="ha-caja" role="dialog" aria-modal="true" aria-labelledby="ha-tit">
+      <button class="ha-cerrar" type="button" data-ha="cerrar" aria-label="Cerrar">✕</button>
+      <span class="ha-sobre">${esc(T.organizador || "")}</span>
+      <h2 id="ha-tit">Descarga la app</h2>
+      ${msg ? `<p class="ha-msg">${esc(msg)}</p>` : ""}
+      ${desdeQR ? "" : seccionQR()}
+      <section class="ha-sec">${principal}</section>
+      ${desdeQR ? seccionQR() : ""}
+      ${enLinea ? `<section class="ha-sec">
+        <h3>Versión sin internet</h3>
+        <p>Un solo archivo para pasarlo por WhatsApp o USB y abrirlo sin datos, en cualquier celular o computadora.</p>
+        <a class="ha-btn sec" href="${ARCHIVO_OFFLINE}" download="${ARCHIVO_OFFLINE}">⬇ Descargar archivo</a>
+      </section>` : ""}
+      ${URL_SITIO ? `<section class="ha-sec">
+        <h3>Compártela</h3>
+        <button class="ha-btn sec" type="button" data-ha="compartir">Compartir enlace</button>
+      </section>` : ""}
+    </div>`;
+  }
+  let hojaDesdeQR = false, hojaMsg = "";
+  function abrirHoja(msg, desdeQR) {
+    if (hoja.hidden) ultimoFoco = document.activeElement;
+    hojaDesdeQR = !!desdeQR;
+    hojaMsg = msg || "";
+    hoja.innerHTML = contenidoHoja(msg, desdeQR);
+    hoja.hidden = false;
+    document.body.classList.add("hoja-abierta");
+    requestAnimationFrame(() => hoja.classList.add("visible"));
+    const c = hoja.querySelector(".ha-cerrar"); if (c) c.focus();
+  }
+  function cerrarHoja() {
+    hoja.classList.remove("visible");
+    document.body.classList.remove("hoja-abierta");
+    setTimeout(() => { hoja.hidden = true; }, 200);
+    if (ultimoFoco && ultimoFoco.focus) ultimoFoco.focus();
+  }
+  boton.addEventListener("click", () => abrirHoja());
+  hoja.addEventListener("click", async (e) => {
+    if (e.target === hoja) { cerrarHoja(); return; }        // tocar fuera de la caja
+    const b = e.target.closest("[data-ha]");
+    if (!b) return;
+    const a = b.dataset.ha;
+    if (a === "cerrar") cerrarHoja();
+    else if (a === "qr-grande") { hoja.innerHTML = vistaQRGrande(); hoja.querySelector(".ha-cerrar").focus(); }
+    else if (a === "volver") abrirHoja(hojaMsg, hojaDesdeQR);
+    else if (a === "qr-guardar") guardarQR(b).catch(() => {});
+    else if (a === "instalar" && promptInstalar) {
+      promptInstalar.prompt();
+      let ok = false;
+      try { ok = (await promptInstalar.userChoice).outcome === "accepted"; } catch (err) { /* nada */ }
+      promptInstalar = null;
+      abrirHoja(ok ? "¡Listo! La app se está instalando en tu pantalla de inicio." : "");
+    } else if (a === "compartir") {
+      const datos = { title: T.nombre, text: `${T.organizador} · ${T.nombre}`, url: URL_SITIO };
+      try {
+        if (navigator.share) await navigator.share(datos);
+        else { await navigator.clipboard.writeText(URL_SITIO); b.textContent = "¡Enlace copiado!"; }
+      } catch (err) { /* cancelado */ }
+    }
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !hoja.hidden) cerrarHoja(); });
+  // Llegó escaneando el QR (…/?app=1): se abre sola la ventana para instalar, y se limpia la dirección.
+  if (llegoPorQR) {
+    try { history.replaceState(null, "", location.pathname + location.hash); } catch (err) { /* nada */ }
+    if (!yaInstalada) setTimeout(() => abrirHoja("¡Bienvenido! Así instalas la app en tu teléfono:", true), 700);
   }
 
   if (!esArchivoLocal && "serviceWorker" in navigator) {
@@ -965,20 +1162,9 @@
   window.addEventListener("beforeinstallprompt", (e) => {
     e.preventDefault();
     promptInstalar = e;
-    if (estado.tab === "inicio") render();
+    if (!hoja.hidden && !hoja.querySelector(".ha-caja-qr")) hoja.innerHTML = contenidoHoja(hojaMsg, hojaDesdeQR);
   });
-  document.addEventListener("click", async (e) => {
-    if (!e.target.closest("#btn-instalar")) return;
-    if (promptInstalar) {
-      promptInstalar.prompt();
-      try { await promptInstalar.userChoice; } catch (err) { /* nada */ }
-      promptInstalar = null;
-      render();
-    } else if (esIOS) {
-      alert("Para instalarlo en tu iPhone:\n\n1. Toca el botón Compartir (el cuadro con la flecha hacia arriba).\n2. Elige \"Agregar a pantalla de inicio\".\n3. Toca \"Agregar\".\n\nDespués podrás abrirlo desde tu pantalla, incluso sin internet.");
-    }
-  });
-
+  window.addEventListener("appinstalled", () => { promptInstalar = null; if (!hoja.hidden) abrirHoja("¡Listo! La app quedó instalada."); });
   if (QUINIELA_ACTIVA) {
     document.getElementById("tab-quiniela").hidden = false;
     document.getElementById("tabs").classList.add("con-6");
@@ -989,4 +1175,14 @@
       "Versión sin internet · datos al " + fecha(T.actualizado, { day: "numeric", month: "long", year: "numeric" });
   }
   render();
+
+  /* Si el organizador ya entró antes con su cuenta, publica en silencio las horas
+     de apertura/cierre de la quiniela (así cada jornada se abre sola 2 días antes). */
+  if (QUINIELA_ACTIVA && !esArchivoLocal && store.get("reddfut-admin") === "1" && navigator.onLine !== false) {
+    setTimeout(() => {
+      import("./quiniela.js")
+        .then((m) => m.sincronizarEnSegundoPlano({ T, CATS, JORNADAS, ESCUELAS, parseRes, escudo, esc, fecha }))
+        .catch(() => {});
+    }, 2500);
+  }
 })();

@@ -25,5 +25,9 @@ window.QUINIELA = {
 
   // Hora en que se cierran los pronósticos el día de la jornada (hora de El Salvador).
   // Una jornada puede tener su propio cierre en datos.js:  cierre: "2026-10-24 08:30"
-  horaCierre: "07:00"
+  horaCierre: "07:00",
+
+  // Cuántos días antes de cada jornada se abre sola la quiniela (2 = jueves 8:00 a. m.
+  // si se juega el sábado a las 8). Cada quien elige hasta 2 partidos por categoría.
+  diasAntes: 2
 };

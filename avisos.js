@@ -94,5 +94,14 @@ export function mensajeError(e) {
   }
   if (m.includes("sin-permiso") || m.includes("permission-default")) return "No se activaron los avisos. Puedes intentarlo cuando quieras.";
   if (m.includes("no-soportado") || m.includes("unsupported")) return "Este navegador no permite avisos. Prueba con Chrome.";
-  return "No se pudieron activar los avisos. Revisa tu conexión a internet e inténtalo otra vez.";
+  if (m.includes("permission") || m.includes("insufficient")) {
+    return "Los avisos todavía se están preparando en el servidor del torneo. Inténtalo de nuevo en unos días.";
+  }
+  if (m.includes("sin-token") || m.includes("token-subscribe") || m.includes("token-unsubscribe")) {
+    return "Tu navegador no entregó el permiso de notificaciones. Cierra y vuelve a abrir el sitio e inténtalo otra vez.";
+  }
+  if (m.includes("network") || m.includes("unavailable") || m.includes("Failed to fetch")) {
+    return "No se pudieron activar los avisos. Revisa tu conexión a internet e inténtalo otra vez.";
+  }
+  return "No se pudieron activar los avisos (" + m.slice(0, 80) + "). Inténtalo otra vez.";
 }

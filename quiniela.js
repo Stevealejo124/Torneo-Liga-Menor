@@ -10,6 +10,8 @@ const VERSION_FB = "10.14.1";
 const CDN = `https://www.gstatic.com/firebasejs/${VERSION_FB}`;
 const ZONA = "-06:00";            // hora de El Salvador (no cambia en el año)
 const OPC = { L: "Local", E: "Empate", V: "Visitante" };
+const MAX_POR_CAT = 2;            // partidos que cada quien puede pronosticar por categoría
+const DIA_MS = 864e5;
 
 let fb = null;                    // módulos de Firebase + auth + db
 let api = null;                   // utilidades que pasa app.js
@@ -24,6 +26,8 @@ const st = {
   yo: null,                       // mi documento
   borrador: {},                   // pronósticos que estoy editando { j3: {clave: "L"} }
   vista: "general",               // ranking: "general" o "j3"
+  catQ: "",                       // categoría que se está viendo en la jornada abierta
+  avisoPick: "",                  // "ya elegiste 2 en Sub-9…"
   error: "",
   aviso: "",
   guardado: "",
@@ -46,6 +50,16 @@ export async function montar(contenedor, utilidades) {
     return;
   }
   pintar();
+}
+
+/* El organizador publica las horas de apertura/cierre aunque no abra la
+   pestaña Quiniela: app.js llama esto en segundo plano si ya entró antes. */
+export async function sincronizarEnSegundoPlano(utilidades) {
+  if (!api) api = utilidades;
+  if (!CFG) CFG = window.QUINIELA || {};
+  if (!listo) listo = arrancar();
+  await listo;
+  return st.sincro;
 }
 
 async function arrancar() {
@@ -91,6 +105,7 @@ async function cargar() {
     st.yo = st.user ? st.todos.find((j) => j.uid === st.user.uid) || null : null;
     st.borrador = JSON.parse(JSON.stringify((st.yo && st.yo.picks) || {}));
     st.error = "";
+    try { esAdmin() ? localStorage.setItem("reddfut-admin", "1") : (st.user && localStorage.removeItem("reddfut-admin")); } catch (e) { /* nada */ }
     if (esAdmin()) await sincronizar();
   } catch (e) {
     st.error = traducir(e);
@@ -102,27 +117,46 @@ function esAdmin() {
   return !!correo && (CFG.administradores || []).map((c) => String(c).toLowerCase()).includes(correo);
 }
 
-/* Jornadas que tienen fecha (o cierre) en datos.js */
+/* "2026-11-14 07:00" (hora de El Salvador) -> Date */
+function aFecha(txt) {
+  const m = String(txt || "").match(/^(\d{4}-\d{2}-\d{2})[ T](\d{1,2}):(\d{2})/);
+  const d = m ? new Date(`${m[1]}T${m[2].padStart(2, "0")}:${m[3]}:00${ZONA}`) : null;
+  return d && !isNaN(d) ? d : null;
+}
+/* Hora en que empiezan los juegos (la más temprana de "horarios" en datos.js) */
+function horaInicio() {
+  const hs = Object.values(api.T.horarios || {}).filter((h) => /^\d{1,2}:\d{2}$/.test(h))
+    .sort((a, b) => a.split(":")[0] * 60 + +a.split(":")[1] - (b.split(":")[0] * 60 + +b.split(":")[1]));
+  return hs[0] || "08:00";
+}
+function diasAntes() { const n = Number(CFG.diasAntes); return Number.isFinite(n) && n >= 0 ? n : 2; }
+
+/* Jornadas con fecha en datos.js. Cada una se ABRE sola "diasAntes" días antes
+   de que empiecen los juegos (jueves 8:00 a. m. si se juega el sábado a las 8)
+   y se CIERRA el día de la jornada a la hora de cierre (7:00 a. m.). */
 function jornadasQuiniela() {
   return api.JORNADAS
     .filter((j) => (j.partidos || []).length && (j.cierre || j.fecha))
     .map((j) => {
-      const txt = j.cierre ? String(j.cierre) : `${j.fecha} ${CFG.horaCierre || "07:00"}`;
-      const m = txt.match(/^(\d{4}-\d{2}-\d{2})[ T](\d{1,2}):(\d{2})/);
-      const cierre = m ? new Date(`${m[1]}T${m[2].padStart(2, "0")}:${m[3]}:00${ZONA}`) : null;
-      return { j, clave: "j" + j.numero, cierre };
+      const cierre = aFecha(j.cierre ? String(j.cierre) : `${j.fecha} ${CFG.horaCierre || "07:00"}`);
+      const inicio = j.fecha ? aFecha(`${j.fecha} ${horaInicio()}`) : cierre;
+      const apertura = j.apertura ? aFecha(j.apertura) : inicio && new Date(inicio.getTime() - diasAntes() * DIA_MS);
+      return { j, clave: "j" + j.numero, cierre, apertura };
     })
-    .filter((x) => x.cierre && !isNaN(x.cierre));
+    .filter((x) => x.cierre && x.apertura);
 }
 
 /* El organizador publica las horas de cierre (las reglas de Firebase las usan
    para que nadie pueda pronosticar después de que empiecen los partidos). */
 async function sincronizar() {
   const deseado = {};
-  jornadasQuiniela().forEach((x) => { deseado[x.clave] = { cierre: fb.Timestamp.fromDate(x.cierre) }; });
+  jornadasQuiniela().forEach((x) => {
+    deseado[x.clave] = { apertura: fb.Timestamp.fromDate(x.apertura), cierre: fb.Timestamp.fromDate(x.cierre) };
+  });
   const ks = Object.keys(deseado);
+  const mismo = (a, b) => a && b && a.toMillis && a.toMillis() === b.toMillis();
   const igual = ks.length === Object.keys(st.cfg).length &&
-    ks.every((k) => st.cfg[k] && st.cfg[k].cierre && st.cfg[k].cierre.toMillis() === deseado[k].cierre.toMillis());
+    ks.every((k) => st.cfg[k] && mismo(st.cfg[k].cierre, deseado[k].cierre) && mismo(st.cfg[k].apertura, deseado[k].apertura));
   if (igual) { st.sincro = "al día"; return; }
   await fb.setDoc(fb.doc(fb.db, "config", "jornadas"), deseado);
   st.cfg = deseado;
@@ -133,14 +167,29 @@ function cierreDe(clave) {
   const c = st.cfg[clave] && st.cfg[clave].cierre;
   return c && c.toMillis ? c.toMillis() : null;
 }
+function aperturaDe(clave) {
+  const a = st.cfg[clave] && st.cfg[clave].apertura;
+  return a && a.toMillis ? a.toMillis() : null;
+}
 function estaAbierta(clave) {
-  const c = cierreDe(clave);
-  return c != null && Date.now() < c;
+  const c = cierreDe(clave), a = aperturaDe(clave);
+  return c != null && Date.now() < c && Date.now() >= (a || 0);
 }
 
 const slug = (s) => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
   .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const claveP = (p, cat) => `${slug(p.local)}__${slug(p.visitante)}~${String(cat).replace(/\D/g, "")}`;
+const numCat = (cat) => String(cat).replace(/\D/g, "") || String(cat);
+const claveM = (p) => `${slug(p.local)}__${slug(p.visitante)}`;
+const claveP = (p, cat) => `${claveM(p)}~${numCat(cat)}`;          // formato viejo (plano)
+/* Pronósticos de una jornada: { "9": { "berlin__la-noria": "L", ... }, "13": {...} } */
+function pickDe(mis, p, cat) {
+  if (!mis) return null;
+  const g = mis[numCat(cat)];
+  if (g && typeof g === "object" && g[claveM(p)]) return g[claveM(p)];
+  const viejo = mis[claveP(p, cat)];
+  return typeof viejo === "string" ? viejo : null;
+}
+const cuantosEn = (mis, cat) => { const g = mis && mis[numCat(cat)]; return g && typeof g === "object" ? Object.keys(g).length : 0; };
 function catsDe(p) {
   return api.CATS.filter((c) => ![p.local, p.visitante].some((n) => {
     const e = api.ESCUELAS.get(n);
@@ -162,7 +211,7 @@ function puntuar(jug, soloClave) {
     if (!mis) continue;
     let a = 0, t = 0;
     for (const p of x.j.partidos || []) for (const c of catsDe(p)) {
-      const pick = mis[claveP(p, c)];
+      const pick = pickDe(mis, p, c);
       const real = pick && resultadoReal(p, c);
       if (!real) continue;
       t++;
@@ -196,7 +245,8 @@ function programarGuardado(clave) {
 async function guardar(clave) {
   if (!st.user || !st.yo) return;
   const picks = JSON.parse(JSON.stringify(st.yo.picks || {}));
-  const nuevos = st.borrador[clave] || {};
+  const nuevos = JSON.parse(JSON.stringify(st.borrador[clave] || {}));
+  Object.keys(nuevos).forEach((c) => { if (nuevos[c] && typeof nuevos[c] === "object" && !Object.keys(nuevos[c]).length) delete nuevos[c]; });
   if (Object.keys(nuevos).length) picks[clave] = nuevos; else delete picks[clave];
   try {
     const datos = { apodo: st.yo.apodo, picks, ultimaJornada: clave, actualizado: fb.serverTimestamp() };
@@ -262,7 +312,7 @@ async function quitarJugador(uid) {
 
 function traducir(e) {
   const c = (e && e.code) || "";
-  if (c.includes("permission-denied")) return "No se pudo guardar: la jornada ya cerró o no tienes permiso.";
+  if (c.includes("permission-denied")) return "No se pudo guardar: la jornada todavía no abre, ya cerró, o pasaste el límite de 2 partidos por categoría.";
   if (c.includes("unavailable") || c.includes("network")) return "Sin conexión. Revisa tu internet e inténtalo otra vez.";
   if (c.includes("unauthorized-domain")) return "Este sitio todavía no está autorizado en Firebase (Authentication → Configuración → Dominios autorizados).";
   if (c.includes("popup")) return "No se pudo abrir la ventana de Google. Inténtalo otra vez.";
@@ -329,38 +379,56 @@ function htmlSesion() {
   </div>`;
 }
 
+function catsJornada(x) {
+  return api.CATS.filter((c) => (x.j.partidos || []).some((p) => catsDe(p).includes(c)));
+}
 function htmlJornadaAbierta(x) {
   const c = cierreDe(x.clave);
   const puedo = !!(st.user && st.yo);
   const mis = st.borrador[x.clave] || {};
-  const partidos = (x.j.partidos || []).map((p, i) => {
-    const filas = catsDe(p).map((cat) => {
-      const k = claveP(p, cat);
-      const btn = (v, txt, extra) => `<button class="q-op ${extra || ""}" data-q="pick" data-j="${x.clave}" data-k="${esc(k)}" data-v="${v}" aria-pressed="${mis[k] === v}" ${puedo ? "" : "data-bloq=\"1\""}>${txt}</button>`;
-      return `<div class="q-fila" role="group" aria-label="${esc(cat)}">
-        <span class="q-cat">${esc(cat)}</span>
-        ${btn("L", esc(nombreCorto(p.local)), "q-op-l")}${btn("E", "Empate", "q-op-e")}${btn("V", esc(nombreCorto(p.visitante)), "q-op-v")}
-      </div>`;
-    }).join("");
-    return `<article class="q-partido tarjeta">
-      <div class="q-partido-cab">
-        <span class="eq">${api.escudo(p.local, true)}<b>${esc(p.local)}</b></span>
-        <span class="vs">vs</span>
-        <span class="eq eq-v"><b>${esc(p.visitante)}</b>${api.escudo(p.visitante, true)}</span>
-      </div>
-      ${filas}
-    </article>`;
+  const cats = catsJornada(x);
+  if (!cats.includes(st.catQ)) st.catQ = cats.find((k) => cuantosEn(mis, k) < MAX_POR_CAT) || cats[0];
+  const cat = st.catQ;
+  const total = cats.reduce((n, k) => n + cuantosEn(mis, k), 0);
+  const lleno = cuantosEn(mis, cat) >= MAX_POR_CAT;
+  const chips = cats.map((k) => {
+    const n = cuantosEn(mis, k);
+    return `<button class="q-chip ${n >= MAX_POR_CAT ? "completa" : ""}" data-q="qcat" data-c="${esc(k)}" aria-pressed="${k === cat}">
+      <b>${esc(k)}</b><span>${n}/${MAX_POR_CAT}</span></button>`;
   }).join("");
-  return `<section class="q-bloque">
+  const filas = (x.j.partidos || []).filter((p) => catsDe(p).includes(cat)).map((p) => {
+    const k = claveM(p), v = pickDe(mis, p, cat);
+    const bloq = !puedo ? 'data-bloq="1"' : "";
+    const cerrada = !v && lleno;
+    const btn = (op, txt, extra) => `<button class="q-op ${extra}" data-q="pick" data-j="${x.clave}" data-c="${esc(numCat(cat))}" data-n="${esc(cat)}" data-k="${esc(k)}" data-v="${op}" aria-pressed="${v === op}" ${bloq} ${cerrada ? 'data-lleno="1"' : ""}>${txt}</button>`;
+    return `<div class="q-m ${v ? "elegido" : ""} ${cerrada ? "lleno" : ""}">
+      <div class="q-m-eq">${api.escudo(p.local, true)}<b>${esc(p.local)}</b><i>vs</i><b class="v">${esc(p.visitante)}</b>${api.escudo(p.visitante, true)}</div>
+      <div class="q-m-ops">${btn("L", esc(nombreCorto(p.local)), "q-op-l")}${btn("E", "Empate", "q-op-e")}${btn("V", esc(nombreCorto(p.visitante)), "q-op-v")}</div>
+    </div>`;
+  }).join("");
+  return `<section class="q-bloque" id="q-jornada-${x.clave}">
     <div class="q-jornada-cab">
       <h3 class="titulo-bloque">Jornada ${x.j.numero} <span class="q-abierta">Abierta</span></h3>
       <p class="q-cierre">Cierra el <b>${esc(fechaCierre(c))}</b> · ${esc(falta(c))}</p>
     </div>
-    ${puedo ? `<p class="q-ayuda">Toca quién crees que gana en cada categoría. Se guarda solo. Puedes cambiarlo hasta el cierre.
+    ${puedo ? `<p class="q-ayuda">Elige <b>hasta ${MAX_POR_CAT} partidos en cada categoría</b> y toca quién crees que gana. Se guarda solo y puedes cambiarlo hasta el cierre.
       <span class="q-guardado" id="q-guardado">${esc(st.guardado)}</span></p>`
-      : `<p class="q-ayuda">Entra con tu cuenta de Google (arriba) para hacer tus pronósticos.</p>`}
-    <div class="q-partidos">${partidos}</div>
+      : `<p class="q-ayuda">Entra con tu cuenta de Google (arriba) para hacer tus pronósticos. Puedes elegir hasta ${MAX_POR_CAT} partidos por categoría.</p>`}
+    <div class="q-chips" role="tablist" aria-label="Categorías">${chips}</div>
+    <div class="q-panel tarjeta">
+      <div class="q-panel-cab"><b>${esc(cat)}</b><span>${lleno ? `Ya elegiste tus ${MAX_POR_CAT} partidos. Toca uno elegido para quitarlo.` : `Elige ${MAX_POR_CAT - cuantosEn(mis, cat)} ${MAX_POR_CAT - cuantosEn(mis, cat) === 1 ? "partido más" : "partidos"}`}</span></div>
+      ${st.avisoPick ? `<p class="q-aviso-pick" role="status">${esc(st.avisoPick)}</p>` : ""}
+      ${filas}
+    </div>
+    <p class="q-total">Llevas <b>${total}</b> de ${cats.length * MAX_POR_CAT} pronósticos en esta jornada.</p>
   </section>`;
+}
+
+function repintarJornada(clave) {
+  const x = jornadasQuiniela().find((y) => y.clave === clave);
+  const el = cont && cont.querySelector(`#q-jornada-${clave}`);
+  if (!x || !el) { pintar(); return; }
+  el.outerHTML = htmlJornadaAbierta(x);
 }
 
 function htmlMisCerradas() {
@@ -373,7 +441,7 @@ function htmlMisCerradas() {
       const mis = st.yo.picks[x.clave];
       const pj = puntuar(st.yo, x.clave).porJ[x.clave] || { a: 0, t: 0 };
       const filas = (x.j.partidos || []).flatMap((p) => catsDe(p).map((cat) => {
-        const pick = mis[claveP(p, cat)];
+        const pick = pickDe(mis, p, cat);
         if (!pick) return "";
         const real = resultadoReal(p, cat);
         const cls = !real ? "pend" : real === pick ? "ok" : "mal";
@@ -427,12 +495,13 @@ function htmlAdmin() {
   return `<section class="q-bloque q-admin">
     <h3 class="titulo-bloque">Panel del organizador <small>solo lo ves tú</small></h3>
     <div class="tarjeta">
-      <p>Las jornadas se publican solas cada vez que entras aquí con tu cuenta (horas de cierre ${esc(st.sincro || "")}).
-         Para abrir una jornada, agrega sus cruces en <code>datos.js</code> con su <code>fecha</code>, sin resultados.</p>
+      <p>Las horas de apertura y cierre se publican solas cuando entras al sitio con tu cuenta (${esc(st.sincro || "")}).
+         Cada jornada se abre ${diasAntes()} días antes y se cierra el día de juego a las ${esc(CFG.horaCierre || "07:00")}. Si cambias una <code>fecha</code> en <code>datos.js</code>, solo entra aquí una vez.</p>
       <ul>${js.length ? js.map((x) => {
         const n = st.todos.filter((j) => (j.picks || {})[x.clave]).length;
-        const estadoTxt = estaAbierta(x.clave) ? "Abierta" : cierreDe(x.clave) ? "Cerrada" : "Sin publicar";
-        return `<li><b>Jornada ${x.j.numero}</b> · cierre ${esc(fechaCierre(x.cierre.getTime()))} · <span class="q-est">${estadoTxt}</span> · ${n} con pronósticos</li>`;
+        const ahora = Date.now();
+        const estadoTxt = !cierreDe(x.clave) ? "Sin publicar" : estaAbierta(x.clave) ? "Abierta" : ahora < (aperturaDe(x.clave) || 0) ? "Por abrir" : "Cerrada";
+        return `<li><b>Jornada ${x.j.numero}</b> · abre ${esc(fechaCierre(x.apertura.getTime()))} · cierra ${esc(fechaCierre(x.cierre.getTime()))} · <span class="q-est">${estadoTxt}</span> · ${n} con pronósticos</li>`;
       }).join("") : "<li>No hay jornadas con fecha en datos.js.</li>"}</ul>
       <p class="muted">Puedes quitar a un jugador (por ejemplo, por un apodo ofensivo) con la ✕ junto a su nombre en la tabla.</p>
     </div>
@@ -443,7 +512,8 @@ function pintar() {
   if (!cont || !cont.isConnected) return;
   const js = jornadasQuiniela();
   const abiertas = js.filter((x) => estaAbierta(x.clave));
-  const proxSinPublicar = js.filter((x) => !cierreDe(x.clave) && x.cierre.getTime() > Date.now());
+  const prox = js.find((x) => x.cierre.getTime() > Date.now() && !estaAbierta(x.clave));
+  const abreMs = prox ? (aperturaDe(prox.clave) || prox.apertura.getTime()) : null;
   cont.innerHTML = `
     <div class="seccion-titulo">
       <h2>Quiniela${api.T.nombre.match(/\d{4}-\d{4}/) ? ` <span class="cat">${esc(api.T.nombre.match(/\d{4}-\d{4}/)[0])}</span>` : ""}</h2>
@@ -451,15 +521,16 @@ function pintar() {
     </div>
     <div class="q-reglas">
       <div><b>1</b><span>Entra con Google y elige un apodo.</span></div>
-      <div><b>2</b><span>Antes de cada jornada, toca quién gana: local, empate o visitante.</span></div>
+      <div><b>2</b><span>${diasAntes()} días antes de cada jornada, elige hasta ${MAX_POR_CAT} partidos por categoría y toca quién gana.</span></div>
       <div><b>3</b><span>Ganas <strong>1 punto</strong> por cada acierto. ¡Sube en la tabla!</span></div>
     </div>
     ${st.error ? `<p class="q-error" role="alert">${esc(st.error)}</p>` : ""}
     ${htmlSesion()}
     ${abiertas.length ? abiertas.map(htmlJornadaAbierta).join("")
-      : `<section class="q-bloque">${cajaMensaje("No hay jornada abierta ahora",
-          proxSinPublicar.length ? `La jornada ${proxSinPublicar[0].j.numero} se abrirá en cuanto el organizador la publique.`
-            : "La quiniela de la próxima jornada se abrirá cuando se publiquen sus partidos. ¡Vuelve pronto!")}</section>`}
+      : `<section class="q-bloque">${prox
+          ? `<div class="q-caja q-proxima"><b>La jornada ${prox.j.numero} se abre el ${esc(fechaCierre(abreMs))}</b>
+              <p>La quiniela se abre sola ${diasAntes()} días antes de cada jornada, con todos los partidos de todas las categorías. ${abreMs > Date.now() ? `<span class="q-falta">${esc(falta(abreMs).replace("faltan", "Faltan"))}</span>` : ""}</p></div>`
+          : cajaMensaje("No hay jornada abierta ahora", "La quiniela de la próxima jornada se abrirá cuando se publiquen sus partidos. ¡Vuelve pronto!")}</section>`}
     ${htmlMisCerradas()}
     ${htmlRanking()}
     ${htmlAdmin()}`;
@@ -481,6 +552,11 @@ function conectar() {
     else if (q === "editar-apodo") { st.editandoApodo = true; pintar(); }
     else if (q === "cancelar-apodo") { st.editandoApodo = false; st.aviso = ""; pintar(); }
     else if (q === "vista") { st.vista = b.dataset.v; pintar(); }
+    else if (q === "qcat") {
+      st.catQ = b.dataset.c; st.avisoPick = "";
+      const sec = b.closest("section[id^='q-jornada-']");
+      if (sec) repintarJornada(sec.id.replace("q-jornada-", "")); else pintar();
+    }
     else if (q === "quitar") quitarJugador(b.dataset.uid);
     else if (q === "pick") {
       if (b.dataset.bloq) {
@@ -488,11 +564,19 @@ function conectar() {
         if (s) { s.classList.remove("q-llamar"); void s.offsetWidth; s.classList.add("q-llamar"); s.scrollIntoView({ behavior: "smooth", block: "center" }); }
         return;
       }
-      const { j, k, v } = b.dataset;
+      const { j, c, n, k, v } = b.dataset;
       if (!estaAbierta(j)) { st.error = "Esta jornada ya cerró."; pintar(); return; }
       const mis = st.borrador[j] || (st.borrador[j] = {});
-      if (mis[k] === v) delete mis[k]; else mis[k] = v;
-      b.parentElement.querySelectorAll(".q-op").forEach((o) => o.setAttribute("aria-pressed", String(mis[o.dataset.k] === o.dataset.v)));
+      const g = (mis[c] && typeof mis[c] === "object") ? mis[c] : (mis[c] = {});
+      st.avisoPick = "";
+      if (g[k] === v) delete g[k];
+      else if (!g[k] && Object.keys(g).length >= MAX_POR_CAT) {
+        st.avisoPick = `Ya elegiste ${MAX_POR_CAT} partidos en ${n}. Quita uno (tocando tu elección) para elegir otro.`;
+        repintarJornada(j);
+        return;
+      } else g[k] = v;
+      if (!Object.keys(g).length) delete mis[c];
+      repintarJornada(j);
       programarGuardado(j);
     }
   };
