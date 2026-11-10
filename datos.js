@@ -19,7 +19,7 @@ window.TORNEO = {
   subtitulo: "Escuelas de fútbol infanto-juveniles de Usulután",
   organizador: "REDDFUT Usulután",
   urlSitio: "https://stevealejo124.github.io/Torneo-Liga-Menor/",
-  actualizado: "2026-11-09",       // fecha de la última actualización (AAAA-MM-DD)
+  actualizado: "2026-11-10",       // fecha de la última actualización (AAAA-MM-DD)
   // Horario de cada categoría los sábados (24 h). Las que tienen la misma hora
   // juegan al mismo tiempo en distintas partes de la cancha.
   horarios: { "Sub-7": "08:00", "Sub-11": "08:00", "Sub-9": "09:30", "Sub-13": "10:00", "Sub-15": "11:10" },
@@ -162,15 +162,22 @@ window.TORNEO = {
     },
     {
       numero: 6,
-      fecha: "2026-11-07",      // fecha estimada (el calendario decía 2026-10-31; se viene jugando una semana después)
+      fecha: "2026-11-07",      // confirmada en la hoja oficial (Sexta fecha, sábado 07 de noviembre de 2026)
       partidos: [
-        { local: "Santiago de María", visitante: "San Marcos", cancha: "Santiago de María" },
-        { local: "La Noria", visitante: "Gerardo Barrios", cancha: "La Noria" },
-        { local: "Ciudad El Triunfo", visitante: "Jucuapa", cancha: "Ciudad El Triunfo" },
-        { local: "Alegría", visitante: "Puerto El Triunfo", cancha: "Alegría" },
-        { local: "Estanzuelas", visitante: "Berlín", cancha: "Estanzuelas" },
-        { local: "Topiltzin", visitante: "Lolotique", cancha: "Jiquilisco" },
-        { local: "Mercedes Umaña", visitante: "El Tránsito", cancha: "Mercedes Umaña" }
+        { local: "Santiago de María", visitante: "San Marcos", cancha: "Santiago de María",
+          resultados: { "Sub-9": "6-6", "Sub-11": "7-7", "Sub-13": "6-3", "Sub-15": "0-0" } },
+        { local: "La Noria", visitante: "Gerardo Barrios", cancha: "La Noria",
+          resultados: { "Sub-9": "3-10", "Sub-11": "2-2", "Sub-13": "0-1", "Sub-15": "2-12" } },
+        { local: "Ciudad El Triunfo", visitante: "Jucuapa", cancha: "Ciudad El Triunfo",
+          resultados: { "Sub-9": "0-12", "Sub-11": "2-3", "Sub-13": "1-2", "Sub-15": "4-3" } },
+        { local: "Alegría", visitante: "Puerto El Triunfo", cancha: "Alegría",
+          resultados: { "Sub-9": "1-13", "Sub-11": "4-3", "Sub-13": "5-6", "Sub-15": "3-5" } },
+        { local: "Estanzuelas", visitante: "Berlín", cancha: "Estanzuelas",
+          resultados: { "Sub-9": "5-14", "Sub-11": "2-14", "Sub-13": "6-17" } },
+        { local: "Topiltzin", visitante: "Lolotique", cancha: "Jiquilisco",
+          resultados: { "Sub-7": "2-2", "Sub-9": "14-0", "Sub-11": "4-2", "Sub-13": "3-1", "Sub-15": "2-0" } },
+        { local: "Mercedes Umaña", visitante: "El Tránsito", cancha: "Mercedes Umaña",
+          resultados: { "Sub-9": "0-11", "Sub-11": "3-2", "Sub-13": "2-6" } }
       ]
     },
     {
