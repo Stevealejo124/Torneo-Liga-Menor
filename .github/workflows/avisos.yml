@@ -1,0 +1,26 @@
+name: Avisos de las tablas
+
+on:
+  push:
+    paths:
+      - datos.js
+  workflow_dispatch:
+
+concurrency: avisos
+
+jobs:
+  avisar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Enviar aviso
+        run: node enviar-avisos.mjs
+        env:
+          FIREBASE_CUENTA: ${{ secrets.FIREBASE_CUENTA }}
+          EVENTO: ${{ github.event_name }}
