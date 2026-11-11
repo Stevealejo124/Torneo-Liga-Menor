@@ -965,3 +965,33 @@ body.hoja-abierta { overflow: hidden; }
   .logo .logo-2 { height: 62px; }
 }
 @media (min-width: 761px) { .cabecera h1 { font-size: clamp(2rem, 4.3vw, 3.05rem); } }
+
+/* ------------------------------------------------------------------ */
+/* Botón de música de fondo (abajo a la izquierda, no tapa nada)       */
+/* ------------------------------------------------------------------ */
+.boton-musica {
+  position: fixed; z-index: 60;
+  left: max(14px, env(safe-area-inset-left)); bottom: max(14px, env(safe-area-inset-bottom));
+  width: 46px; height: 46px; border: 0; border-radius: 50%; padding: 0;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--azul); color: var(--oro); cursor: pointer;
+  box-shadow: 0 0 0 2px var(--oro), 0 8px 22px rgba(8, 24, 46, .35);
+}
+.boton-musica[hidden] { display: none !important; }
+.boton-musica:hover { background: var(--azul-2); }
+.boton-musica:active { transform: translateY(1px); }
+.boton-musica:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.boton-musica .bm-raya { opacity: .9; }
+.boton-musica .bm-eq { display: none; align-items: flex-end; gap: 3px; height: 18px; }
+.boton-musica .bm-eq i { display: block; width: 4px; height: 100%; border-radius: 2px; background: var(--oro); transform-origin: bottom; animation: bm-eq .9s ease-in-out infinite; }
+.boton-musica .bm-eq i:nth-child(2) { animation-delay: -.45s; animation-duration: .8s; }
+.boton-musica .bm-eq i:nth-child(3) { animation-delay: -.2s;  animation-duration: 1.05s; }
+.boton-musica .bm-eq i:nth-child(4) { animation-delay: -.65s; animation-duration: .7s; }
+.boton-musica[data-estado="sonando"] .bm-nota { display: none; }
+.boton-musica[data-estado="sonando"] .bm-eq { display: inline-flex; }
+.boton-musica[data-estado="cargando"] .bm-raya { display: none; }
+.boton-musica[data-estado="cargando"] .bm-nota { animation: bm-latido 1s ease-in-out infinite; }
+@keyframes bm-eq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
+@keyframes bm-latido { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .boton-musica .bm-eq i { animation: none; transform: scaleY(.7); } }
+body.con-boton-musica .pie { padding-bottom: 84px; }

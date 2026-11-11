@@ -16,6 +16,7 @@ La portada se arma sola con los datos de `datos.js`; no hay que editarla.
 | `404.html` | No | Página que aparece si alguien abre un enlace que no existe |
 | `logo.png` | No | Logo oficial de REDDFUT Usulután (encabezado) |
 | `Torneo_REDDFUT_sin_internet.html` | No | Versión sin internet que se descarga con el botón **Descargar app** (se regenera con cada actualización) |
+| `cancion1.mp4` | No | Música de fondo (botón redondo abajo a la izquierda, empieza apagada). Se configura en `datos.js` → `musica` |
 | `logo-escuelitas.png` | No | Escudo propio “Escuelitas Usulután” (cabecera, junto al de RedDFUT) |
 | `escudo-topiltzin.png` | No | Escudo oficial de CD Topiltzin (se activa con `logo:` en `datos.js`) |
 | `favicon.png`, `icono-192.png` | No | Ícono de la pestaña del navegador |

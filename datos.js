@@ -345,6 +345,13 @@ window.TORNEO = {
   // canchas, correcciones, etc. (sección "¿Te gustaría apoyarnos?" en Inicio).
   contacto: { correo: "cseuropa1890@gmail.com" },
 
+  // ---- MÚSICA DE FONDO: botón redondo abajo a la izquierda (empieza apagada).
+  // Sube el archivo a GitHub junto a los demás y escribe aquí su nombre exacto.
+  // Varias canciones = suenan una tras otra. Para quitar la música: musica: [],
+  // Si cambias una canción, súbela con OTRO nombre (ej. cancion2.mp4), porque
+  // los teléfonos guardan la anterior para poder sonar sin internet.
+  musica: ["cancion1.mp4"],
+
   // ---- ANUNCIOS: aparecen al final de cada sección, sin tapar nada.
   // Para quitar uno, borra su bloque { ... }. Para cambiar textos o enlace,
   // edita aquí. "estilo" puede ser "retro" (oscuro) o "claro".
