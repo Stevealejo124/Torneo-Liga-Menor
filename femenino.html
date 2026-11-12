@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LFFU · Liga de Fútbol Femenino Usulután</title>
+<meta name="description" content="Posiciones, resultados, goleadoras y playoffs de la Liga de Fútbol Femenino Usulután. Juntas por el fútbol femenino.">
+<meta name="theme-color" content="#101c4e">
+<meta property="og:title" content="LFFU · Liga de Fútbol Femenino Usulután">
+<meta property="og:description" content="Temporada 2026·27 · Posiciones, resultados y calendario de la liga femenina de Usulután.">
+<link rel="preload" href="letra-800.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="femenino-estilos.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23101c4e'/%3E%3Ccircle cx='32' cy='32' r='19' fill='%23fff'/%3E%3Cpath d='M32 20l7 5-2.7 8.3h-8.6L25 25z' fill='%23101c4e'/%3E%3C/svg%3E">
+</head>
+<body>
+<!-- Selector de torneos: una sola app para los dos torneos -->
+<nav class="torneos" id="torneos" aria-label="Torneos">
+  <div class="torneos-in">
+    <span class="torneos-lbl">Torneos</span>
+    <a class="torneo-op" href="./#/inicio" data-torneo="escuelitas"><i class="t-punto t-oro"></i>Escuelitas<small>&nbsp;· REDDFUT</small></a>
+    <a class="torneo-op" href="femenino.html" data-torneo="femenino" aria-current="page"><i class="t-punto t-magenta"></i>Femenino<small>&nbsp;· LFFU</small></a>
+  </div>
+</nav>
+
+<!-- Cortina de transición entre pestañas -->
+<div id="wipe" class="wipe" aria-hidden="true">
+  <div class="wipe-barras"><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="wipe-placa"><small>LFFU · Usulután</small><h2 id="wipe-titulo">Inicio</h2></div>
+</div>
+
+<header class="cabecera">
+  <div class="contenedor cabecera-inner">
+    <div class="escudo-lffu">
+      <svg viewBox="0 0 120 132" role="img" aria-label="Escudo LFFU">
+        <defs><linearGradient id="g-azul" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#2743c9"/><stop offset="1" stop-color="#101c4e"/>
+        </linearGradient></defs>
+        <path d="M60 4 L112 20 V70 C112 100 88 118 60 128 C32 118 8 100 8 70 V20 Z" fill="url(#g-azul)" stroke="#fff" stroke-width="4"/>
+        <path d="M60 12 L104 26 V70 C104 95 84 111 60 120 C36 111 16 95 16 70 V26 Z" fill="none" stroke="#e91e8c" stroke-width="2.5"/>
+        <circle cx="60" cy="44" r="17" fill="#fff"/>
+        <path d="M60 33l6.5 4.7-2.5 7.6h-8l-2.5-7.6z" fill="#101c4e"/>
+        <path d="M60 27v6M71 35l-5 2.6M68 51l-3.6-5M52 51l3.6-5M49 35l5 2.6" stroke="#101c4e" stroke-width="2"/>
+        <text x="60" y="82" text-anchor="middle" font-family="Barlow Condensed,Arial" font-weight="800" font-size="26" fill="#fff" letter-spacing="2">LFFU</text>
+        <text x="60" y="98" text-anchor="middle" font-family="Barlow Condensed,Arial" font-weight="600" font-size="9.5" fill="#ffd23f" letter-spacing="1.5">FÚTBOL FEMENINO</text>
+        <text x="60" y="110" text-anchor="middle" font-family="Barlow Condensed,Arial" font-weight="600" font-size="9.5" fill="#fff" letter-spacing="2">USULUTÁN</text>
+      </svg>
+    </div>
+    <div class="titulos">
+      <p class="org">Liga de Fútbol Femenino Usulután</p>
+      <h1>Temporada <span class="anio">2026·27</span><span class="l2">Juntas por el fútbol femenino</span></h1>
+    </div>
+    <div class="balon-escena" aria-hidden="true">
+      <div class="balon-giro">
+        <div class="balon"><i class="p p1"></i><i class="p p2"></i><i class="p p3"></i><i class="p p4"></i><i class="p p5"></i></div>
+        <div class="balon-sombra"></div>
+      </div>
+    </div>
+  </div>
+  <div class="franja">
+    <div class="contenedor franja-inner">
+      <span class="franja-txt">8 equipos · Usulután, El Salvador</span>
+      <span class="franja-jor">Jornada <b id="fr-ja">7</b> de <b>14</b> <span class="ticks" id="fr-ticks"></span></span>
+      <span class="franja-cuenta" id="fr-cuenta"></span>
+    </div>
+  </div>
+</header>
+
+<nav class="barra" aria-label="Secciones">
+  <div class="contenedor">
+    <div class="tabs" role="tablist" id="tabs">
+      <button role="tab" data-tab="inicio" aria-selected="true">Inicio</button>
+      <button role="tab" data-tab="posiciones">Posiciones</button>
+      <button role="tab" data-tab="resultados">Resultados</button>
+      <button role="tab" data-tab="goleadoras">Goleadoras</button>
+      <button role="tab" data-tab="playoffs">Playoffs</button>
+      <button role="tab" data-tab="canchas">Canchas</button>
+      <button role="tab" data-tab="liga">La Liga</button>
+    </div>
+  </div>
+</nav>
+
+<main class="contenedor" id="app"></main>
+
+<footer class="pie">
+  <div class="contenedor pie-grid">
+    <div>
+      <p class="pie-marca">LFFU <span>· Liga de Fútbol Femenino Usulután</span></p>
+      <p class="muted">Barrio El Candelaria, Usulután, El Salvador</p>
+      <p class="muted" id="pie-act"></p>
+    </div>
+    <div class="pie-links">
+      <a href="https://wa.me/15107798559" target="_blank" rel="noopener">WhatsApp de la liga ↗</a>
+      <a href="#/liga" data-ir="liga">Reglamento y formato</a>
+      <a href="#/canchas" data-ir="canchas">Cómo llegar a las canchas</a>
+    </div>
+  </div>
+  <div class="contenedor pie-lema">Apoyemos el fútbol femenino en Usulután <span class="corazon">♥</span></div>
+</footer>
+
+<script src="femenino-datos.js"></script>
+<script src="femenino-app.js"></script>
+<script>
+  /* Misma app que el torneo de Escuelitas: recuerda el torneo y funciona sin internet */
+  try { localStorage.setItem("torneo-ultimo", "femenino"); } catch (e) {}
+  if ("serviceWorker" in navigator && location.protocol !== "file:") {
+    window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).catch(function () {}); });
+  }
+</script>
+</body>
+</html>

@@ -23,8 +23,27 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="preload" href="letra-800.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="estilos.css">
+  <script>
+    /* App instalada: se abre en el último torneo que se vio (Escuelitas o Femenino) */
+    (function () {
+      try {
+        var instalada = (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone;
+        if (instalada && location.protocol !== "file:" && !location.hash && !location.search &&
+            localStorage.getItem("torneo-ultimo") === "femenino") { location.replace("femenino.html"); return; }
+        localStorage.setItem("torneo-ultimo", "escuelitas");
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
+  <!-- Selector de torneos: una sola app para los dos torneos -->
+  <nav class="torneos" id="torneos" aria-label="Torneos">
+    <div class="torneos-in">
+      <span class="torneos-lbl">Torneos</span>
+      <a class="torneo-op" href="./#/inicio" data-torneo="escuelitas" aria-current="page"><i class="t-punto t-oro"></i>Escuelitas<small>&nbsp;· REDDFUT</small></a>
+      <a class="torneo-op" href="femenino.html" data-torneo="femenino"><i class="t-punto t-magenta"></i>Femenino<small>&nbsp;· LFFU</small></a>
+    </div>
+  </nav>
   <!-- Cortina de transición entre pestañas (invisible hasta que se cambia de sección) -->
   <div id="wipe-overlay" class="wipe-container" aria-hidden="true">
     <div class="wipe-bars"><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span></div>

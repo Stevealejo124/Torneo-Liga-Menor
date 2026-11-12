@@ -1085,6 +1085,7 @@
   /* ------------------------------------------------------------------ */
   let promptInstalar = null;
   const esArchivoLocal = !!window.MODO_OFFLINE || location.protocol === "file:";
+  if (esArchivoLocal) { const tiraT = document.getElementById("torneos"); if (tiraT) tiraT.hidden = true; }   // el archivo sin internet es solo de Escuelitas
   const esIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const yaInstalada = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
 

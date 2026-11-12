@@ -995,3 +995,26 @@ body.hoja-abierta { overflow: hidden; }
 @keyframes bm-latido { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 @media (prefers-reduced-motion: reduce) { .boton-musica .bm-eq i { animation: none; transform: scaleY(.7); } }
 body.con-boton-musica .pie { padding-bottom: 84px; }
+
+/* ------------------------------------------------------------------ */
+/* Selector de torneos (misma app: Escuelitas REDDFUT y Femenino LFFU) */
+/* ------------------------------------------------------------------ */
+.torneos { background: #050f22; border-bottom: 1px solid rgba(255,255,255,.08); font-family: var(--titular); position: relative; z-index: 11; }
+.torneos-in { max-width: 1100px; margin: 0 auto; padding: 6px 16px; display: flex; align-items: center; gap: 8px; }
+.torneos-lbl { color: #8a97b8; font-weight: 700; font-size: .78rem; letter-spacing: .22em; text-transform: uppercase; margin-right: 4px; }
+.torneo-op { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 5px 13px 4px; border-radius: 999px;
+  color: #c9d2e8; text-decoration: none; font-weight: 700; font-size: .92rem; letter-spacing: .08em; text-transform: uppercase;
+  border: 1px solid rgba(255,255,255,.16); white-space: nowrap; line-height: 1.2; transition: border-color .15s, color .15s; }
+.torneo-op small { font-size: inherit; color: #7f8bab; font-weight: 600; }
+.torneo-op:hover { border-color: rgba(255,255,255,.45); color: #fff; }
+.torneo-op[aria-current] { background: #fff; color: #0b2545; border-color: #fff; pointer-events: none; }
+.torneo-op[aria-current] small { color: #5d6b88; }
+.t-punto { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.t-oro { background: #f2b705; box-shadow: 0 0 0 2px rgba(242,183,5,.28); }
+.t-magenta { background: #e91e8c; box-shadow: 0 0 0 2px rgba(233,30,140,.28); }
+.torneos[hidden] { display: none !important; }
+@media (max-width: 480px) {
+  .torneos-in { padding: 6px 10px; gap: 6px; }
+  .torneos-lbl, .torneo-op small { display: none; }
+  .torneo-op { flex: 1; font-size: .86rem; }
+}
