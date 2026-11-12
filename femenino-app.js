@@ -16,6 +16,21 @@ function fecha(iso, opts) {
   const d = new Date(iso + "T12:00:00");
   return d.toLocaleDateString("es-SV", opts || { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 }
+function horaTxt(h) {               // "15:30" → "3:30 p.m."
+  const m = /^(\d{1,2}):(\d{2})$/.exec(String(h || "").trim());
+  if (!m) return h || "";
+  const hh = +m[1];
+  return `${hh % 12 || 12}:${m[2]} ${hh < 12 ? "a.m." : "p.m."}`;
+}
+function diaCorto(iso) {             // "2026-09-11" → "Vie. 11"
+  const t = fecha(iso, { weekday: "short", day: "numeric" }).replace(",", "");
+  return t.charAt(0).toUpperCase() + t.slice(1).replace(/^(\S+?)\.?\s/, "$1. ");
+}
+function fechasJornada(j) {          // una o varias fechas (viernes y sábado, reprogramados)
+  const ds = [...new Set([j.fecha, ...j.partidos.map(p => p.fecha).filter(Boolean)])].sort();
+  const txt = ds.map(d => fecha(d, { weekday: "long", day: "numeric", month: "long" })).join(" · ");
+  return j.porConfirmar ? `Fecha estimada: ${txt} · por confirmar` : txt;
+}
 function parseRes(v) {
   if (v == null) return null;
   const s = String(v).trim();
@@ -34,7 +49,10 @@ function escudo(nombre, grande) {
 function calcularTabla() {
   const filas = T.equipos.map(e => ({ nombre: e.nombre, pj: 0, g: 0, e: 0, p: 0, gf: 0, gc: 0, forma: [] }));
   const por = new Map(filas.map(f => [f.nombre, f]));
-  T.jornadas.forEach(j => j.partidos.forEach(p => {
+  // en orden de fecha real (un partido reprogramado cuenta cuando se jugó, para "Últimos 5")
+  const todos = [];
+  T.jornadas.forEach(j => j.partidos.forEach((p, i) => todos.push({ p, f: (p.fecha || j.fecha) + String(j.numero).padStart(2, "0") + i })));
+  todos.sort((x, y) => x.f.localeCompare(y.f)).forEach(({ p }) => {
     const r = parseRes(p.resultado);
     if (!r || r.gl == null) return;
     const L = por.get(p.local), V = por.get(p.visitante);
@@ -43,7 +61,7 @@ function calcularTabla() {
     if (r.gl > r.gv) { L.g++; V.p++; L.forma.push("G"); V.forma.push("P"); }
     else if (r.gl < r.gv) { V.g++; L.p++; V.forma.push("G"); L.forma.push("P"); }
     else { L.e++; V.e++; L.forma.push("E"); V.forma.push("E"); }
-  }));
+  });
   filas.forEach(f => { f.dg = f.gf - f.gc; f.pts = f.g * 3 + f.e; });
   filas.sort((a, b) => b.pts - a.pts || b.g - a.g || b.dg - a.dg || b.gf - a.gf || a.nombre.localeCompare(b.nombre, "es"));
   return filas;
@@ -149,9 +167,34 @@ function tickerHTML() {
   });
   const P = proxima();
   if (P && P.modo === "cuenta") P.j.partidos.forEach(p =>
-    items.push(`<span class="ticker-item"><em>J${P.j.numero}</em> ${esc(p.local)} vs ${esc(p.visitante)} · ${esc(p.hora || "")}</span>`));
+    items.push(`<span class="ticker-item"><em>J${P.j.numero}</em> ${esc(p.local)} vs ${esc(p.visitante)}${p.hora ? " · " + esc(horaTxt(p.hora)) : ""}</span>`));
   const html = items.join("");
   return `<div class="ticker" data-reveal="up"><div class="ticker-track">${html}${html}</div></div>`;
+}
+
+/* ---------- Datos de la temporada (se calculan solos) ---------- */
+function datosTemporadaHTML(tabla) {
+  const jugados = [];
+  T.jornadas.forEach(j => j.partidos.forEach(p => { const r = parseRes(p.resultado); if (r && r.gl != null) jugados.push({ p, r, j }); }));
+  if (!jugados.length) return "";
+  const goles = jugados.reduce((n, x) => n + x.r.gl + x.r.gv, 0);
+  const goleada = jugados.slice().sort((a, b) => (Math.abs(b.r.gl - b.r.gv) - Math.abs(a.r.gl - a.r.gv)) || ((b.r.gl + b.r.gv) - (a.r.gl + a.r.gv)))[0];
+  const invictos = tabla.filter(f => f.pj && f.p === 0).map(f => f.nombre);
+  const ataque = tabla.slice().sort((a, b) => b.gf - a.gf)[0];
+  const defensa = tabla.slice().sort((a, b) => a.gc - b.gc)[0];
+  const empates = jugados.filter(x => x.r.gl === x.r.gv).length;
+  const items = [
+    ["⚽", "Promedio de gol", `${(goles / jugados.length).toFixed(2)} por partido`],
+    ["🔥", "Mayor goleada", `${goleada.p.local} ${goleada.r.gl}–${goleada.r.gv} ${goleada.p.visitante} (J${goleada.j.numero})`],
+    ["🛡️", invictos.length === 1 ? "Única invicta" : "Invictas", invictos.length ? invictos.join(", ") : "Ninguna"],
+    ["👑", "Mejor ataque", `${ataque.nombre}: ${ataque.gf} goles`],
+    ["🧱", "Defensa menos vencida", `${defensa.nombre}: ${defensa.gc} en contra`],
+    ["🤝", "Empates", String(empates)]
+  ];
+  return `<section class="bloque" data-reveal="up">
+    <h2 class="titulo-bloque">Datos de la temporada <small>Tras la jornada ${JA}</small></h2>
+    <div class="datos-temp">${items.map(([i, t, v]) => `<div class="tarjeta dato-t"><span class="dato-ico">${i}</span><span><small>${esc(t)}</small><b>${esc(v)}</b></span></div>`).join("")}</div>
+  </section>`;
 }
 
 /* ---------- Vistas ---------- */
@@ -164,7 +207,7 @@ function renderInicio() {
   if (P) {
     const j = P.j;
     const cruces = j.partidos.map(p =>
-      `<div class="cruce">${escudo(p.local)}<span>${esc(p.local)}</span><em>vs</em><span>${esc(p.visitante)}</span>${escudo(p.visitante)}<span class="h">${esc(p.hora || "")}</span></div>`).join("");
+      `<div class="cruce">${escudo(p.local)}<span>${esc(p.local)}</span><em>vs</em><span>${esc(p.visitante)}</span>${escudo(p.visitante)}<span class="h">${esc(horaTxt(p.hora))}</span></div>`).join("");
     const reloj = P.modo === "vivo"
       ? `<div class="en-vivo-bandera"><i></i>Se está jugando hoy</div>`
       : (() => { const c = partes(P.t - Date.now());
@@ -175,7 +218,7 @@ function renderInicio() {
     cuenta = `<section class="cuenta ${P.modo === "vivo" ? "en-vivo" : ""}" data-reveal="up">
       <div class="cuenta-cab"><span class="cuenta-tit">${P.modo === "vivo" ? "En juego" : "Próxima jornada"}</span><span class="cuenta-num">J${dos2(j.numero)}</span></div>
       ${reloj}
-      <p class="cuenta-fecha">${esc(fecha(j.fecha))}</p>
+      <p class="cuenta-fecha">${esc(fechasJornada(j))}</p>
       <div class="cuenta-cruces">${cruces}</div>
       <button class="cuenta-ver" data-ir="resultados" data-jor="${j.numero}">Ver los ${j.partidos.length} partidos y canchas ›</button>
     </section>`;
@@ -194,7 +237,7 @@ function renderInicio() {
       </div>
       <div class="lideres" data-reveal="right" style="--d:.1s">
         <div class="lideres-cab"><h2>Tabla <span>· J${JA}</span></h2><small>Toca para ver completa</small></div>
-        ${tabla.slice(0, 5).map((f, i) => `
+        ${tabla.slice(0, T.clasificados).map((f, i) => `
           <button class="lider-fila" data-ir="posiciones">
             <span class="lider-pos">${i + 1}º</span>${escudo(f.nombre, true)}
             <span class="lider-info"><b>${esc(f.nombre)}</b><small>DG ${f.dg > 0 ? "+" : ""}${f.dg} · ${f.g}G ${f.e}E ${f.p}P</small></span>
@@ -208,8 +251,13 @@ function renderInicio() {
       ${[[T.equipos.length, "Equipos"], [NJ, "Jornadas"], [jugados, "Partidos jugados"], [goles, "Goles anotados"]].map(([n, l], i) =>
         `<div class="stat" data-reveal="up" style="--d:${i * .08}s"><b data-contador="${n}">0</b><span>${l}</span></div>`).join("")}
     </div>
+    ${datosTemporadaHTML(tabla)}
+    ${(T.reconocimientos || []).length ? `<section class="bloque" data-reveal="up">
+      <h2 class="titulo-bloque">Reconocimientos <small>Oficiales de la liga</small></h2>
+      ${T.reconocimientos.map(r => `<div class="tarjeta recon"><span class="recon-ico">🎖️</span><p><b>${esc(fecha(r.fecha, { day: "numeric", month: "long" }))}:</b> ${esc(r.texto)}</p></div>`).join("")}
+    </section>` : ""}
     <section class="bloque" data-reveal="up">
-      <h2 class="titulo-bloque">Los 8 equipos <small>Temporada ${esc(T.temporada)}</small></h2>
+      <h2 class="titulo-bloque">Los ${T.equipos.length} equipos <small>Temporada ${esc(T.temporada)}</small></h2>
       <div class="equipos-chips">
         ${T.equipos.map(e => `<span class="eq-chip">${escudo(e.nombre)}${esc(e.nombre)}</span>`).join("")}
       </div>
@@ -239,7 +287,7 @@ function renderPosiciones() {
         </tbody>
       </table>
     </div>
-    <p class="tabla-nota" data-reveal="up"><i></i>Las primeras ${T.clasificados} posiciones clasifican a semifinales. Desempate: puntos → victorias → diferencia de gol → goles a favor.</p>`;
+    <p class="tabla-nota" data-reveal="up"><i></i>Las primeras ${T.clasificados} posiciones clasifican a cuartos de final. Desempate: puntos → victorias → diferencia de gol → goles a favor.</p>`;
 }
 
 function renderResultados() {
@@ -259,7 +307,7 @@ function renderResultados() {
     </div>
     <div class="jornada-cab" data-reveal="left">
       <h2>Jornada ${j.numero} <span>LFFU</span></h2>
-      <span class="fecha-j">${esc(fecha(j.fecha))}</span>
+      <span class="fecha-j">${esc(fechasJornada(j))}</span>
     </div>
     <div class="partidos">
       ${j.partidos.map((p, i) => {
@@ -267,22 +315,27 @@ function renderResultados() {
         const jugado = r && r.gl != null;
         const marc = jugado
           ? `<div class="marcador">${r.gl}<span class="sep">–</span>${r.gv}</div>`
-          : `<div class="marcador pendiente">${p.hora ? esc(p.hora) : "POR JUGAR"}</div>`;
+          : `<div class="marcador pendiente">${p.hora ? esc(horaTxt(p.hora)) : "POR JUGAR"}</div>`;
         const pl = jugado && r.gl < r.gv ? " perdio" : "", pv = jugado && r.gv < r.gl ? " perdio" : "";
         return `<article class="tarjeta partido" data-reveal="up" style="--d:${i * .07}s">
-          <div class="partido-meta">📍 <b>${esc(p.cancha || "")}</b>${p.hora ? " · " + esc(p.hora) : ""}</div>
+          <div class="partido-meta">📍 <b>${esc(p.cancha || "")}</b> · ${esc(diaCorto(p.fecha || j.fecha))}${p.hora ? " · " + esc(horaTxt(p.hora)) : ""}</div>
           <div class="partido-fila">
             <div class="eq local${pl}"><span class="n">${esc(p.local)}</span>${escudo(p.local)}</div>
             ${marc}
             <div class="eq${pv}">${escudo(p.visitante)}<span class="n">${esc(p.visitante)}</span></div>
           </div>
-          ${jugado && r.nota ? `<div class="nota-res">${esc(r.nota)}</div>` : ""}
+          ${(jugado && r.nota) || p.nota ? `<div class="nota-res">${esc([jugado ? r.nota : "", p.nota].filter(Boolean).join(" · "))}</div>` : ""}
         </article>`;
       }).join("")}
     </div>`;
 }
 
 function renderGoleadoras() {
+  if (!(T.goleadoras || []).length) {
+    app.innerHTML = `<div class="jornada-cab" data-reveal="left"><h2>Goleadoras</h2></div>
+      <p class="tabla-nota" data-reveal="up">La tabla de goleadoras aparecerá aquí cuando la liga la publique.</p>`;
+    return;
+  }
   const max = Math.max(...T.goleadoras.map(g => g.goles), 1);
   app.innerHTML = `
     <div class="jornada-cab" data-reveal="left">
@@ -305,32 +358,44 @@ function renderGoleadoras() {
 function renderPlayoffs() {
   const tabla = calcularTabla();
   const completa = JA >= NJ;
-  const seed = n => tabla[n - 1];
-  const fila = (s, placeholder) => s
-    ? `<div class="fila"><span class="seed">${s.pos}º</span>${escudo(s.nombre)}<span class="n">${esc(s.nombre)}</span></div>`
-    : `<div class="fila"><span class="seed">–</span><span class="n por-definir">${placeholder}</span></div>`;
-  const s = n => { const f = seed(n); return f ? { ...f, pos: n } : null; };
+  const s = n => { const f = tabla[n - 1]; return f ? { ...f, pos: n } : null; };
+  const fila = (x, ph) => x
+    ? `<div class="fila"><span class="seed">${x.pos}º</span>${escudo(x.nombre)}<span class="n">${esc(x.nombre)}</span></div>`
+    : `<div class="fila"><span class="seed">–</span><span class="n por-definir">${ph}</span></div>`;
+  const vacia = t => `<div class="fila"><span class="n por-definir">${t}</span></div>`;
   app.innerHTML = `
-    <div class="jornada-cab" data-reveal="left"><h2>Playoffs <span>LFFU</span></h2></div>
+    <div class="jornada-cab" data-reveal="left"><h2>Playoffs <span>LFFU</span></h2><span class="fecha-j">Clasifican ${T.clasificados} equipos</span></div>
     <div class="aviso-proy" data-reveal="up">📊 <b>${completa ? "Cruces confirmados." : "Proyección:"}</b>
-      ${completa ? "Así quedaron los cruces de la fase final." : `así quedarían los cruces si la fase regular terminara hoy (jornada ${JA} de ${NJ}). Se confirman al finalizar la jornada ${NJ}.`}</div>
+      ${completa ? "Así quedaron los cruces de la fase final." : `así quedarían los cuartos de final si la fase regular terminara hoy (jornada ${JA} de ${NJ}). Se confirman al finalizar la jornada ${NJ}.`}</div>
     <div class="bracket-wrap" data-reveal="zoom">
-      <div class="bracket">
-        <div class="ronda"><h3>Semifinales</h3><div class="ronda-col">
-          <div class="tarjeta llave"><div class="llave-id">Semifinal 1</div>${fila(s(1), "1º de la tabla")}${fila(s(4), "4º de la tabla")}</div>
-          <div class="tarjeta llave"><div class="llave-id">Semifinal 2</div>${fila(s(2), "2º de la tabla")}${fila(s(3), "3º de la tabla")}</div>
+      <div class="bracket bracket-4">
+        <div class="ronda"><h3>Cuartos <small>ida y vuelta</small></h3><div class="ronda-col">
+          <div class="tarjeta llave"><div class="llave-id">Cuartos 1</div>${fila(s(1), "1º de la tabla")}${fila(s(6), "6º de la tabla")}</div>
+          <div class="tarjeta llave"><div class="llave-id">Cuartos 2</div>${fila(s(2), "2º de la tabla")}${fila(s(5), "5º de la tabla")}</div>
+          <div class="tarjeta llave"><div class="llave-id">Cuartos 3</div>${fila(s(3), "3º de la tabla")}${fila(s(4), "4º de la tabla")}</div>
         </div></div>
-        <div class="ronda"><h3>Final</h3><div class="ronda-col">
-          <div class="tarjeta llave final"><div class="llave-id">🏆 Gran Final</div>
-            <div class="fila"><span class="n por-definir">Ganadora Semifinal 1</span></div>
-            <div class="fila"><span class="n por-definir">Ganadora Semifinal 2</span></div>
-          </div>
+        <div class="ronda"><h3>Semifinales <small>ida y vuelta</small></h3><div class="ronda-col">
+          <div class="tarjeta llave"><div class="llave-id">Semifinal 1</div>${vacia("Clasificada de cuartos")}${vacia("Clasificada de cuartos")}</div>
+          <div class="tarjeta llave"><div class="llave-id">Semifinal 2</div>${vacia("Clasificada de cuartos")}${vacia("Clasificada de cuartos")}</div>
+        </div></div>
+        <div class="ronda"><h3>Final <small>un solo partido</small></h3><div class="ronda-col">
+          <div class="tarjeta llave final"><div class="llave-id">🏆 Gran Final · 3:30 p.m.</div>${vacia("Ganadora Semifinal 1")}${vacia("Ganadora Semifinal 2")}</div>
+          <div class="tarjeta llave"><div class="llave-id">🥉 Tercer lugar · 1:30 p.m.</div>${vacia("Perdedora Semifinal 1")}${vacia("Perdedora Semifinal 2")}</div>
         </div></div>
         <div class="ronda"><h3>Campeona</h3><div class="ronda-col">
-          <div class="campeon-caja"><b>Copa LFFU</b><p style="margin-top:6px;font-size:.9rem;color:#c6cdf0">La gloria espera en Usulután ✨</p></div>
+          <div class="campeon-caja"><b>Campeona LFFU</b><p style="margin-top:6px;font-size:.9rem;color:#c6cdf0">${esc(T.temporada)}</p></div>
         </div></div>
       </div>
-    </div>`;
+    </div>
+    <section class="tarjeta formato-final" data-reveal="up">
+      <h3>Cómo se juega la fase final</h3>
+      <ul>
+        <li><b>Cuartos de final (ida y vuelta):</b> juegan los ${T.clasificados} primeros de la fase regular. El 1º, 2º y 3º eligen si juegan de local o de visita el primer partido. Si hay empate, pasa el equipo mejor ubicado en la tabla.</li>
+        <li><b>Semifinales (ida y vuelta):</b> las 3 ganadoras de cuartos y la mejor perdedora. Los 2 equipos mejor ubicados en la tabla eligen la localía del primer partido. Si hay empate global, se va directo a penales.</li>
+        <li><b>Gran final (un solo partido):</b> si hay empate, se va directo a penales. Ese mismo día se juega el partido por el tercer y cuarto lugar.</li>
+      </ul>
+      <p class="muted" style="font-size:.85rem">Los cruces de cuartos se muestran por posición en la tabla (1º–6º, 2º–5º, 3º–4º); la liga los confirma al cerrar la fase regular.</p>
+    </section>`;
 }
 
 function renderCanchas() {
@@ -384,33 +449,37 @@ function renderCanchas() {
 }
 
 function renderLiga() {
+  const partidos = T.jornadas.reduce((n, j) => n + j.partidos.length, 0);
   app.innerHTML = `
     <article class="tarjeta liga-art" data-reveal="up">
-      <h2>La Liga · Formato y reglamento</h2>
-      <p class="muted">LFFU · Temporada ${esc(T.temporada)} · Liga de Fútbol Femenino Usulután</p>
-      <h3>1. Presentación</h3>
-      <p>La LFFU es la liga de fútbol femenino de Usulután, abierta a todas las edades y a todos los equipos del departamento. Nació para que cada jugadora tenga una cancha, un calendario y una afición que la respalde. <b>Juntas por el fútbol femenino.</b></p>
-      <h3>2. Sistema de competencia</h3>
+      <h2>La Liga · Información general</h2>
+      <p class="muted">${esc(T.siglas)} · ${esc(T.temporada)} · ${esc(T.nombre)}</p>
+      <h3>1. El torneo</h3>
+      <p>La <b>${esc(T.nombre)}</b> reúne a <b>${T.equipos.length} equipos</b> del departamento de Usulután en el torneo <b>${esc(T.temporada)}</b>.
+        Los partidos son de <b>11 contra 11</b>, en <b>dos tiempos de 45 minutos</b>, y se juegan los viernes y sábados por la tarde en la cancha del equipo local.</p>
+      <div class="equipos-chips" style="margin:10px 0 4px">${T.equipos.map(e => `<span class="eq-chip">${escudo(e.nombre)}${esc(e.nombre)}</span>`).join("")}</div>
+      <h3>2. Formato</h3>
       <div class="fases">
-        <div class="fase"><span class="fase-num2">Fase I</span><h4>Temporada regular</h4>
-          <ul><li><b>Participantes:</b> ${T.equipos.length} equipos.</li>
-          <li><b>Formato:</b> todos contra todos, ida y vuelta (${NJ} jornadas).</li>
-          <li><b>Puntuación:</b> 3 por victoria, 1 por empate, 0 por derrota.</li>
-          <li><b>Desempate:</b> puntos → victorias → diferencia de gol → goles a favor.</li></ul></div>
-        <div class="fase"><span class="fase-num2">Fase II</span><h4>Playoffs</h4>
-          <ul><li>Clasifican las <b>${T.clasificados} primeras</b> de la tabla.</li>
-          <li><b>Semifinales:</b> 1ª vs 4ª y 2ª vs 3ª.</li>
-          <li><b>Gran final:</b> las dos ganadoras disputan la Copa LFFU.</li></ul></div>
+        <div class="fase"><span class="fase-num2">Fase I</span><h4>Fase regular</h4>
+          <ul><li><b>Todos contra todos, ida y vuelta:</b> ${NJ} jornadas y ${partidos} partidos.</li>
+          <li><b>Puntos:</b> 3 por victoria, 1 por empate y 0 por derrota.</li>
+          <li><b>Desempate en la tabla:</b> puntos → victorias → diferencia de gol → goles a favor.</li>
+          <li>Los <b>${T.clasificados} primeros</b> clasifican a la fase final.</li></ul></div>
+        <div class="fase"><span class="fase-num2">Fase II</span><h4>Fase final</h4>
+          <ul><li><b>Cuartos de final:</b> ida y vuelta.</li>
+          <li><b>Semifinales:</b> las 3 ganadoras de cuartos y la mejor perdedora, ida y vuelta.</li>
+          <li><b>Tercer lugar:</b> un partido, 1:30 p.m.</li>
+          <li><b>Gran final:</b> un partido, 3:30 p.m. La organiza la ${esc(T.siglas)}.</li></ul></div>
       </div>
-      <h3>3. Espíritu de la liga</h3>
-      <p>Cada jornada es una fiesta deportiva: respeto a las árbitras, a las rivales y a la afición. Las transmisiones en vivo por la página oficial de la LFFU acercan cada jugada a quienes no pueden estar en la cancha.</p>
-      <h3>4. Datos y correcciones</h3>
-      <p>Este sitio se actualiza después de cada jornada. Si ves un resultado, nombre o fecha que no cuadra, avísanos y lo corregimos.</p>
+      <p><a href="#/playoffs" data-ir="playoffs">Ver cómo van los cruces de la fase final ›</a></p>
+      <h3>3. Datos y correcciones</h3>
+      <p>Este sitio se actualiza después de cada jornada con los resultados oficiales de la liga. Si ves un dato que no cuadra, avísanos y lo corregimos.</p>
       <div class="contacto-caja">
         <b>Contacto de la liga</b>
         <p style="margin:8px 0 4px">📱 WhatsApp: <a href="https://wa.me/15107798559" target="_blank" rel="noopener">${esc(T.contacto.whatsapp)}</a></p>
         <p>📍 ${esc(T.contacto.lugar)}</p>
       </div>
+      ${T.lema ? `<p class="liga-lema">“${esc(T.lema)}”</p>` : ""}
     </article>`;
 }
 
@@ -469,11 +538,15 @@ document.addEventListener("click", e => {
 });
 
 /* ---------- Arranque ---------- */
+if (!(T.goleadoras || []).length) {
+  const bg = document.querySelector('#tabs button[data-tab="goleadoras"]');
+  if (bg) bg.remove();
+}
 document.getElementById("fr-ja").textContent = JA;
 document.getElementById("fr-ticks").innerHTML = Array.from({ length: NJ }, (_, i) => `<i class="${i < JA ? "ok" : ""}"></i>`).join("");
 document.getElementById("pie-act").textContent = "Actualizado: " + fecha(T.actualizado, { day: "numeric", month: "long", year: "numeric" });
 const h = location.hash.replace(/^#\//, "").split("/");
-if (["inicio", "posiciones", "resultados", "goleadoras", "playoffs", "canchas", "liga"].includes(h[0])) {
+if (["inicio", "posiciones", "resultados", "playoffs", "canchas", "liga"].concat((T.goleadoras || []).length ? ["goleadoras"] : []).includes(h[0])) {
   estado.tab = h[0];
   if (h[0] === "resultados" && +h[1]) estado.jornada = Math.min(NJ, Math.max(1, +h[1]));
   if (h[0] === "canchas" && h[1]) estado.cancha = h[1];
