@@ -54,22 +54,6 @@ a{color:var(--azul-2)}
 .cabecera h1 .anio{color:var(--magenta);text-shadow:0 0 18px rgba(233,30,140,.5)}
 .cabecera h1 .l2{display:block;color:#b9c4ee;font-size:.62em;letter-spacing:.04em}
 
-/* Balón 3D */
-.balon-escena{margin-left:auto;perspective:800px;width:130px;height:150px;display:grid;place-items:center;flex:none}
-.balon-giro{position:relative;width:110px;height:110px;transform-style:preserve-3d;animation:gira-balon 9s linear infinite}
-@keyframes gira-balon{from{transform:rotateY(0) rotateX(12deg)}to{transform:rotateY(360deg) rotateX(12deg)}}
-.balon{width:100%;height:100%;border-radius:50%;position:relative;overflow:hidden;
-  background:radial-gradient(circle at 32% 28%,#fff,#cfd6ea);
-  box-shadow:inset -16px -16px 36px rgba(10,18,54,.55),0 0 26px rgba(233,30,140,.45)}
-.balon .p{position:absolute;background:var(--azul);clip-path:polygon(50% 0,100% 38%,82% 100%,18% 100%,0 38%)}
-.balon .p1{width:38px;height:38px;top:12px;left:36px}
-.balon .p2{width:26px;height:26px;top:52px;left:8px;transform:rotate(22deg)}
-.balon .p3{width:26px;height:26px;top:52px;right:8px;transform:rotate(-22deg)}
-.balon .p4{width:32px;height:32px;bottom:6px;left:39px}
-.balon .p5{width:18px;height:18px;top:34px;left:46px;background:var(--magenta);opacity:.85}
-.balon-sombra{position:absolute;bottom:-22px;left:50%;transform:translateX(-50%);width:80px;height:14px;
-  background:radial-gradient(ellipse,rgba(0,0,0,.45),transparent 70%);filter:blur(4px)}
-
 /* Franja negra */
 .franja{background:#0b0d16;border-top:1px solid rgba(255,255,255,.08);position:relative;z-index:1}
 .franja-inner{display:flex;align-items:center;justify-content:space-between;gap:8px 18px;flex-wrap:wrap;min-height:42px;padding-block:8px;
@@ -391,7 +375,6 @@ table.tabla{width:100%;border-collapse:collapse;font-size:.93rem;min-width:640px
 .corazon{color:var(--magenta);display:inline-block;animation:latido 1.6s infinite}
 
 @media(max-width:720px){
-  .balon-escena{display:none}
   .escudo-lffu svg{width:72px}
   .fase-num b{font-size:4rem}
   .mapa{position:static}
@@ -435,3 +418,41 @@ table.tabla{width:100%;border-collapse:collapse;font-size:.93rem;min-width:640px
 .formato-final ul{margin:0 0 10px 18px}
 .formato-final li{margin-bottom:6px}
 .liga-lema{margin-top:22px;font-family:var(--titular);font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--magenta);font-size:1.15rem;text-align:center;max-width:none!important}
+
+/* ---------- Mapa real de Usulután (canchas) ---------- */
+.m-otro{fill:#ebe7dc;stroke:#d3cdbb;stroke-width:1.2}
+.m-usu{fill:#fbe3f1;stroke:none}
+.m-muni{fill:none;stroke:rgba(233,30,140,.28);stroke-width:1.1;stroke-dasharray:5 4}
+.m-usu-borde{fill:none;stroke:var(--magenta);stroke-width:3;stroke-linejoin:round}
+.mapa .m-nom{font-size:34px;fill:rgba(16,28,78,.22);letter-spacing:6px}
+.m-vec-t{font-family:var(--titular);font-weight:700;font-size:17px;letter-spacing:3px;fill:rgba(16,28,78,.3)}
+.mapa .m-mar-t{font-size:22px;letter-spacing:6px}
+.m-bahia{font-family:var(--cuerpo);font-style:italic;font-size:15px;fill:#6f9cc4}
+.m-pueblo circle{fill:#fff;stroke:#6b7088;stroke-width:2}
+.m-pueblo text{font-family:var(--cuerpo);font-size:15px;font-weight:600;fill:#4c5170;paint-order:stroke;stroke:#fbe3f1;stroke-width:4}
+.m-zona{fill:none;stroke:var(--azul);stroke-width:2;stroke-dasharray:5 5;opacity:.55}
+.m-punto.aprox .m-dot{stroke-dasharray:none}
+.mapa figcaption{flex-wrap:wrap;align-items:center}
+.ley{display:inline-flex;align-items:center;gap:6px;font-weight:600;color:var(--azul)}
+.ley-dot{width:12px;height:12px;border-radius:50%;background:var(--magenta);border:2px solid #fff;box-shadow:0 0 0 1px var(--magenta)}
+.ley-dot.aprox{background:var(--azul);box-shadow:0 0 0 2px #fff,0 0 0 3px var(--azul);outline:1.5px dashed var(--azul);outline-offset:3px}
+.ley-nota{margin-left:auto}
+.canchas-pend{margin:10px 6px 4px;padding:12px 14px;border-radius:8px;background:#fff6fb;border:1px dashed rgba(233,30,140,.45)}
+.canchas-pend b{font-family:var(--titular);color:var(--azul);letter-spacing:.5px}
+.canchas-pend p{margin:4px 0 8px;font-size:.8rem;color:var(--gris)}
+.pend-chips{display:flex;flex-wrap:wrap;gap:6px}
+.pend-chips .eq-chip{text-decoration:none;color:var(--azul)}
+.cancha-fuente{font-size:.74rem;color:var(--gris);margin:-4px 0 8px}
+.tag.zona{background:#e3f4ea;color:#17683b}
+.tag.muni{background:#eef0fa;color:var(--azul)}
+.tag.pend{background:#fff1d6;color:#8a5a00}
+@media (max-width:600px){.ley-nota{margin-left:0;width:100%}.mapa .m-nom{font-size:30px}}
+.mapa .m-etq{font-size:28px;stroke-width:6}
+.m-pueblo text{font-size:22px;stroke-width:6}
+.m-vec-t{font-size:22px}
+.mapa .m-nom{font-size:46px}
+.mapa .m-mar-t{font-size:28px}
+.m-zona{stroke-width:3}
+@media (max-width:600px){.mapa .m-nom{font-size:46px}}
+.pend-chips .eq-chip{font-size:.82rem;padding:4px 12px 4px 4px;gap:7px}
+.pend-chips .eq-chip .escudo,.pend-chips .eq-chip svg{width:24px;height:24px}
