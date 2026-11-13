@@ -1072,6 +1072,63 @@ body.con-boton-musica .pie { padding-bottom: 84px; }
 @media (max-width: 760px) { .redes { grid-template-columns: 1fr; } }
 @media (max-width: 760px) { .red-txt b { font-size: .9rem; } .red-btn { gap: 10px; } .red-accion { padding: 6px 9px; } }
 
+/* ---------- Barra lateral de redes (en todas las pestañas) ---------- */
+.redes-lateral {
+  position: fixed; z-index: 55; left: 0; top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 12px 8px 10px 7px; background: var(--azul);
+  border-radius: 0 10px 10px 0; border: 2px solid var(--oro); border-left: 0;
+  box-shadow: 0 10px 26px rgba(8, 24, 46, .32);
+}
+.rl-titulo {
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  font-family: var(--titular); font-weight: 800; font-size: .74rem; letter-spacing: .24em; text-transform: uppercase;
+  color: var(--oro); margin-bottom: 4px;
+}
+.rl-btn { position: relative; display: block; text-decoration: none; }
+.rl-ico { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; color: #fff; transition: transform .2s; }
+.rl-ico svg { width: 23px; height: 23px; }
+.rl-facebook .rl-ico { background: #1877f2; }
+.rl-instagram .rl-ico { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%); }
+.rl-btn:hover .rl-ico, .rl-btn:focus-visible .rl-ico { transform: scale(1.08); }
+.rl-btn:focus-visible { outline: 3px solid var(--oro); outline-offset: 3px; border-radius: 12px; }
+.rl-tip {
+  position: absolute; left: calc(100% + 16px); top: 50%; transform: translate(-6px, -50%);
+  display: flex; flex-direction: column; white-space: nowrap; pointer-events: none;
+  background: #fff; color: var(--tinta); padding: 7px 12px; border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(8, 24, 46, .25); opacity: 0; transition: opacity .18s, transform .18s;
+}
+.rl-tip::before { content: ""; position: absolute; left: -6px; top: 50%; margin-top: -6px; border: 6px solid transparent; border-left: 0; border-right-color: #fff; }
+.rl-tip small { font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gris); }
+.rl-tip b { font-size: .9rem; }
+.rl-btn:hover .rl-tip, .rl-btn:focus-visible .rl-tip { opacity: 1; transform: translate(0, -50%); }
+.rl-asa { display: none; }
+/* Pantallas medianas y celulares: pestañita en el borde izquierdo (sobre el botón de música); al tocarla salen los botones */
+@media (max-width: 1139px) {
+  .redes-lateral {
+    top: auto; left: 0; bottom: calc(max(14px, env(safe-area-inset-bottom)) + 4px);
+    padding: 7px 7px 7px 6px; gap: 7px; border-radius: 0 12px 12px 0;
+    transform: translateX(-100%); transition: transform .28s cubic-bezier(.2,.8,.2,1);
+  }
+  body.con-boton-musica .redes-lateral { bottom: calc(max(14px, env(safe-area-inset-bottom)) + 62px); }
+  .redes-lateral.abierta { transform: translateX(0); }
+  .rl-titulo, .rl-tip { display: none; }
+  .rl-ico { width: 38px; height: 38px; border-radius: 50%; }
+  .rl-ico svg { width: 21px; height: 21px; }
+  .rl-asa {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+    position: absolute; left: calc(100% + 2px); bottom: 10px;
+    width: 28px; padding: 9px 0; border: 2px solid var(--oro); border-left: 0; border-radius: 0 10px 10px 0;
+    background: var(--azul); color: #fff; cursor: pointer; box-shadow: 4px 6px 16px rgba(8, 24, 46, .3);
+  }
+  .rl-asa-ico { display: grid; place-items: center; }
+  .rl-asa-ico svg { width: 15px; height: 15px; }
+  .rl-asa:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+  .redes-lateral.abierta .rl-asa { opacity: 0; pointer-events: none; }
+}
+@media (max-width: 1139px) and (prefers-reduced-motion: reduce) { .redes-lateral { transition: none; } }
+@media print { .redes-lateral { display: none; } }
+
 </style>
   <script>
     /* App instalada: se abre en el último torneo que se vio (Escuelitas o Femenino) */
@@ -2328,7 +2385,6 @@ window.QUINIELA = {
       ${cuentaHTML()}
       ${promoQuiniela()}
       ${avisosHTML()}
-      ${redesHTML()}
 
       <section class="bloque">
         <h3 class="titulo-bloque">Categorías <small>Elige una para ver su tabla</small></h3>
@@ -2360,7 +2416,6 @@ window.QUINIELA = {
 
   /* ---------- Redes sociales: "Síguenos" en Inicio + iconos en el pie ---------- */
   const REDES = T.redes || {};
-  function logoEscuelitasSrc() { const i = document.querySelector("img.logo-2"); return i ? i.src : "logo-escuelitas.png"; }
   const ICO_RED = {
     facebook: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.5 21v-7.6h2.6l.4-3h-3V8.5c0-.9.3-1.5 1.6-1.5h1.6V4.3c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.2H7.9v3h2.6V21z"/></svg>`,
     instagram: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" d="M7.5 3h9A4.5 4.5 0 0 1 21 7.5v9a4.5 4.5 0 0 1-4.5 4.5h-9A4.5 4.5 0 0 1 3 16.5v-9A4.5 4.5 0 0 1 7.5 3z"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.3" fill="currentColor"/></svg>`
@@ -2369,28 +2424,35 @@ window.QUINIELA = {
     REDES.facebook && { id: "facebook", url: REDES.facebook, red: "Facebook", accion: "Seguir", nombre: REDES.nombre || "" },
     REDES.instagram && { id: "instagram", url: REDES.instagram, red: "Instagram", accion: "Seguir", nombre: REDES.usuario || "" }
   ].filter(Boolean);
-  function redesHTML() {
+  /* Barra lateral fija: se ve en TODAS las pestañas (PC: borde izquierdo al centro; celular: arriba del botón de música) */
+  function barraRedes() {
     const l = listaRedes();
-    if (!l.length) return "";
-    return `
-      <section class="bloque redes" aria-label="Síguenos en redes sociales">
-        <div class="redes-cab">
-          <img class="redes-logo" src="${esc(logoEscuelitasSrc())}" alt="" width="48" height="59">
-          <div>
-            <span class="redes-sobre">Síguenos</span>
-            <h3>${esc(REDES.nombre || "En redes sociales")}</h3>
-            <p>Tablas, resultados y fotos de cada jornada, también en redes.</p>
-          </div>
-        </div>
-        <div class="redes-botones">
-          ${l.map((r) => `<a class="red-btn red-${r.id}" href="${esc(r.url)}" target="_blank" rel="noopener">
-            <span class="red-ico">${ICO_RED[r.id]}</span>
-            <span class="red-txt"><small>${esc(r.red)}</small><b>${esc(r.nombre)}</b></span>
-            <span class="red-accion">${esc(r.accion)} <span aria-hidden="true">↗</span></span>
-          </a>`).join("")}
-        </div>
-      </section>`;
+    if (!l.length || document.getElementById("redes-lateral")) return;
+    document.body.insertAdjacentHTML("beforeend", `<aside class="redes-lateral" id="redes-lateral" aria-label="Síguenos en redes sociales">
+      <span class="rl-titulo" aria-hidden="true">Síguenos</span>
+      ${l.map((r) => `<a class="rl-btn rl-${r.id}" href="${esc(r.url)}" target="_blank" rel="noopener" aria-label="Seguir en ${esc(r.red)}: ${esc(r.nombre)}">
+        <span class="rl-ico">${ICO_RED[r.id]}</span>
+        <span class="rl-tip" aria-hidden="true"><small>${esc(r.red)} · Seguir ↗</small><b>${esc(r.nombre)}</b></span>
+      </a>`).join("")}
+      <button class="rl-asa" type="button" aria-expanded="false" aria-label="Mostrar redes sociales">
+        <span class="rl-asa-ico">${ICO_RED.facebook}</span><span class="rl-asa-ico">${ICO_RED.instagram}</span>
+      </button>
+    </aside>`);
+    /* En celular/tablet la barra se esconde en una pestañita del borde para no tapar las tablas */
+    const barra = document.getElementById("redes-lateral"), asa = barra.querySelector(".rl-asa");
+    let reloj = 0;
+    const abrir = (si, ms = 6000) => {
+      barra.classList.toggle("abierta", si); asa.setAttribute("aria-expanded", String(si));
+      asa.setAttribute("aria-label", si ? "Ocultar redes sociales" : "Mostrar redes sociales");
+      clearTimeout(reloj); if (si) reloj = setTimeout(() => abrir(false), ms);
+    };
+    asa.addEventListener("click", (ev) => { ev.stopPropagation(); abrir(!barra.classList.contains("abierta")); });
+    document.addEventListener("click", (ev) => { if (!barra.contains(ev.target)) abrir(false); });
+    try {                       // la primera vez de cada visita se asoma unos segundos para que la gente la vea
+      if (!sessionStorage.getItem("redes-vistas")) { sessionStorage.setItem("redes-vistas", "1"); setTimeout(() => abrir(true, 4500), 1800); }
+    } catch (e) {}
   }
+  barraRedes();
   function pieRedes() {
     const pie = document.querySelector(".pie .contenedor");
     const l = listaRedes();

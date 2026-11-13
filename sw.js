@@ -1,7 +1,7 @@
 /* Permite usar el sitio sin internet después de abrirlo una vez.
    Con internet siempre muestra la versión más reciente; sin internet usa la copia guardada.
    Si agregas archivos nuevos, súbele el número a VERSION. */
-const VERSION = "reddfut-v20";
+const VERSION = "reddfut-v21";
 const CACHE_MUSICA = "reddfut-musica";   // aparte: no se borra al cambiar VERSION (la canción pesa)
 const ARCHIVOS = [
   "./", "index.html", "estilos.css", "app.js", "datos.js", "manifest.webmanifest",

@@ -706,7 +706,6 @@
       ${cuentaHTML()}
       ${promoQuiniela()}
       ${avisosHTML()}
-      ${redesHTML()}
 
       <section class="bloque">
         <h3 class="titulo-bloque">Categorías <small>Elige una para ver su tabla</small></h3>
@@ -738,7 +737,6 @@
 
   /* ---------- Redes sociales: "Síguenos" en Inicio + iconos en el pie ---------- */
   const REDES = T.redes || {};
-  function logoEscuelitasSrc() { const i = document.querySelector("img.logo-2"); return i ? i.src : "logo-escuelitas.png"; }
   const ICO_RED = {
     facebook: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13.5 21v-7.6h2.6l.4-3h-3V8.5c0-.9.3-1.5 1.6-1.5h1.6V4.3c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.2H7.9v3h2.6V21z"/></svg>`,
     instagram: `<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2" d="M7.5 3h9A4.5 4.5 0 0 1 21 7.5v9a4.5 4.5 0 0 1-4.5 4.5h-9A4.5 4.5 0 0 1 3 16.5v-9A4.5 4.5 0 0 1 7.5 3z"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.4" cy="6.6" r="1.3" fill="currentColor"/></svg>`
@@ -747,28 +745,35 @@
     REDES.facebook && { id: "facebook", url: REDES.facebook, red: "Facebook", accion: "Seguir", nombre: REDES.nombre || "" },
     REDES.instagram && { id: "instagram", url: REDES.instagram, red: "Instagram", accion: "Seguir", nombre: REDES.usuario || "" }
   ].filter(Boolean);
-  function redesHTML() {
+  /* Barra lateral fija: se ve en TODAS las pestañas (PC: borde izquierdo al centro; celular: arriba del botón de música) */
+  function barraRedes() {
     const l = listaRedes();
-    if (!l.length) return "";
-    return `
-      <section class="bloque redes" aria-label="Síguenos en redes sociales">
-        <div class="redes-cab">
-          <img class="redes-logo" src="${esc(logoEscuelitasSrc())}" alt="" width="48" height="59">
-          <div>
-            <span class="redes-sobre">Síguenos</span>
-            <h3>${esc(REDES.nombre || "En redes sociales")}</h3>
-            <p>Tablas, resultados y fotos de cada jornada, también en redes.</p>
-          </div>
-        </div>
-        <div class="redes-botones">
-          ${l.map((r) => `<a class="red-btn red-${r.id}" href="${esc(r.url)}" target="_blank" rel="noopener">
-            <span class="red-ico">${ICO_RED[r.id]}</span>
-            <span class="red-txt"><small>${esc(r.red)}</small><b>${esc(r.nombre)}</b></span>
-            <span class="red-accion">${esc(r.accion)} <span aria-hidden="true">↗</span></span>
-          </a>`).join("")}
-        </div>
-      </section>`;
+    if (!l.length || document.getElementById("redes-lateral")) return;
+    document.body.insertAdjacentHTML("beforeend", `<aside class="redes-lateral" id="redes-lateral" aria-label="Síguenos en redes sociales">
+      <span class="rl-titulo" aria-hidden="true">Síguenos</span>
+      ${l.map((r) => `<a class="rl-btn rl-${r.id}" href="${esc(r.url)}" target="_blank" rel="noopener" aria-label="Seguir en ${esc(r.red)}: ${esc(r.nombre)}">
+        <span class="rl-ico">${ICO_RED[r.id]}</span>
+        <span class="rl-tip" aria-hidden="true"><small>${esc(r.red)} · Seguir ↗</small><b>${esc(r.nombre)}</b></span>
+      </a>`).join("")}
+      <button class="rl-asa" type="button" aria-expanded="false" aria-label="Mostrar redes sociales">
+        <span class="rl-asa-ico">${ICO_RED.facebook}</span><span class="rl-asa-ico">${ICO_RED.instagram}</span>
+      </button>
+    </aside>`);
+    /* En celular/tablet la barra se esconde en una pestañita del borde para no tapar las tablas */
+    const barra = document.getElementById("redes-lateral"), asa = barra.querySelector(".rl-asa");
+    let reloj = 0;
+    const abrir = (si, ms = 6000) => {
+      barra.classList.toggle("abierta", si); asa.setAttribute("aria-expanded", String(si));
+      asa.setAttribute("aria-label", si ? "Ocultar redes sociales" : "Mostrar redes sociales");
+      clearTimeout(reloj); if (si) reloj = setTimeout(() => abrir(false), ms);
+    };
+    asa.addEventListener("click", (ev) => { ev.stopPropagation(); abrir(!barra.classList.contains("abierta")); });
+    document.addEventListener("click", (ev) => { if (!barra.contains(ev.target)) abrir(false); });
+    try {                       // la primera vez de cada visita se asoma unos segundos para que la gente la vea
+      if (!sessionStorage.getItem("redes-vistas")) { sessionStorage.setItem("redes-vistas", "1"); setTimeout(() => abrir(true, 4500), 1800); }
+    } catch (e) {}
   }
+  barraRedes();
   function pieRedes() {
     const pie = document.querySelector(".pie .contenedor");
     const l = listaRedes();
