@@ -1018,3 +1018,40 @@ body.con-boton-musica .pie { padding-bottom: 84px; }
   .torneos-lbl, .torneo-op small { display: none; }
   .torneo-op { flex: 1; font-size: .86rem; }
 }
+
+/* ---------- Redes sociales (Síguenos) ---------- */
+.redes { background: var(--azul); color: #fff; border-radius: var(--radio); padding: 20px 22px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 18px 26px; align-items: center; position: relative; overflow: hidden; border-bottom: 4px solid var(--oro); }
+.redes::after { content: ""; position: absolute; right: -60px; top: -60px; width: 220px; height: 220px; border-radius: 50%; border: 26px solid rgba(255,255,255,.04); pointer-events: none; }
+.redes-cab { display: flex; gap: 14px; align-items: center; }
+.redes-logo { flex: none; filter: drop-shadow(0 4px 10px rgba(0,0,0,.35)); }
+.redes-sobre { font-family: var(--titular); font-weight: 800; letter-spacing: .22em; text-transform: uppercase; font-size: .78rem; color: var(--oro); }
+.redes h3 { margin: 2px 0 4px; font-family: var(--titular); font-weight: 800; font-size: 1.45rem; line-height: 1.05; text-transform: uppercase; letter-spacing: .02em; }
+.redes p { margin: 0; color: var(--plata); font-size: .88rem; }
+.redes-botones { display: grid; gap: 10px; position: relative; z-index: 1; }
+.red-btn { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px 14px 10px 10px; border-radius: var(--radio); background: #fff; color: var(--tinta); text-decoration: none; transition: transform .2s, box-shadow .2s; }
+.red-btn:hover, .red-btn:focus-visible { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.28); }
+.red-ico { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; color: #fff; }
+.red-ico svg { width: 26px; height: 26px; }
+.red-facebook .red-ico { background: #1877f2; }
+.red-instagram .red-ico { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%); }
+.red-txt { display: flex; flex-direction: column; min-width: 0; }
+.red-txt small { font-size: .72rem; color: var(--gris); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+.red-txt b { font-size: .98rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.red-accion { font-family: var(--titular); font-weight: 800; text-transform: uppercase; letter-spacing: .06em; font-size: .86rem; padding: 7px 12px; border-radius: 99px; background: var(--azul); color: #fff; white-space: nowrap; }
+.red-facebook .red-accion { background: #1877f2; }
+.red-instagram .red-accion { background: #d6249f; }
+.pie-redes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 12px !important; }
+.pie-redes > span { font-family: var(--titular); font-weight: 800; letter-spacing: .14em; text-transform: uppercase; font-size: .8rem; color: var(--plata-osc); }
+.pie-red { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px 6px 8px; border-radius: 99px; background: rgba(255,255,255,.08); color: #fff; text-decoration: none; font-weight: 600; font-size: .85rem; transition: background .2s; }
+.pie-red svg { width: 18px; height: 18px; }
+.pie-facebook:hover { background: #1877f2; }
+.pie-instagram:hover { background: #d6249f; }
+@media (max-width: 760px) {
+  .redes { grid-template-columns: 1fr; padding: 18px 16px; }
+  .red-accion { padding: 6px 10px; font-size: .78rem; }
+}
+@media (max-width: 380px) { .red-accion { display: none; } .red-btn { grid-template-columns: 44px minmax(0, 1fr); } }
+.red-txt b { white-space: normal; overflow: visible; text-overflow: clip; overflow-wrap: anywhere; line-height: 1.2; }
+.redes { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
+@media (max-width: 760px) { .redes { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .red-txt b { font-size: .9rem; } .red-btn { gap: 10px; } .red-accion { padding: 6px 9px; } }

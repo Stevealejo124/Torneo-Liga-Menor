@@ -44,7 +44,7 @@ window.TORNEO = {
     { nombre: "Estanzuelas",        corto: "EST", sinCategorias: ["Sub-15"] },
     { nombre: "Gerardo Barrios",    corto: "GB"  },
     { nombre: "Jucuapa",            corto: "JUC" },
-    { nombre: "La Noria",           corto: "LNO" },
+    { nombre: "La Noria",           corto: "LNO", sinCategorias: ["Sub-7"] },
     { nombre: "Lolotique",          corto: "LOL" },
     { nombre: "Mercedes Umaña",     corto: "MU"  },
     { nombre: "Puerto El Triunfo",  corto: "PET" },
@@ -146,7 +146,7 @@ window.TORNEO = {
         { local: "Mercedes Umaña", visitante: "Puerto El Triunfo", cancha: "Mercedes Umaña",
           resultados: { "Sub-9": "0-9", "Sub-11": "2-3", "Sub-13": "2-1", "Sub-15": "0-2 W.O." } },
         { local: "Ciudad El Triunfo", visitante: "La Noria", cancha: "Ciudad El Triunfo",
-          resultados: { "Sub-7": "3-5", "Sub-11": "0-10", "Sub-13": "0-3", "Sub-15": "2-6" } },
+          resultados: { "Sub-11": "0-10", "Sub-13": "0-3", "Sub-15": "2-6" } },
         { local: "Lolotique", visitante: "Jucuapa", cancha: "Lolotique",
           resultados: { "Sub-7": "11-1", "Sub-9": "2-6", "Sub-11": "3-1", "Sub-13": "2-3", "Sub-15": "2-2" } }
       ]
@@ -344,6 +344,15 @@ window.TORNEO = {
   // ---- APÓYANOS: correo al que llegan fotos, videos, escudos, ubicaciones de
   // canchas, correcciones, etc. (sección "¿Te gustaría apoyarnos?" en Inicio).
   contacto: { correo: "cseuropa1890@gmail.com" },
+
+  // ---- REDES SOCIALES: aparecen en Inicio ("Síguenos") y en el pie de página.
+  // Para quitar una, bórrala o déjala vacía: "".
+  redes: {
+    nombre: "Escuelitas de Fútbol Usulután",
+    facebook: "https://www.facebook.com/share/1bbL9hkWfS/",
+    instagram: "https://www.instagram.com/escuelitasusulutan/",
+    usuario: "@escuelitasusulutan"
+  },
 
   // ---- MÚSICA DE FONDO: botón redondo abajo a la izquierda (empieza apagada).
   // Sube el archivo a GitHub junto a los demás y escribe aquí su nombre exacto.
