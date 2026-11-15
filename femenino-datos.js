@@ -14,7 +14,7 @@ window.LFFU = {
   nombre: "Liga de Fútbol Femenino Usulután",
   siglas: "LFFU",
   temporada: "Apertura 2026",
-  actualizado: "2026-11-12",
+  actualizado: "2026-11-15",
   totalJornadas: 14,
   clasificados: 6,          // los 6 primeros van a cuartos de final
   lema: "El primer amor de una mujer debe ser siempre el amor propio",
@@ -82,16 +82,16 @@ window.LFFU = {
       { local: "Palmo", visitante: "C.D. Federal", cancha: "Cancha El Palmo", fecha: "2026-11-06", hora: "15:30", resultado: "1-3" },
       { local: "Cuscatlecas", visitante: "Usuluteca", cancha: "Cancha Miramar", fecha: "2026-11-06", resultado: "0-3", nota: "Resultado administrativo" },
       { local: "Vencedor", visitante: "Galingagua", cancha: "Cancha Balboa", resultado: "10-3", nota: "Mayor goleada del torneo" } ] },
-    { numero: 10, fecha: "2026-11-14", porConfirmar: true, partidos: [
-      { local: "Usuluteca", visitante: "Palmo", cancha: "Cancha San José", resultado: "" },
-      { local: "C.D. Federal", visitante: "Cuscatlecas", cancha: "Cancha El Mono", resultado: "" },
-      { local: "Guadalupano", visitante: "Vencedor", cancha: "Cancha Machupichu", resultado: "" },
-      { local: "Galingagua", visitante: "Estrellas Marinas", cancha: "Cancha Galingagua", resultado: "" } ] },
-    { numero: 11, fecha: "2026-11-21", porConfirmar: true, partidos: [
-      { local: "Cuscatlecas", visitante: "Galingagua", cancha: "Cancha Miramar", resultado: "" },
-      { local: "Palmo", visitante: "Guadalupano", cancha: "Cancha El Palmo", resultado: "" },
-      { local: "Vencedor", visitante: "Usuluteca", cancha: "Cancha Balboa", resultado: "" },
-      { local: "Estrellas Marinas", visitante: "C.D. Federal", cancha: "Cancha El Nigre", resultado: "" } ] },
+    { numero: 10, fecha: "2026-11-14", partidos: [
+      { local: "Galingagua", visitante: "Estrellas Marinas", cancha: "Cancha Galingagua", hora: "15:00", resultado: "3-4" },
+      { local: "C.D. Federal", visitante: "Cuscatlecas", cancha: "Cancha El Mono", hora: "15:00", resultado: "3-0", nota: "Resultado administrativo" },
+      { local: "Guadalupano", visitante: "Vencedor", cancha: "Cancha Machupichu", hora: "15:30", resultado: "1-4" },
+      { local: "Usuluteca", visitante: "Palmo", cancha: "Cancha Usuluteca", hora: "15:30", resultado: "0-0" } ] },
+    { numero: 11, fecha: "2026-11-21", partidos: [
+      { local: "Palmo", visitante: "Guadalupano", cancha: "Cancha El Palmo", fecha: "2026-11-20", hora: "14:30", resultado: "" },
+      { local: "Estrellas Marinas", visitante: "C.D. Federal", cancha: "Cancha El Nigre", fecha: "2026-11-20", hora: "15:00", resultado: "" },
+      { local: "Cuscatlecas", visitante: "Galingagua", cancha: "Cancha Miramar", hora: "15:00", resultado: "0-3", nota: "Resultado administrativo" },
+      { local: "Vencedor", visitante: "Usuluteca", cancha: "Cancha Balboa", hora: "15:00", resultado: "" } ] },
     { numero: 12, fecha: "2026-11-28", porConfirmar: true, partidos: [
       { local: "Estrellas Marinas", visitante: "Cuscatlecas", cancha: "Cancha El Nigre", resultado: "" },
       { local: "Vencedor", visitante: "Palmo", cancha: "Cancha Balboa", resultado: "" },

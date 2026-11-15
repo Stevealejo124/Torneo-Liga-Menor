@@ -22,6 +22,12 @@ function horaTxt(h) {               // "15:30" → "3:30 p.m."
   const hh = +m[1];
   return `${hh % 12 || 12}:${m[2]} ${hh < 12 ? "a.m." : "p.m."}`;
 }
+function horaCruce(p, j) {           // en la cuenta regresiva: "Vie. 20 · 2:30 p.m." si no es el día de la jornada; marcador si ya hay uno
+  const r = parseRes(p.resultado);
+  if (r && r.gl != null) return `${r.gl}–${r.gv}${/admin/i.test(p.nota || "") ? " adm." : ""}`;
+  const h = horaTxt(p.hora);
+  return p.fecha && p.fecha !== j.fecha ? diaCorto(p.fecha) + (h ? " · " + h : "") : h;
+}
 function diaCorto(iso) {             // "2026-09-11" → "Vie. 11"
   const t = fecha(iso, { weekday: "short", day: "numeric" }).replace(",", "");
   return t.charAt(0).toUpperCase() + t.slice(1).replace(/^(\S+?)\.?\s/, "$1. ");
@@ -52,7 +58,9 @@ function calcularTabla() {
   const por = new Map(filas.map(f => [f.nombre, f]));
   // en orden de fecha real (un partido reprogramado cuenta cuando se jugó, para "Últimos 5")
   const todos = [];
-  T.jornadas.forEach(j => j.partidos.forEach((p, i) => todos.push({ p, f: (p.fecha || j.fecha) + String(j.numero).padStart(2, "0") + i })));
+  // Solo cuentan las jornadas ya empezadas: un marcador administrativo publicado antes (ej. 0-3 de la J11)
+  // entra a la tabla cuando llega su jornada, igual que en las tablas oficiales de la liga.
+  T.jornadas.filter(j => j.numero <= JA).forEach(j => j.partidos.forEach((p, i) => todos.push({ p, f: (p.fecha || j.fecha) + String(j.numero).padStart(2, "0") + i })));
   todos.sort((x, y) => x.f.localeCompare(y.f)).forEach(({ p }) => {
     const r = parseRes(p.resultado);
     if (!r || r.gl == null) return;
@@ -67,27 +75,33 @@ function calcularTabla() {
   filas.sort((a, b) => b.pts - a.pts || b.g - a.g || b.dg - a.dg || b.gf - a.gf || a.nombre.localeCompare(b.nombre, "es"));
   return filas;
 }
+const conResultado = (j) => j.partidos.some(p => { const r = parseRes(p.resultado); return r && r.gl != null; });
+// Jornada jugada = tiene resultados Y ya empezó (un marcador administrativo adelantado no la da por jugada)
+const jugada = (j) => conResultado(j) && Date.now() >= inicioJornada(j);
 function jornadaActual() {
   let ult = 0;
-  T.jornadas.forEach(j => {
-    if (j.partidos.some(p => { const r = parseRes(p.resultado); return r && r.gl != null; })) ult = Math.max(ult, j.numero);
-  });
+  T.jornadas.forEach(j => { if (jugada(j)) ult = Math.max(ult, j.numero); });
   return ult;
 }
 const JA = jornadaActual();
 
 /* ---------- Reloj / próxima jornada ---------- */
-function inicioJornada(j) {
-  const horas = j.partidos.map(p => p.hora).filter(Boolean).sort();
-  return new Date(j.fecha + "T" + (horas[0] || "14:00") + ":00").getTime();
+function inicioJornada(j) {          // el primer partido (puede ser el viernes)
+  const ts = j.partidos.map(p => new Date((p.fecha || j.fecha) + "T" + (p.hora || "14:00") + ":00").getTime());
+  return ts.length ? Math.min(...ts) : new Date(j.fecha + "T14:00:00").getTime();
 }
-function proxima() {
+function proxima() {                 // por partido: una jornada de viernes y sábado sigue contando hasta su último partido
   const ahora = Date.now();
-  const pend = T.jornadas.filter(j => !j.partidos.some(p => { const r = parseRes(p.resultado); return r && r.gl != null; }));
-  const vivo = pend.find(j => ahora >= inicioJornada(j) && ahora < inicioJornada(j) + 6 * 3600e3);
+  let vivo = null, prox = null;
+  T.jornadas.forEach(j => j.partidos.forEach(p => {
+    const r = parseRes(p.resultado);
+    if (r && r.gl != null) return;                         // ya tiene marcador (jugado o administrativo)
+    const t = new Date((p.fecha || j.fecha) + "T" + (p.hora || "14:00") + ":00").getTime();
+    if (ahora >= t && ahora < t + 3 * 3600e3) { if (!vivo) vivo = j; }
+    else if (t > ahora && (!prox || t < prox.t)) prox = { j, t };
+  }));
   if (vivo) return { modo: "vivo", j: vivo };
-  const prox = pend.find(j => inicioJornada(j) > ahora);
-  return prox ? { modo: "cuenta", j: prox, t: inicioJornada(prox) } : null;
+  return prox ? { modo: "cuenta", j: prox.j, t: prox.t } : null;
 }
 function partes(ms) {
   const s = Math.max(0, Math.floor(ms / 1000));
@@ -176,7 +190,7 @@ function tickerHTML() {
 /* ---------- Datos de la temporada (se calculan solos) ---------- */
 function datosTemporadaHTML(tabla) {
   const jugados = [];
-  T.jornadas.forEach(j => j.partidos.forEach(p => { const r = parseRes(p.resultado); if (r && r.gl != null) jugados.push({ p, r, j }); }));
+  T.jornadas.filter(j => j.numero <= JA).forEach(j => j.partidos.forEach(p => { const r = parseRes(p.resultado); if (r && r.gl != null) jugados.push({ p, r, j }); }));
   if (!jugados.length) return "";
   const goles = jugados.reduce((n, x) => n + x.r.gl + x.r.gv, 0);
   const goleada = jugados.slice().sort((a, b) => (Math.abs(b.r.gl - b.r.gv) - Math.abs(a.r.gl - a.r.gv)) || ((b.r.gl + b.r.gv) - (a.r.gl + a.r.gv)))[0];
@@ -202,13 +216,13 @@ function datosTemporadaHTML(tabla) {
 function renderInicio() {
   const tabla = calcularTabla();
   const P = proxima();
-  const jugados = T.jornadas.reduce((n, j) => n + j.partidos.filter(p => { const r = parseRes(p.resultado); return r && r.gl != null; }).length, 0);
+  const jugados = T.jornadas.filter(j => j.numero <= JA).reduce((n, j) => n + j.partidos.filter(p => { const r = parseRes(p.resultado); return r && r.gl != null; }).length, 0);
   const goles = tabla.reduce((n, f) => n + f.gf, 0);
   let cuenta = "";
   if (P) {
     const j = P.j;
     const cruces = j.partidos.map(p =>
-      `<div class="cruce">${escudo(p.local)}<span>${esc(p.local)}</span><em>vs</em><span>${esc(p.visitante)}</span>${escudo(p.visitante)}<span class="h">${esc(horaTxt(p.hora))}</span></div>`).join("");
+      `<div class="cruce">${escudo(p.local)}<span>${esc(p.local)}</span><em>vs</em><span>${esc(p.visitante)}</span>${escudo(p.visitante)}<span class="h">${esc(horaCruce(p, j))}</span></div>`).join("");
     const reloj = P.modo === "vivo"
       ? `<div class="en-vivo-bandera"><i></i>Se está jugando hoy</div>`
       : (() => { const c = partes(P.t - Date.now());
