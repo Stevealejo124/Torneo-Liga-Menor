@@ -456,3 +456,34 @@ table.tabla{width:100%;border-collapse:collapse;font-size:.93rem;min-width:640px
 @media (max-width:600px){.mapa .m-nom{font-size:46px}}
 .pend-chips .eq-chip{font-size:.82rem;padding:4px 12px 4px 4px;gap:7px}
 .pend-chips .eq-chip .escudo,.pend-chips .eq-chip svg{width:24px;height:24px}
+
+/* Escudos oficiales (imagen) */
+.escudo.con-logo{background:none !important;box-shadow:none;border-radius:0;padding:0;width:32px;height:32px}
+.escudo.con-logo.grande{width:42px;height:42px}
+.escudo.con-logo img{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.28))}
+.pend-chips .eq-chip .escudo.con-logo{width:24px;height:24px}
+.m-logo{pointer-events:none;transition:transform .25s;transform-box:fill-box;transform-origin:center}
+.m-punto:hover .m-logo,.m-punto.sel .m-logo{transform:scale(1.35)}
+
+/* Botón de música de fondo (mismo que en Escuelitas, con los colores del femenino) */
+.boton-musica{position:fixed;z-index:60;left:max(14px,env(safe-area-inset-left));bottom:max(14px,env(safe-area-inset-bottom));
+  width:46px;height:46px;border:0;border-radius:50%;padding:0;display:inline-flex;align-items:center;justify-content:center;
+  background:var(--azul);color:var(--amarillo);cursor:pointer;box-shadow:0 0 0 2px var(--magenta),0 8px 22px rgba(10,18,54,.4)}
+.boton-musica[hidden]{display:none !important}
+.boton-musica:hover{background:var(--azul-2)}
+.boton-musica:active{transform:translateY(1px)}
+.boton-musica:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.boton-musica .bm-raya{opacity:.9}
+.boton-musica .bm-eq{display:none;align-items:flex-end;gap:3px;height:18px}
+.boton-musica .bm-eq i{display:block;width:4px;height:100%;border-radius:2px;background:var(--amarillo);transform-origin:bottom;animation:bm-eq .9s ease-in-out infinite}
+.boton-musica .bm-eq i:nth-child(2){animation-delay:-.45s;animation-duration:.8s}
+.boton-musica .bm-eq i:nth-child(3){animation-delay:-.2s;animation-duration:1.05s}
+.boton-musica .bm-eq i:nth-child(4){animation-delay:-.65s;animation-duration:.7s}
+.boton-musica[data-estado="sonando"] .bm-nota{display:none}
+.boton-musica[data-estado="sonando"] .bm-eq{display:inline-flex}
+.boton-musica[data-estado="cargando"] .bm-raya{display:none}
+.boton-musica[data-estado="cargando"] .bm-nota{animation:bm-latido 1s ease-in-out infinite}
+@keyframes bm-eq{0%,100%{transform:scaleY(.25)}50%{transform:scaleY(1)}}
+@keyframes bm-latido{0%,100%{opacity:1}50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.boton-musica .bm-eq i{animation:none;transform:scaleY(.7)}}
+body.con-boton-musica .pie{padding-bottom:78px}

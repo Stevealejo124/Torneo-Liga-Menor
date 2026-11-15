@@ -19,18 +19,23 @@ window.LFFU = {
   clasificados: 6,          // los 6 primeros van a cuartos de final
   lema: "El primer amor de una mujer debe ser siempre el amor propio",
 
+  // "logo" = escudo oficial (PNG en la misma carpeta). Si se borra, se usa el escudo de colores con las siglas.
   equipos: [
-    { nombre: "C.D. Federal",      corto: "FED", color: "#1d6fb8", color2: "#0d3f6e" },
-    { nombre: "Vencedor",          corto: "VEN", color: "#8e24aa", color2: "#4a1259" },
-    { nombre: "Galingagua",        corto: "GAL", color: "#b3202c", color2: "#57060c" },
-    { nombre: "Palmo",             corto: "PAL", color: "#1e8a4c", color2: "#0b4a26" },
-    { nombre: "Estrellas Marinas", corto: "EST", color: "#d81b7f", color2: "#6d0f45" },
-    { nombre: "Usuluteca",         corto: "USU", color: "#c62828", color2: "#1a3a8f" },
-    { nombre: "Cuscatlecas",       corto: "CUS", color: "#283593", color2: "#0d1440" },
-    { nombre: "Guadalupano",       corto: "GUA", color: "#f2a007", color2: "#7a4d00" }
+    { nombre: "C.D. Federal",      corto: "FED", color: "#1d6fb8", color2: "#0d3f6e", logo: "escudo-fem-federal.png" },
+    { nombre: "Vencedor",          corto: "VEN", color: "#8e24aa", color2: "#4a1259", logo: "escudo-fem-vencedor.png" },
+    { nombre: "Galingagua",        corto: "GAL", color: "#b3202c", color2: "#57060c", logo: "escudo-fem-galingagua.png" },
+    { nombre: "Palmo",             corto: "PAL", color: "#1e8a4c", color2: "#0b4a26", logo: "escudo-fem-palmo.png" },
+    { nombre: "Estrellas Marinas", corto: "EST", color: "#d81b7f", color2: "#6d0f45", logo: "escudo-fem-estrellas.png" },
+    { nombre: "Usuluteca",         corto: "USU", color: "#c62828", color2: "#1a3a8f", logo: "escudo-fem-usuluteca.png" },
+    { nombre: "Cuscatlecas",       corto: "CUS", color: "#283593", color2: "#0d1440", logo: "escudo-fem-cuscatlecas.png" },
+    { nombre: "Guadalupano",       corto: "GUA", color: "#f2a007", color2: "#7a4d00", logo: "escudo-fem-guadalupano.png" }
   ],
 
   // porConfirmar: true = fecha estimada (la liga aún no la publica). Quítalo cuando se confirme.
+  // Música de fondo (la misma del torneo de Escuelitas; sigue sonando al cambiar de torneo).
+  // Para quitarla aquí: musica: [],
+  musica: ["cancion1.mp3"],
+
   jornadas: [
     { numero: 1, fecha: "2026-09-12", partidos: [
       { local: "Cuscatlecas", visitante: "Guadalupano", cancha: "Cancha Miramar", fecha: "2026-09-11", hora: "16:00", resultado: "2-1" },

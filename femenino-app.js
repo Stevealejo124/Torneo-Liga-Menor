@@ -42,6 +42,7 @@ function parseRes(v) {
 function escudo(nombre, grande) {
   const e = EQ.get(nombre);
   if (!e) return `<span class="escudo${grande ? " grande" : ""}" style="background:#cbd2db">?</span>`;
+  if (e.logo) return `<span class="escudo con-logo${grande ? " grande" : ""}"><img src="${esc(e.logo)}" alt="" loading="lazy" decoding="async"></span>`;
   return `<span class="escudo${grande ? " grande" : ""}" style="background:linear-gradient(160deg,${e.color},${e.color2})">${esc(e.corto)}</span>`;
 }
 
@@ -445,6 +446,7 @@ function mapaUsulutanHTML(lista) {
           <circle class="m-halo" cx="${x}" cy="${y}" r="40"/>
           ${aprox ? `<circle class="m-zona" cx="${x}" cy="${y}" r="32"/>` : ""}
           <circle class="m-dot" cx="${x}" cy="${y}" r="16" style="--c:${e ? e.color : "#101c4e"}"/>
+          ${e && e.logo ? `<image class="m-logo" href="${esc(e.logo)}" x="${(+x - 13).toFixed(1)}" y="${(+y - 13).toFixed(1)}" width="26" height="26"/>` : ""}
           <text class="m-etq" x="${(+x + (izq ? -24 : 24)).toFixed(1)}" y="${(+y + 10).toFixed(1)}" text-anchor="${izq ? "end" : "start"}">${t}</text>
         </a>`;
       }).join("")}

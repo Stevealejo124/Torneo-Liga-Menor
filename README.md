@@ -21,6 +21,9 @@ La portada se arma sola con los datos de `datos.js`; no hay que editarla.
 | `femenino-datos.js` | **Sí, cada jornada del femenino** | Resultados, equipos, goleadoras y canchas de la LFFU |
 | `femenino-app.js` | No | Lógica de la página del femenino |
 | `femenino-estilos.css` | No | Diseño de la página del femenino |
+| `musica.js` | No | **Música de fondo** de los dos torneos (botón abajo a la izquierda); sigue sonando al cambiar de torneo |
+| `escudo-fem-….png` (8) | No | Escudos oficiales de los equipos del **Femenino** (se indican en `femenino-datos.js` → `logo`) |
+| `aviso-legal.js` | Solo si cambias el texto | **Descargo de responsabilidad**: botón en el pie de página de las dos páginas y la ventana con el aviso completo |
 | `logo-escuelitas.png` | No | Escudo propio “Escuelitas Usulután” (cabecera, junto al de RedDFUT) |
 | `escudo-topiltzin.png` | No | Escudo oficial de CD Topiltzin (se activa con `logo:` en `datos.js`) |
 | `favicon.png`, `icono-192.png` | No | Ícono de la pestaña del navegador |

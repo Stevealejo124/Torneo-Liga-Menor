@@ -1,13 +1,14 @@
 /* Permite usar el sitio sin internet después de abrirlo una vez.
    Con internet siempre muestra la versión más reciente; sin internet usa la copia guardada.
    Si agregas archivos nuevos, súbele el número a VERSION. */
-const VERSION = "reddfut-v21";
+const VERSION = "reddfut-v22";
 const CACHE_MUSICA = "reddfut-musica";   // aparte: no se borra al cambiar VERSION (la canción pesa)
 const ARCHIVOS = [
   "./", "index.html", "estilos.css", "app.js", "datos.js", "manifest.webmanifest",
   "logo.png", "logo-escuelitas.png", "escudo-topiltzin.png", "favicon.png", "icono-192.png", "icono-512.png", "apple-touch-icon.png",
   "letra-600.woff2", "letra-800.woff2", "firebase-config.js", "quiniela.js", "avisos.js",
-  "femenino.html", "femenino-app.js", "femenino-datos.js", "femenino-estilos.css"
+  "femenino.html", "femenino-app.js", "femenino-datos.js", "femenino-estilos.css", "aviso-legal.js", "musica.js",
+  "escudo-fem-federal.png", "escudo-fem-vencedor.png", "escudo-fem-galingagua.png", "escudo-fem-palmo.png", "escudo-fem-estrellas.png", "escudo-fem-usuluteca.png", "escudo-fem-cuscatlecas.png", "escudo-fem-guadalupano.png"
 ];
 
 self.addEventListener("install", (e) => {
