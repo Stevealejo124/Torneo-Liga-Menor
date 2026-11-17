@@ -19,10 +19,16 @@ window.TORNEO = {
   subtitulo: "Escuelas de fútbol infanto-juveniles de Usulután",
   organizador: "REDDFUT Usulután",
   urlSitio: "https://stevealejo124.github.io/Torneo-Liga-Menor/",
-  actualizado: "2026-11-10",       // fecha de la última actualización (AAAA-MM-DD)
+  actualizado: "2026-11-15",       // fecha de la última actualización (AAAA-MM-DD)
   // Horario de cada categoría los sábados (24 h). Las que tienen la misma hora
   // juegan al mismo tiempo en distintas partes de la cancha.
   horarios: { "Sub-7": "08:00", "Sub-11": "08:00", "Sub-9": "09:30", "Sub-13": "10:00", "Sub-15": "11:10" },
+
+  // Sábados SIN partidos (aparece un aviso en Inicio y en Resultados hasta que pase ese día).
+  // Si se suspende otro sábado, agrega otra línea igual y corre las fechas de las jornadas.
+  sinPartidos: [
+    { fecha: "2026-11-21", motivo: "Capacitación de los árbitros de la federación" }
+  ],
 
   // true = muestra el aviso amarillo de "datos de ejemplo"
   modoDemo: false,
@@ -246,7 +252,7 @@ window.TORNEO = {
     },
     {
       numero: 8,
-      fecha: "2026-11-21",      // fecha estimada (el calendario decía 2026-11-14; se viene jugando una semana después)
+      fecha: "2026-11-28",      // fecha estimada (el sábado 21 de noviembre no se juega: capacitación de árbitros)
       partidos: [
         { local: "Santiago de María", visitante: "Topiltzin", cancha: "Santiago de María" },
         { local: "Puerto El Triunfo", visitante: "Berlín", cancha: "Puerto El Triunfo" },
@@ -259,7 +265,7 @@ window.TORNEO = {
     },
     {
       numero: 9,
-      fecha: "2026-11-28",      // fecha estimada (el calendario decía 2026-11-21; se viene jugando una semana después)
+      fecha: "2026-12-05",      // fecha estimada (el sábado 21 de noviembre no se juega: capacitación de árbitros)
       partidos: [
         { local: "Santiago de María", visitante: "Alegría", cancha: "Santiago de María" },
         { local: "San Marcos", visitante: "Estanzuelas", cancha: "San Marcos" },
@@ -272,7 +278,7 @@ window.TORNEO = {
     },
     {
       numero: 10,
-      fecha: "2026-12-05",      // fecha estimada (el calendario decía 2026-11-28; se viene jugando una semana después)
+      fecha: "2026-12-12",      // fecha estimada (el sábado 21 de noviembre no se juega: capacitación de árbitros)
       partidos: [
         { local: "Mercedes Umaña", visitante: "Santiago de María", cancha: "Mercedes Umaña" },
         { local: "Estanzuelas", visitante: "Lolotique", cancha: "Estanzuelas" },
@@ -285,7 +291,7 @@ window.TORNEO = {
     },
     {
       numero: 11,
-      fecha: "2026-12-12",      // fecha estimada (el calendario decía 2026-12-05; se viene jugando una semana después)
+      fecha: "2026-12-19",      // fecha estimada (el sábado 21 de noviembre no se juega: capacitación de árbitros)
       partidos: [
         { local: "Santiago de María", visitante: "Ciudad El Triunfo", cancha: "Santiago de María" },
         { local: "San Marcos", visitante: "Puerto El Triunfo", cancha: "San Marcos" },
@@ -298,7 +304,7 @@ window.TORNEO = {
     },
     {
       numero: 12,
-      fecha: "2026-12-19",      // fecha estimada (el calendario decía 2026-12-12; se viene jugando una semana después)
+      fecha: "2026-12-26",      // fecha estimada (el sábado 21 de noviembre no se juega: capacitación de árbitros)
       partidos: [
         { local: "Estanzuelas", visitante: "Santiago de María", cancha: "Estanzuelas" },
         { local: "Jucuapa", visitante: "Alegría", cancha: "Jucuapa" },
@@ -311,7 +317,7 @@ window.TORNEO = {
     },
     {
       numero: 13,
-      fecha: "2026-12-26",      // fecha estimada (el calendario decía 2026-12-19; se viene jugando una semana después)
+      fecha: "2027-01-02",      // fecha estimada (el sábado 21 de noviembre no se juega: capacitación de árbitros)
       partidos: [
         { local: "Santiago de María", visitante: "La Noria", cancha: "Santiago de María" },
         { local: "Mercedes Umaña", visitante: "Estanzuelas", cancha: "Mercedes Umaña" },

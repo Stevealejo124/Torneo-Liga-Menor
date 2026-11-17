@@ -1112,3 +1112,10 @@ body.con-boton-musica .pie { padding-bottom: 84px; }
 }
 @media (max-width: 1139px) and (prefers-reduced-motion: reduce) { .redes-lateral { transition: none; } }
 @media print { .redes-lateral { display: none; } }
+
+/* Aviso de sábado sin partidos (datos.js → sinPartidos) */
+.aviso-pausa { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 12px; padding: 10px 14px; border-radius: var(--radio);
+  background: #fff4e5; color: #5a3200; border-left: 4px solid #e8590c; font-size: .92rem; line-height: 1.45; }
+.aviso-pausa b { color: #8a3b00; }
+.ap-ico { font-size: 1.05rem; line-height: 1.3; }
+.cuenta .aviso-pausa { margin: 10px 0 12px; }

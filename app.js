@@ -370,7 +370,7 @@
       const relojJ = P && P.j && P.j.numero === j.numero
         ? (P.modo === "vivo" ? `<div class="mini-cuenta vivo"><i></i>Se está jugando hoy</div>`
           : `<div class="mini-cuenta">⏱️ Faltan <b data-cuenta-corta="${P.t}"></b> para esta jornada</div>`) : "";
-      cuerpo = relojJ + (sinJugar ? `<div class="aviso-proy">📅 <b>Programación oficial.</b> Las fechas y canchas pueden cambiar por decisión de la comisión organizadora.</div>` : "")
+      cuerpo = (P && P.j && P.j.numero === j.numero && P.modo !== "vivo" ? pausasHTML(j) : "") + relojJ + (sinJugar ? `<div class="aviso-proy">📅 <b>Programación oficial.</b> Las fechas y canchas pueden cambiar por decisión de la comisión organizadora.</div>` : "")
         + `<div class="partidos">${j.partidos.map((p) => {
         const r = parseRes(p.resultados && p.resultados[estado.cat]);
         const jugado = CATS.some((c) => parseRes(p.resultados && p.resultados[c]));
@@ -504,6 +504,18 @@
     return { d: Math.floor(s / 86400), h: Math.floor(s / 3600) % 24, m: Math.floor(s / 60) % 60, s: s % 60 };
   }
   const dos2 = (n) => String(n).padStart(2, "0");
+  /* Sábados sin partidos (datos.js → sinPartidos): aviso hasta que pase ese día */
+  function hoySV() { return new Date().toLocaleDateString("en-CA", { timeZone: "America/El_Salvador" }); }
+  function pausasHTML(j) {
+    const hoy = hoySV();
+    const lista = (T.sinPartidos || []).filter((x) => x && x.fecha && x.fecha >= hoy && (!j || !j.fecha || x.fecha < j.fecha));
+    return lista.map((x) => {
+      const largo = (f) => fecha(f, { weekday: "long", day: "numeric", month: "long" }).replace(",", "");
+      const dia = largo(x.fecha);
+      const sig = j && j.fecha ? ` La <b>jornada ${j.numero}</b> se juega el ${esc(largo(j.fecha))}.` : "";
+      return `<div class="aviso-pausa" role="note"><span class="ap-ico" aria-hidden="true">⛔</span><span><b>${esc(dia.charAt(0).toUpperCase() + dia.slice(1))}: no hay partidos.</b>${x.motivo ? ` ${esc(x.motivo)}.` : ""}${sig}</span></div>`;
+    }).join("");
+  }
   function cuentaHTML() {
     const P = proximaJornada();
     if (!P) return "";
@@ -524,6 +536,7 @@
         <span class="cuenta-tit">${P.modo === "vivo" ? "En juego" : "Próxima jornada"}</span>
         <span class="cuenta-num">J${dos2(j.numero)}</span>
       </div>
+      ${P.modo === "vivo" ? "" : pausasHTML(j)}
       ${reloj}
       <p class="cuenta-fecha">${esc(dia)} · desde las ${esc(hora)}</p>
       ${turnosHTML(j)}
